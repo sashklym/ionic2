@@ -61,23 +61,6 @@
     </feature>
 
     <!--
-        Config File
-    -->
-    <!-- iOS Only -->
-    <gap:config-file platform="ios" parent="CFBundleVersion">
-        <string>1.0</string>
-    </gap:config-file>
-    <gap:config-file platform="ios" parent="CFBundleAllowMixedLocalizations" overwrite="true">
-        <true/>
-    </gap:config-file>
-    <gap:config-file platform="ios" parent="UIStatusBarHidden" overwrite="true">
-        <true/>
-    </gap:config-file>
-    <gap:config-file platform="ios" parent="UIViewControllerBasedStatusBarAppearance" overwrite="true">
-        <false/>
-    </gap:config-file>
-
-    <!--
         Plugins
     -->
     <!-- Core plugins -->
