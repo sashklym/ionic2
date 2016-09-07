@@ -12,106 +12,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var ionic_native_1 = require('ionic-native');
-var account_1 = require('./pages/account/account');
-var conference_data_1 = require('./providers/conference-data');
-var login_1 = require('./pages/login/login');
-var signup_1 = require('./pages/signup/signup');
 var tabs_1 = require('./pages/tabs/tabs');
-var tutorial_1 = require('./pages/tutorial/tutorial');
-var user_data_1 = require('./providers/user-data');
-var ConferenceApp = (function () {
-    function ConferenceApp(events, userData, menu, platform, confData) {
-        var _this = this;
-        this.events = events;
-        this.userData = userData;
-        this.menu = menu;
-        // List of pages that can be navigated to from the left menu
-        // the left menu only works after login
-        // the login page disables the left menu
-        this.appPages = [
-            { title: 'Schedule', component: tabs_1.TabsPage, icon: 'calendar' },
-            { title: 'Speakers', component: tabs_1.TabsPage, index: 1, icon: 'contacts' },
-            { title: 'Map', component: tabs_1.TabsPage, index: 2, icon: 'map' },
-            { title: 'About', component: tabs_1.TabsPage, index: 3, icon: 'information-circle' },
-        ];
-        this.loggedInPages = [
-            { title: 'Account', component: account_1.AccountPage, icon: 'person' },
-            { title: 'Logout', component: tabs_1.TabsPage, icon: 'log-out' }
-        ];
-        this.loggedOutPages = [
-            { title: 'Login', component: login_1.LoginPage, icon: 'log-in' },
-            { title: 'Signup', component: signup_1.SignupPage, icon: 'person-add' }
-        ];
-        this.rootPage = tutorial_1.TutorialPage;
-        // Call any initial plugins when ready
+var MyApp = (function () {
+    function MyApp(platform) {
+        this.platform = platform;
+        this.rootPage = tabs_1.TabsPage;
         platform.ready().then(function () {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
             ionic_native_1.StatusBar.styleDefault();
-            ionic_native_1.Splashscreen.hide();
         });
-        // load the conference data
-        confData.load();
-        // decide which menu items should be hidden by current login status stored in local storage
-        this.userData.hasLoggedIn().then(function (hasLoggedIn) {
-            _this.enableMenu(hasLoggedIn === 'true');
-        });
-        this.listenToLoginEvents();
     }
-    ConferenceApp.prototype.openPage = function (page) {
-        var _this = this;
-        // the nav component was found using @ViewChild(Nav)
-        // reset the nav to remove previous pages and only have this page
-        // we wouldn't want the back button to show in this scenario
-        if (page.index) {
-            this.nav.setRoot(page.component, { tabIndex: page.index });
-        }
-        else {
-            this.nav.setRoot(page.component);
-        }
-        if (page.title === 'Logout') {
-            // Give the menu time to close before changing to logged out
-            setTimeout(function () {
-                _this.userData.logout();
-            }, 1000);
-        }
-    };
-    ConferenceApp.prototype.listenToLoginEvents = function () {
-        var _this = this;
-        this.events.subscribe('user:login', function () {
-            _this.enableMenu(true);
-        });
-        this.events.subscribe('user:signup', function () {
-            _this.enableMenu(true);
-        });
-        this.events.subscribe('user:logout', function () {
-            _this.enableMenu(false);
-        });
-    };
-    ConferenceApp.prototype.enableMenu = function (loggedIn) {
-        this.menu.enable(loggedIn, 'loggedInMenu');
-        this.menu.enable(!loggedIn, 'loggedOutMenu');
-    };
-    __decorate([
-        core_1.ViewChild(ionic_angular_1.Nav),
-        __metadata('design:type', ionic_angular_1.Nav)
-    ], ConferenceApp.prototype, "nav", void 0);
-    ConferenceApp = __decorate([
+    MyApp = __decorate([
         core_1.Component({
-            templateUrl: 'build/app.html'
+            template: '<ion-nav [root]="rootPage"></ion-nav>'
         }),
-        __metadata('design:paramtypes', [ionic_angular_1.Events, user_data_1.UserData, ionic_angular_1.MenuController, ionic_angular_1.Platform, conference_data_1.ConferenceData])
-    ], ConferenceApp);
-    return ConferenceApp;
+        __metadata('design:paramtypes', [ionic_angular_1.Platform])
+    ], MyApp);
+    return MyApp;
 }());
-// Pass the main App component as the first argument
-// Pass any providers for your app in the second argument
-// Set any config for your app as the third argument, see the docs for
-// more ways to configure your app:
-// http://ionicframework.com/docs/v2/api/config/Config/
-// Place the tabs on the bottom for all platforms
-// See the theming docs for the default values:
-// http://ionicframework.com/docs/v2/theming/platform-specific-styles/
-ionic_angular_1.ionicBootstrap(ConferenceApp, [conference_data_1.ConferenceData, user_data_1.UserData], {});
-},{"./pages/account/account":3,"./pages/login/login":4,"./pages/signup/signup":9,"./pages/tabs/tabs":12,"./pages/tutorial/tutorial":13,"./providers/conference-data":14,"./providers/user-data":15,"@angular/core":163,"ionic-angular":477,"ionic-native":504}],2:[function(require,module,exports){
+exports.MyApp = MyApp;
+ionic_angular_1.ionicBootstrap(MyApp);
+},{"./pages/tabs/tabs":5,"@angular/core":153,"ionic-angular":468,"ionic-native":495}],2:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -124,40 +46,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
-var PopoverPage = (function () {
-    function PopoverPage(viewCtrl) {
-        this.viewCtrl = viewCtrl;
-    }
-    PopoverPage.prototype.close = function () {
-        this.viewCtrl.dismiss();
-    };
-    PopoverPage = __decorate([
-        core_1.Component({
-            template: "\n    <ion-list>\n      <button ion-item (click)=\"close()\">Learn Ionic</button>\n      <button ion-item (click)=\"close()\">Documentation</button>\n      <button ion-item (click)=\"close()\">Showcase</button>\n      <button ion-item (click)=\"close()\">GitHub Repo</button>\n    </ion-list>\n  "
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.ViewController])
-    ], PopoverPage);
-    return PopoverPage;
-}());
 var AboutPage = (function () {
-    function AboutPage(popoverCtrl) {
-        this.popoverCtrl = popoverCtrl;
-        this.conferenceDate = '2047-05-17';
+    function AboutPage(navCtrl) {
+        this.navCtrl = navCtrl;
     }
-    AboutPage.prototype.presentPopover = function (event) {
-        var popover = this.popoverCtrl.create(PopoverPage);
-        popover.present({ ev: event });
-    };
     AboutPage = __decorate([
         core_1.Component({
             templateUrl: 'build/pages/about/about.html'
         }),
-        __metadata('design:paramtypes', [ionic_angular_1.PopoverController])
+        __metadata('design:paramtypes', [ionic_angular_1.NavController])
     ], AboutPage);
     return AboutPage;
 }());
 exports.AboutPage = AboutPage;
-},{"@angular/core":163,"ionic-angular":477}],3:[function(require,module,exports){
+},{"@angular/core":153,"ionic-angular":468}],3:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -170,444 +72,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
-var login_1 = require('../login/login');
-var user_data_1 = require('../../providers/user-data');
-var AccountPage = (function () {
-    function AccountPage(alertCtrl, nav, userData) {
-        this.alertCtrl = alertCtrl;
-        this.nav = nav;
-        this.userData = userData;
-    }
-    AccountPage.prototype.ngAfterViewInit = function () {
-        this.getUsername();
-    };
-    AccountPage.prototype.updatePicture = function () {
-        console.log('Clicked to update picture');
-    };
-    // Present an alert with the current username populated
-    // clicking OK will update the username and display it
-    // clicking Cancel will close the alert and do nothing
-    AccountPage.prototype.changeUsername = function () {
-        var _this = this;
-        var alert = this.alertCtrl.create({
-            title: 'Change Username',
-            buttons: [
-                'Cancel'
-            ]
-        });
-        alert.addInput({
-            name: 'username',
-            value: this.username,
-            placeholder: 'username'
-        });
-        alert.addButton({
-            text: 'Ok',
-            handler: function (data) {
-                _this.userData.setUsername(data.username);
-                _this.getUsername();
-            }
-        });
-        alert.present();
-    };
-    AccountPage.prototype.getUsername = function () {
-        var _this = this;
-        this.userData.getUsername().then(function (username) {
-            _this.username = username;
-        });
-    };
-    AccountPage.prototype.changePassword = function () {
-        console.log('Clicked to change password');
-    };
-    AccountPage.prototype.logout = function () {
-        this.userData.logout();
-        this.nav.setRoot(login_1.LoginPage);
-    };
-    AccountPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/account/account.html',
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.AlertController, ionic_angular_1.NavController, user_data_1.UserData])
-    ], AccountPage);
-    return AccountPage;
-}());
-exports.AccountPage = AccountPage;
-},{"../../providers/user-data":15,"../login/login":4,"@angular/core":163,"ionic-angular":477}],4:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var signup_1 = require('../signup/signup');
-var tabs_1 = require('../tabs/tabs');
-var user_data_1 = require('../../providers/user-data');
-var LoginPage = (function () {
-    function LoginPage(navCtrl, userData) {
+var ContactPage = (function () {
+    function ContactPage(navCtrl) {
         this.navCtrl = navCtrl;
-        this.userData = userData;
-        this.login = {};
-        this.submitted = false;
     }
-    LoginPage.prototype.onLogin = function (form) {
-        this.submitted = true;
-        if (form.valid) {
-            this.userData.login(this.login.username);
-            this.navCtrl.push(tabs_1.TabsPage);
-        }
-    };
-    LoginPage.prototype.onSignup = function () {
-        this.navCtrl.push(signup_1.SignupPage);
-    };
-    LoginPage = __decorate([
+    ContactPage = __decorate([
         core_1.Component({
-            templateUrl: 'build/pages/login/login.html'
+            templateUrl: 'build/pages/contact/contact.html'
         }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, user_data_1.UserData])
-    ], LoginPage);
-    return LoginPage;
+        __metadata('design:paramtypes', [ionic_angular_1.NavController])
+    ], ContactPage);
+    return ContactPage;
 }());
-exports.LoginPage = LoginPage;
-},{"../../providers/user-data":15,"../signup/signup":9,"../tabs/tabs":12,"@angular/core":163,"ionic-angular":477}],5:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var conference_data_1 = require('../../providers/conference-data');
-var MapPage = (function () {
-    function MapPage(confData) {
-        this.confData = confData;
-    }
-    MapPage.prototype.ionViewLoaded = function () {
-        this.confData.getMap().then(function (mapData) {
-            var mapEle = document.getElementById('map');
-            var map = new google.maps.Map(mapEle, {
-                center: mapData.find(function (d) { return d.center; }),
-                zoom: 16
-            });
-            mapData.forEach(function (markerData) {
-                var infoWindow = new google.maps.InfoWindow({
-                    content: "<h5>" + markerData.name + "</h5>"
-                });
-                var marker = new google.maps.Marker({
-                    position: markerData,
-                    map: map,
-                    title: markerData.name
-                });
-                marker.addListener('click', function () {
-                    infoWindow.open(map, marker);
-                });
-            });
-            google.maps.event.addListenerOnce(map, 'idle', function () {
-                mapEle.classList.add('show-map');
-            });
-        });
-    };
-    MapPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/map/map.html'
-        }),
-        __metadata('design:paramtypes', [conference_data_1.ConferenceData])
-    ], MapPage);
-    return MapPage;
-}());
-exports.MapPage = MapPage;
-},{"../../providers/conference-data":14,"@angular/core":163}],6:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var conference_data_1 = require('../../providers/conference-data');
-var ScheduleFilterPage = (function () {
-    function ScheduleFilterPage(confData, navParams, viewCtrl) {
-        var _this = this;
-        this.confData = confData;
-        this.navParams = navParams;
-        this.viewCtrl = viewCtrl;
-        this.tracks = [];
-        // passed in array of track names that should be excluded (unchecked)
-        var excludedTrackNames = this.navParams.data;
-        this.confData.getTracks().then(function (trackNames) {
-            trackNames.forEach(function (trackName) {
-                _this.tracks.push({
-                    name: trackName,
-                    isChecked: (excludedTrackNames.indexOf(trackName) === -1)
-                });
-            });
-        });
-    }
-    ScheduleFilterPage.prototype.resetFilters = function () {
-        // reset all of the toggles to be checked
-        this.tracks.forEach(function (track) {
-            track.isChecked = true;
-        });
-    };
-    ScheduleFilterPage.prototype.applyFilters = function () {
-        // Pass back a new array of track names to exclude
-        var excludedTrackNames = this.tracks.filter(function (c) { return !c.isChecked; }).map(function (c) { return c.name; });
-        this.dismiss(excludedTrackNames);
-    };
-    ScheduleFilterPage.prototype.dismiss = function (data) {
-        // using the injected ViewController this page
-        // can "dismiss" itself and pass back data
-        this.viewCtrl.dismiss(data);
-    };
-    ScheduleFilterPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/schedule-filter/schedule-filter.html'
-        }),
-        __metadata('design:paramtypes', [conference_data_1.ConferenceData, ionic_angular_1.NavParams, ionic_angular_1.ViewController])
-    ], ScheduleFilterPage);
-    return ScheduleFilterPage;
-}());
-exports.ScheduleFilterPage = ScheduleFilterPage;
-},{"../../providers/conference-data":14,"@angular/core":163,"ionic-angular":477}],7:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var conference_data_1 = require('../../providers/conference-data');
-var schedule_filter_1 = require('../schedule-filter/schedule-filter');
-var session_detail_1 = require('../session-detail/session-detail');
-var user_data_1 = require('../../providers/user-data');
-var SchedulePage = (function () {
-    function SchedulePage(alertCtrl, app, modalCtrl, navCtrl, confData, user) {
-        this.alertCtrl = alertCtrl;
-        this.app = app;
-        this.modalCtrl = modalCtrl;
-        this.navCtrl = navCtrl;
-        this.confData = confData;
-        this.user = user;
-        this.dayIndex = 0;
-        this.queryText = '';
-        this.segment = 'all';
-        this.excludeTracks = [];
-        this.shownSessions = [];
-        this.groups = [];
-    }
-    SchedulePage.prototype.ionViewDidEnter = function () {
-        this.app.setTitle('Schedule');
-    };
-    SchedulePage.prototype.ngAfterViewInit = function () {
-        this.updateSchedule();
-    };
-    SchedulePage.prototype.updateSchedule = function () {
-        var _this = this;
-        // Close any open sliding items when the schedule updates
-        this.scheduleList && this.scheduleList.closeSlidingItems();
-        this.confData.getTimeline(this.dayIndex, this.queryText, this.excludeTracks, this.segment).then(function (data) {
-            _this.shownSessions = data.shownSessions;
-            _this.groups = data.groups;
-        });
-    };
-    SchedulePage.prototype.presentFilter = function () {
-        var _this = this;
-        var modal = this.modalCtrl.create(schedule_filter_1.ScheduleFilterPage, this.excludeTracks);
-        modal.present();
-        modal.onDidDismiss(function (data) {
-            if (data) {
-                _this.excludeTracks = data;
-                _this.updateSchedule();
-            }
-        });
-    };
-    SchedulePage.prototype.goToSessionDetail = function (sessionData) {
-        // go to the session detail page
-        // and pass in the session data
-        this.navCtrl.push(session_detail_1.SessionDetailPage, sessionData);
-    };
-    SchedulePage.prototype.addFavorite = function (slidingItem, sessionData) {
-        if (this.user.hasFavorite(sessionData.name)) {
-            // woops, they already favorited it! What shall we do!?
-            // prompt them to remove it
-            this.removeFavorite(slidingItem, sessionData, 'Favorite already added');
-        }
-        else {
-            // remember this session as a user favorite
-            this.user.addFavorite(sessionData.name);
-            // create an alert instance
-            var alert_1 = this.alertCtrl.create({
-                title: 'Favorite Added',
-                buttons: [{
-                        text: 'OK',
-                        handler: function () {
-                            // close the sliding item
-                            slidingItem.close();
-                        }
-                    }]
-            });
-            // now present the alert on top of all other content
-            alert_1.present();
-        }
-    };
-    SchedulePage.prototype.removeFavorite = function (slidingItem, sessionData, title) {
-        var _this = this;
-        var alert = this.alertCtrl.create({
-            title: title,
-            message: 'Would you like to remove this session from your favorites?',
-            buttons: [
-                {
-                    text: 'Cancel',
-                    handler: function () {
-                        // they clicked the cancel button, do not remove the session
-                        // close the sliding item and hide the option buttons
-                        slidingItem.close();
-                    }
-                },
-                {
-                    text: 'Remove',
-                    handler: function () {
-                        // they want to remove this session from their favorites
-                        _this.user.removeFavorite(sessionData.name);
-                        _this.updateSchedule();
-                        // close the sliding item and hide the option buttons
-                        slidingItem.close();
-                    }
-                }
-            ]
-        });
-        // now present the alert on top of all other content
-        alert.present();
-    };
-    __decorate([
-        core_1.ViewChild('scheduleList', { read: ionic_angular_1.List }),
-        __metadata('design:type', ionic_angular_1.List)
-    ], SchedulePage.prototype, "scheduleList", void 0);
-    SchedulePage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/schedule/schedule.html'
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.AlertController, ionic_angular_1.App, ionic_angular_1.ModalController, ionic_angular_1.NavController, conference_data_1.ConferenceData, user_data_1.UserData])
-    ], SchedulePage);
-    return SchedulePage;
-}());
-exports.SchedulePage = SchedulePage;
-},{"../../providers/conference-data":14,"../../providers/user-data":15,"../schedule-filter/schedule-filter":6,"../session-detail/session-detail":8,"@angular/core":163,"ionic-angular":477}],8:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var SessionDetailPage = (function () {
-    function SessionDetailPage(navParams) {
-        this.navParams = navParams;
-        this.session = navParams.data;
-    }
-    SessionDetailPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/session-detail/session-detail.html'
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
-    ], SessionDetailPage);
-    return SessionDetailPage;
-}());
-exports.SessionDetailPage = SessionDetailPage;
-},{"@angular/core":163,"ionic-angular":477}],9:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var tabs_1 = require('../tabs/tabs');
-var user_data_1 = require('../../providers/user-data');
-var SignupPage = (function () {
-    function SignupPage(navCtrl, userData) {
-        this.navCtrl = navCtrl;
-        this.userData = userData;
-        this.signup = {};
-        this.submitted = false;
-    }
-    SignupPage.prototype.onSignup = function (form) {
-        this.submitted = true;
-        if (form.valid) {
-            this.userData.signup(this.signup.username);
-            this.navCtrl.push(tabs_1.TabsPage);
-        }
-    };
-    SignupPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/signup/signup.html'
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, user_data_1.UserData])
-    ], SignupPage);
-    return SignupPage;
-}());
-exports.SignupPage = SignupPage;
-},{"../../providers/user-data":15,"../tabs/tabs":12,"@angular/core":163,"ionic-angular":477}],10:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var session_detail_1 = require('../session-detail/session-detail');
-var SpeakerDetailPage = (function () {
-    function SpeakerDetailPage(navCtrl, navParams) {
-        this.navCtrl = navCtrl;
-        this.navParams = navParams;
-        this.speaker = this.navParams.data;
-    }
-    SpeakerDetailPage.prototype.goToSessionDetail = function (session) {
-        this.navCtrl.push(session_detail_1.SessionDetailPage, session);
-    };
-    SpeakerDetailPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/speaker-detail/speaker-detail.html'
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, ionic_angular_1.NavParams])
-    ], SpeakerDetailPage);
-    return SpeakerDetailPage;
-}());
-exports.SpeakerDetailPage = SpeakerDetailPage;
-},{"../session-detail/session-detail":8,"@angular/core":163,"ionic-angular":477}],11:[function(require,module,exports){
+exports.ContactPage = ContactPage;
+},{"@angular/core":153,"ionic-angular":468}],4:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -621,68 +99,60 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var ionic_native_1 = require('ionic-native');
-var conference_data_1 = require('../../providers/conference-data');
-var session_detail_1 = require('../session-detail/session-detail');
-var speaker_detail_1 = require('../speaker-detail/speaker-detail');
-var SpeakerListPage = (function () {
-    function SpeakerListPage(actionSheetCtrl, navCtrl, confData) {
-        var _this = this;
-        this.actionSheetCtrl = actionSheetCtrl;
+var HomePage = (function () {
+    function HomePage(navCtrl) {
         this.navCtrl = navCtrl;
-        this.speakers = [];
-        confData.getSpeakers().then(function (speakers) {
-            _this.speakers = speakers;
-        });
+        this.moves = [];
     }
-    SpeakerListPage.prototype.goToSessionDetail = function (session) {
-        this.navCtrl.push(session_detail_1.SessionDetailPage, session);
-    };
-    SpeakerListPage.prototype.goToSpeakerDetail = function (speakerName) {
-        this.navCtrl.push(speaker_detail_1.SpeakerDetailPage, speakerName);
-    };
-    SpeakerListPage.prototype.goToSpeakerTwitter = function (speaker) {
-        new ionic_native_1.InAppBrowser("https://twitter.com/" + speaker.twitter, '_system');
-    };
-    SpeakerListPage.prototype.openSpeakerShare = function (speaker) {
-        var actionSheet = this.actionSheetCtrl.create({
-            title: 'Share ' + speaker.name,
-            buttons: [
-                {
-                    text: 'Copy Link',
-                    handler: function () {
-                        console.log('Copy link clicked on https://twitter.com/' + speaker.twitter);
-                        if (window['cordova'] && window['cordova'].plugins.clipboard) {
-                            window['cordova'].plugins.clipboard.copy('https://twitter.com/' + speaker.twitter);
-                        }
-                    }
-                },
-                {
-                    text: 'Share via ...',
-                    handler: function () {
-                        console.log('Share via clicked');
-                    }
-                },
-                {
-                    text: 'Cancel',
-                    role: 'cancel',
-                    handler: function () {
-                        console.log('Cancel clicked');
-                    }
-                }
-            ]
+    HomePage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.database = new ionic_native_1.SQLite();
+        this.database.openDatabase({
+            name: 'data.db',
+            location: 'default' // the location field is required
+        }).then(function () {
+            _this.database.executeSql('drop table if exists danceMoves', []).then(function () {
+                _this.database.executeSql('create table IF NOT EXISTS danceMoves(id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(32))', {}).then(function () {
+                    _this.refresh();
+                }, function (err) {
+                    console.log('Unable to execute sql err:' + JSON.stringify(err));
+                });
+            }, function (err) {
+                console.log('Unable to opendb err:' + JSON.stringify(err));
+            });
         });
-        actionSheet.present();
     };
-    SpeakerListPage = __decorate([
+    HomePage.prototype.onAddClick = function (name) {
+        var _this = this;
+        this.database.executeSql("INSERT INTO danceMoves(name) VALUES (?)", [name]).then(function () {
+            _this.refresh();
+        });
+    };
+    HomePage.prototype.onDeleteClick = function (id) {
+        var _this = this;
+        this.database.executeSql("DELETE FROM danceMoves WHERE id=?", [id]).then(function () {
+            _this.refresh();
+        });
+    };
+    HomePage.prototype.refresh = function () {
+        var _this = this;
+        this.database.executeSql("SELECT * FROM danceMoves", []).then(function (data) {
+            _this.moves = [];
+            for (var i = 0; i < data.rows.length; i++) {
+                _this.moves.push({ id: data.rows.item(i).id, name: data.rows.item(i).name });
+            }
+        });
+    };
+    HomePage = __decorate([
         core_1.Component({
-            templateUrl: 'build/pages/speaker-list/speaker-list.html'
+            templateUrl: 'build/pages/home/home.html'
         }),
-        __metadata('design:paramtypes', [ionic_angular_1.ActionSheetController, ionic_angular_1.NavController, conference_data_1.ConferenceData])
-    ], SpeakerListPage);
-    return SpeakerListPage;
+        __metadata('design:paramtypes', [ionic_angular_1.NavController])
+    ], HomePage);
+    return HomePage;
 }());
-exports.SpeakerListPage = SpeakerListPage;
-},{"../../providers/conference-data":14,"../session-detail/session-detail":8,"../speaker-detail/speaker-detail":10,"@angular/core":163,"ionic-angular":477,"ionic-native":504}],12:[function(require,module,exports){
+exports.HomePage = HomePage;
+},{"@angular/core":153,"ionic-angular":468,"ionic-native":495}],5:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -694,322 +164,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
+var home_1 = require('../home/home');
 var about_1 = require('../about/about');
-var map_1 = require('../map/map');
-var schedule_1 = require('../schedule/schedule');
-var speaker_list_1 = require('../speaker-list/speaker-list');
+var contact_1 = require('../contact/contact');
 var TabsPage = (function () {
-    function TabsPage(navParams) {
-        // set the root pages for each tab
-        this.tab1Root = schedule_1.SchedulePage;
-        this.tab2Root = speaker_list_1.SpeakerListPage;
-        this.tab3Root = map_1.MapPage;
-        this.tab4Root = about_1.AboutPage;
-        this.mySelectedIndex = navParams.data.tabIndex || 0;
+    function TabsPage() {
+        // this tells the tabs component which Pages
+        // should be each tab's root Page
+        this.tab1Root = home_1.HomePage;
+        this.tab2Root = about_1.AboutPage;
+        this.tab3Root = contact_1.ContactPage;
     }
     TabsPage = __decorate([
         core_1.Component({
             templateUrl: 'build/pages/tabs/tabs.html'
         }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
+        __metadata('design:paramtypes', [])
     ], TabsPage);
     return TabsPage;
 }());
 exports.TabsPage = TabsPage;
-},{"../about/about":2,"../map/map":5,"../schedule/schedule":7,"../speaker-list/speaker-list":11,"@angular/core":163,"ionic-angular":477}],13:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var tabs_1 = require('../tabs/tabs');
-var TutorialPage = (function () {
-    function TutorialPage(navCtrl, menu) {
-        this.navCtrl = navCtrl;
-        this.menu = menu;
-        this.showSkip = true;
-        this.slides = [
-            {
-                title: 'Welcome to <b>ICA</b>',
-                description: 'The <b>Ionic Conference App</b> is a practical preview of the Ionic Framework in action, and a demonstration of proper code use.',
-                image: 'img/ica-slidebox-img-1.png',
-            },
-            {
-                title: 'What is Ionic?',
-                description: '<b>Ionic Framework</b> is an open source SDK that enables developers to build high quality mobile apps with web technologies like HTML, CSS, and JavaScript.',
-                image: 'img/ica-slidebox-img-2.png',
-            },
-            {
-                title: 'What is Ionic Platform?',
-                description: 'The <b>Ionic Platform</b> is a cloud platform for managing and scaling Ionic apps with integrated services like push notifications, native builds, user auth, and live updating.',
-                image: 'img/ica-slidebox-img-3.png',
-            }
-        ];
-    }
-    TutorialPage.prototype.startApp = function () {
-        this.navCtrl.push(tabs_1.TabsPage);
-    };
-    TutorialPage.prototype.onSlideChangeStart = function (slider) {
-        this.showSkip = !slider.isEnd;
-    };
-    TutorialPage.prototype.ionViewDidEnter = function () {
-        // the root left menu should be disabled on the tutorial page
-        this.menu.enable(false);
-    };
-    TutorialPage.prototype.ionViewWillLeave = function () {
-        // enable the root left menu when leaving the tutorial page
-        this.menu.enable(true);
-    };
-    TutorialPage = __decorate([
-        core_1.Component({
-            templateUrl: 'build/pages/tutorial/tutorial.html'
-        }),
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, ionic_angular_1.MenuController])
-    ], TutorialPage);
-    return TutorialPage;
-}());
-exports.TutorialPage = TutorialPage;
-},{"../tabs/tabs":12,"@angular/core":163,"ionic-angular":477}],14:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var http_1 = require('@angular/http');
-var user_data_1 = require('./user-data');
-var ConferenceData = (function () {
-    function ConferenceData(http, user) {
-        this.http = http;
-        this.user = user;
-    }
-    ConferenceData.prototype.load = function () {
-        var _this = this;
-        if (this.data) {
-            // already loaded data
-            return Promise.resolve(this.data);
-        }
-        // don't have the data yet
-        return new Promise(function (resolve) {
-            // We're using Angular Http provider to request the data,
-            // then on the response it'll map the JSON data to a parsed JS object.
-            // Next we process the data and resolve the promise with the new data.
-            _this.http.get('data/data.json').subscribe(function (res) {
-                // we've got back the raw data, now generate the core schedule data
-                // and save the data for later reference
-                _this.data = _this.processData(res.json());
-                resolve(_this.data);
-            });
-        });
-    };
-    ConferenceData.prototype.processData = function (data) {
-        // just some good 'ol JS fun with objects and arrays
-        // build up the data by linking speakers to sessions
-        var _this = this;
-        data.tracks = [];
-        // loop through each day in the schedule
-        data.schedule.forEach(function (day) {
-            // loop through each timeline group in the day
-            day.groups.forEach(function (group) {
-                // loop through each session in the timeline group
-                group.sessions.forEach(function (session) {
-                    _this.processSession(data, session);
-                });
-            });
-        });
-        return data;
-    };
-    ConferenceData.prototype.processSession = function (data, session) {
-        // loop through each speaker and load the speaker data
-        // using the speaker name as the key
-        session.speakers = [];
-        if (session.speakerNames) {
-            session.speakerNames.forEach(function (speakerName) {
-                var speaker = data.speakers.find(function (s) { return s.name === speakerName; });
-                if (speaker) {
-                    session.speakers.push(speaker);
-                    speaker.sessions = speaker.sessions || [];
-                    speaker.sessions.push(session);
-                }
-            });
-        }
-        if (session.tracks) {
-            session.tracks.forEach(function (track) {
-                if (data.tracks.indexOf(track) < 0) {
-                    data.tracks.push(track);
-                }
-            });
-        }
-    };
-    ConferenceData.prototype.getTimeline = function (dayIndex, queryText, excludeTracks, segment) {
-        var _this = this;
-        if (queryText === void 0) { queryText = ''; }
-        if (excludeTracks === void 0) { excludeTracks = []; }
-        if (segment === void 0) { segment = 'all'; }
-        return this.load().then(function (data) {
-            var day = data.schedule[dayIndex];
-            day.shownSessions = 0;
-            queryText = queryText.toLowerCase().replace(/,|\.|-/g, ' ');
-            var queryWords = queryText.split(' ').filter(function (w) { return !!w.trim().length; });
-            day.groups.forEach(function (group) {
-                group.hide = true;
-                group.sessions.forEach(function (session) {
-                    // check if this session should show or not
-                    _this.filterSession(session, queryWords, excludeTracks, segment);
-                    if (!session.hide) {
-                        // if this session is not hidden then this group should show
-                        group.hide = false;
-                        day.shownSessions++;
-                    }
-                });
-            });
-            return day;
-        });
-    };
-    ConferenceData.prototype.filterSession = function (session, queryWords, excludeTracks, segment) {
-        var matchesQueryText = false;
-        if (queryWords.length) {
-            // of any query word is in the session name than it passes the query test
-            queryWords.forEach(function (queryWord) {
-                if (session.name.toLowerCase().indexOf(queryWord) > -1) {
-                    matchesQueryText = true;
-                }
-            });
-        }
-        else {
-            // if there are no query words then this session passes the query test
-            matchesQueryText = true;
-        }
-        // if any of the sessions tracks are not in the
-        // exclude tracks then this session passes the track test
-        var matchesTracks = false;
-        session.tracks.forEach(function (trackName) {
-            if (excludeTracks.indexOf(trackName) === -1) {
-                matchesTracks = true;
-            }
-        });
-        // if the segement is 'favorites', but session is not a user favorite
-        // then this session does not pass the segment test
-        var matchesSegment = false;
-        if (segment === 'favorites') {
-            if (this.user.hasFavorite(session.name)) {
-                matchesSegment = true;
-            }
-        }
-        else {
-            matchesSegment = true;
-        }
-        // all tests must be true if it should not be hidden
-        session.hide = !(matchesQueryText && matchesTracks && matchesSegment);
-    };
-    ConferenceData.prototype.getSpeakers = function () {
-        return this.load().then(function (data) {
-            return data.speakers.sort(function (a, b) {
-                var aName = a.name.split(' ').pop();
-                var bName = b.name.split(' ').pop();
-                return aName.localeCompare(bName);
-            });
-        });
-    };
-    ConferenceData.prototype.getTracks = function () {
-        return this.load().then(function (data) {
-            return data.tracks.sort();
-        });
-    };
-    ConferenceData.prototype.getMap = function () {
-        return this.load().then(function (data) {
-            return data.map;
-        });
-    };
-    ConferenceData = __decorate([
-        core_1.Injectable(),
-        __metadata('design:paramtypes', [http_1.Http, user_data_1.UserData])
-    ], ConferenceData);
-    return ConferenceData;
-}());
-exports.ConferenceData = ConferenceData;
-},{"./user-data":15,"@angular/core":163,"@angular/http":290}],15:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
-var UserData = (function () {
-    function UserData(events) {
-        this.events = events;
-        this._favorites = [];
-        this.HAS_LOGGED_IN = 'hasLoggedIn';
-        this.storage = new ionic_angular_1.Storage(ionic_angular_1.LocalStorage);
-    }
-    UserData.prototype.hasFavorite = function (sessionName) {
-        return (this._favorites.indexOf(sessionName) > -1);
-    };
-    UserData.prototype.addFavorite = function (sessionName) {
-        this._favorites.push(sessionName);
-    };
-    UserData.prototype.removeFavorite = function (sessionName) {
-        var index = this._favorites.indexOf(sessionName);
-        if (index > -1) {
-            this._favorites.splice(index, 1);
-        }
-    };
-    UserData.prototype.login = function (username) {
-        this.storage.set(this.HAS_LOGGED_IN, true);
-        this.setUsername(username);
-        this.events.publish('user:login');
-    };
-    UserData.prototype.signup = function (username) {
-        this.storage.set(this.HAS_LOGGED_IN, true);
-        this.setUsername(username);
-        this.events.publish('user:signup');
-    };
-    UserData.prototype.logout = function () {
-        this.storage.remove(this.HAS_LOGGED_IN);
-        this.storage.remove('username');
-        this.events.publish('user:logout');
-    };
-    UserData.prototype.setUsername = function (username) {
-        this.storage.set('username', username);
-    };
-    UserData.prototype.getUsername = function () {
-        return this.storage.get('username').then(function (value) {
-            return value;
-        });
-    };
-    // return a promise
-    UserData.prototype.hasLoggedIn = function () {
-        return this.storage.get(this.HAS_LOGGED_IN).then(function (value) {
-            return value;
-        });
-    };
-    UserData = __decorate([
-        core_1.Injectable(),
-        __metadata('design:paramtypes', [ionic_angular_1.Events])
-    ], UserData);
-    return UserData;
-}());
-exports.UserData = UserData;
-},{"@angular/core":163,"ionic-angular":477}],16:[function(require,module,exports){
+},{"../about/about":2,"../contact/contact":3,"../home/home":4,"@angular/core":153}],6:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1029,7 +204,7 @@ __export(require('./src/location'));
 var localization_1 = require('./src/localization');
 exports.NgLocalization = localization_1.NgLocalization;
 
-},{"./src/common_directives":17,"./src/directives":18,"./src/forms-deprecated":35,"./src/localization":60,"./src/location":61,"./src/pipes":67}],17:[function(require,module,exports){
+},{"./src/common_directives":7,"./src/directives":8,"./src/forms-deprecated":25,"./src/localization":50,"./src/location":51,"./src/pipes":57}],7:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1087,7 +262,7 @@ var forms_deprecated_1 = require('./forms-deprecated');
  */
 exports.COMMON_DIRECTIVES = [directives_1.CORE_DIRECTIVES, forms_deprecated_1.FORM_DIRECTIVES];
 
-},{"./directives":18,"./forms-deprecated":35}],18:[function(require,module,exports){
+},{"./directives":8,"./forms-deprecated":25}],8:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1121,7 +296,7 @@ exports.NgSwitchDefault = ng_switch_1.NgSwitchDefault;
 var ng_template_outlet_1 = require('./directives/ng_template_outlet');
 exports.NgTemplateOutlet = ng_template_outlet_1.NgTemplateOutlet;
 
-},{"./directives/core_directives":19,"./directives/ng_class":20,"./directives/ng_for":21,"./directives/ng_if":22,"./directives/ng_plural":23,"./directives/ng_style":24,"./directives/ng_switch":25,"./directives/ng_template_outlet":26}],19:[function(require,module,exports){
+},{"./directives/core_directives":9,"./directives/ng_class":10,"./directives/ng_for":11,"./directives/ng_if":12,"./directives/ng_plural":13,"./directives/ng_style":14,"./directives/ng_switch":15,"./directives/ng_template_outlet":16}],9:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1192,7 +367,7 @@ exports.CORE_DIRECTIVES = [
     ng_plural_1.NgPluralCase,
 ];
 
-},{"./ng_class":20,"./ng_for":21,"./ng_if":22,"./ng_plural":23,"./ng_style":24,"./ng_switch":25,"./ng_template_outlet":26}],20:[function(require,module,exports){
+},{"./ng_class":10,"./ng_for":11,"./ng_if":12,"./ng_plural":13,"./ng_style":14,"./ng_switch":15,"./ng_template_outlet":16}],10:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1327,7 +502,7 @@ var NgClass = (function () {
 }());
 exports.NgClass = NgClass;
 
-},{"../facade/collection":29,"../facade/lang":33,"@angular/core":163}],21:[function(require,module,exports){
+},{"../facade/collection":19,"../facade/lang":23,"@angular/core":153}],11:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1497,7 +672,7 @@ var RecordViewTuple = (function () {
     return RecordViewTuple;
 }());
 
-},{"../facade/exceptions":31,"../facade/lang":33,"@angular/core":163}],22:[function(require,module,exports){
+},{"../facade/exceptions":21,"../facade/lang":23,"@angular/core":153}],12:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1541,7 +716,7 @@ var NgIf = (function () {
 }());
 exports.NgIf = NgIf;
 
-},{"../facade/lang":33,"@angular/core":163}],23:[function(require,module,exports){
+},{"../facade/lang":23,"@angular/core":153}],13:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1628,7 +803,7 @@ var NgPlural = (function () {
 }());
 exports.NgPlural = NgPlural;
 
-},{"../facade/lang":33,"../localization":60,"./ng_switch":25,"@angular/core":163}],24:[function(require,module,exports){
+},{"../facade/lang":23,"../localization":50,"./ng_switch":15,"@angular/core":153}],14:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1686,7 +861,7 @@ var NgStyle = (function () {
 }());
 exports.NgStyle = NgStyle;
 
-},{"../facade/lang":33,"@angular/core":163}],25:[function(require,module,exports){
+},{"../facade/lang":23,"@angular/core":153}],15:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1862,7 +1037,7 @@ var NgSwitchDefault = (function () {
 }());
 exports.NgSwitchDefault = NgSwitchDefault;
 
-},{"../facade/collection":29,"../facade/lang":33,"@angular/core":163}],26:[function(require,module,exports){
+},{"../facade/collection":19,"../facade/lang":23,"@angular/core":153}],16:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -1924,7 +1099,7 @@ var NgTemplateOutlet = (function () {
 }());
 exports.NgTemplateOutlet = NgTemplateOutlet;
 
-},{"../facade/lang":33,"@angular/core":163}],27:[function(require,module,exports){
+},{"../facade/lang":23,"@angular/core":153}],17:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2092,7 +1267,7 @@ var EventEmitter = (function (_super) {
 }(Subject_1.Subject));
 exports.EventEmitter = EventEmitter;
 
-},{"./lang":33,"./promise":34,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],28:[function(require,module,exports){
+},{"./lang":23,"./promise":24,"rxjs/Observable":562,"rxjs/Subject":564,"rxjs/observable/PromiseObservable":568,"rxjs/operator/toPromise":569}],18:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2150,7 +1325,7 @@ var BaseWrappedException = (function (_super) {
 }(Error));
 exports.BaseWrappedException = BaseWrappedException;
 
-},{}],29:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2526,7 +1701,7 @@ var SetWrapper = (function () {
 }());
 exports.SetWrapper = SetWrapper;
 
-},{"./lang":33}],30:[function(require,module,exports){
+},{"./lang":23}],20:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2667,7 +1842,7 @@ var ExceptionHandler = (function () {
 }());
 exports.ExceptionHandler = ExceptionHandler;
 
-},{"./base_wrapped_exception":28,"./collection":29,"./lang":33}],31:[function(require,module,exports){
+},{"./base_wrapped_exception":18,"./collection":19,"./lang":23}],21:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2757,7 +1932,7 @@ function unimplemented() {
 }
 exports.unimplemented = unimplemented;
 
-},{"./base_wrapped_exception":28,"./exception_handler":30}],32:[function(require,module,exports){
+},{"./base_wrapped_exception":18,"./exception_handler":20}],22:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -2947,7 +2122,7 @@ var DateFormatter = (function () {
 }());
 exports.DateFormatter = DateFormatter;
 
-},{}],33:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -3416,7 +2591,7 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],34:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3472,7 +2647,7 @@ var PromiseWrapper = (function () {
 }());
 exports.PromiseWrapper = PromiseWrapper;
 
-},{}],35:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3544,7 +2719,7 @@ exports.Validators = validators_2.Validators;
  */
 exports.FORM_PROVIDERS = [form_builder_1.FormBuilder, radio_control_value_accessor_1.RadioControlRegistry];
 
-},{"./forms-deprecated/directives":36,"./forms-deprecated/directives/abstract_control_directive":37,"./forms-deprecated/directives/checkbox_value_accessor":38,"./forms-deprecated/directives/control_container":39,"./forms-deprecated/directives/control_value_accessor":40,"./forms-deprecated/directives/default_value_accessor":41,"./forms-deprecated/directives/ng_control":42,"./forms-deprecated/directives/ng_control_group":43,"./forms-deprecated/directives/ng_control_name":44,"./forms-deprecated/directives/ng_control_status":45,"./forms-deprecated/directives/ng_form":46,"./forms-deprecated/directives/ng_form_control":47,"./forms-deprecated/directives/ng_form_model":48,"./forms-deprecated/directives/ng_model":49,"./forms-deprecated/directives/radio_control_value_accessor":52,"./forms-deprecated/directives/select_control_value_accessor":53,"./forms-deprecated/directives/validators":56,"./forms-deprecated/form_builder":57,"./forms-deprecated/model":58,"./forms-deprecated/validators":59}],36:[function(require,module,exports){
+},{"./forms-deprecated/directives":26,"./forms-deprecated/directives/abstract_control_directive":27,"./forms-deprecated/directives/checkbox_value_accessor":28,"./forms-deprecated/directives/control_container":29,"./forms-deprecated/directives/control_value_accessor":30,"./forms-deprecated/directives/default_value_accessor":31,"./forms-deprecated/directives/ng_control":32,"./forms-deprecated/directives/ng_control_group":33,"./forms-deprecated/directives/ng_control_name":34,"./forms-deprecated/directives/ng_control_status":35,"./forms-deprecated/directives/ng_form":36,"./forms-deprecated/directives/ng_form_control":37,"./forms-deprecated/directives/ng_form_model":38,"./forms-deprecated/directives/ng_model":39,"./forms-deprecated/directives/radio_control_value_accessor":42,"./forms-deprecated/directives/select_control_value_accessor":43,"./forms-deprecated/directives/validators":46,"./forms-deprecated/form_builder":47,"./forms-deprecated/model":48,"./forms-deprecated/validators":49}],26:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3642,7 +2817,7 @@ exports.FORM_DIRECTIVES = [
     validators_1.PatternValidator,
 ];
 
-},{"./directives/checkbox_value_accessor":38,"./directives/default_value_accessor":41,"./directives/ng_control":42,"./directives/ng_control_group":43,"./directives/ng_control_name":44,"./directives/ng_control_status":45,"./directives/ng_form":46,"./directives/ng_form_control":47,"./directives/ng_form_model":48,"./directives/ng_model":49,"./directives/number_value_accessor":51,"./directives/radio_control_value_accessor":52,"./directives/select_control_value_accessor":53,"./directives/select_multiple_control_value_accessor":54,"./directives/validators":56}],37:[function(require,module,exports){
+},{"./directives/checkbox_value_accessor":28,"./directives/default_value_accessor":31,"./directives/ng_control":32,"./directives/ng_control_group":33,"./directives/ng_control_name":34,"./directives/ng_control_status":35,"./directives/ng_form":36,"./directives/ng_form_control":37,"./directives/ng_form_model":38,"./directives/ng_model":39,"./directives/number_value_accessor":41,"./directives/radio_control_value_accessor":42,"./directives/select_control_value_accessor":43,"./directives/select_multiple_control_value_accessor":44,"./directives/validators":46}],27:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3714,7 +2889,7 @@ var AbstractControlDirective = (function () {
 }());
 exports.AbstractControlDirective = AbstractControlDirective;
 
-},{"../../facade/exceptions":31,"../../facade/lang":33}],38:[function(require,module,exports){
+},{"../../facade/exceptions":21,"../../facade/lang":23}],28:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3759,7 +2934,7 @@ var CheckboxControlValueAccessor = (function () {
 }());
 exports.CheckboxControlValueAccessor = CheckboxControlValueAccessor;
 
-},{"./control_value_accessor":40,"@angular/core":163}],39:[function(require,module,exports){
+},{"./control_value_accessor":30,"@angular/core":153}],29:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3806,7 +2981,7 @@ var ControlContainer = (function (_super) {
 }(abstract_control_directive_1.AbstractControlDirective));
 exports.ControlContainer = ControlContainer;
 
-},{"./abstract_control_directive":37}],40:[function(require,module,exports){
+},{"./abstract_control_directive":27}],30:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3825,7 +3000,7 @@ var core_1 = require('@angular/core');
 exports.NG_VALUE_ACCESSOR =
 /*@ts2dart_const*/ new core_1.OpaqueToken('NgValueAccessor');
 
-},{"@angular/core":163}],41:[function(require,module,exports){
+},{"@angular/core":153}],31:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3876,7 +3051,7 @@ var DefaultValueAccessor = (function () {
 }());
 exports.DefaultValueAccessor = DefaultValueAccessor;
 
-},{"../../facade/lang":33,"./control_value_accessor":40,"@angular/core":163}],42:[function(require,module,exports){
+},{"../../facade/lang":23,"./control_value_accessor":30,"@angular/core":153}],32:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -3921,7 +3096,7 @@ var NgControl = (function (_super) {
 }(abstract_control_directive_1.AbstractControlDirective));
 exports.NgControl = NgControl;
 
-},{"../../facade/exceptions":31,"./abstract_control_directive":37}],43:[function(require,module,exports){
+},{"../../facade/exceptions":21,"./abstract_control_directive":27}],33:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4007,7 +3182,7 @@ var NgControlGroup = (function (_super) {
 }(control_container_1.ControlContainer));
 exports.NgControlGroup = NgControlGroup;
 
-},{"../validators":59,"./control_container":39,"./shared":55,"@angular/core":163}],44:[function(require,module,exports){
+},{"../validators":49,"./control_container":29,"./shared":45,"@angular/core":153}],34:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4108,7 +3283,7 @@ var NgControlName = (function (_super) {
 }(ng_control_1.NgControl));
 exports.NgControlName = NgControlName;
 
-},{"../../facade/async":27,"../validators":59,"./control_container":39,"./control_value_accessor":40,"./ng_control":42,"./shared":55,"@angular/core":163}],45:[function(require,module,exports){
+},{"../../facade/async":17,"../validators":49,"./control_container":29,"./control_value_accessor":30,"./ng_control":32,"./shared":45,"@angular/core":153}],35:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4188,7 +3363,7 @@ var NgControlStatus = (function () {
 }());
 exports.NgControlStatus = NgControlStatus;
 
-},{"../../facade/lang":33,"./ng_control":42,"@angular/core":163}],46:[function(require,module,exports){
+},{"../../facade/lang":23,"./ng_control":32,"@angular/core":153}],36:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4334,7 +3509,7 @@ var NgForm = (function (_super) {
 }(control_container_1.ControlContainer));
 exports.NgForm = NgForm;
 
-},{"../../facade/async":27,"../../facade/collection":29,"../../facade/lang":33,"../model":58,"../validators":59,"./control_container":39,"./shared":55,"@angular/core":163}],47:[function(require,module,exports){
+},{"../../facade/async":17,"../../facade/collection":19,"../../facade/lang":23,"../model":48,"../validators":49,"./control_container":29,"./shared":45,"@angular/core":153}],37:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4428,7 +3603,7 @@ var NgFormControl = (function (_super) {
 }(ng_control_1.NgControl));
 exports.NgFormControl = NgFormControl;
 
-},{"../../facade/async":27,"../../facade/collection":29,"../validators":59,"./control_value_accessor":40,"./ng_control":42,"./shared":55,"@angular/core":163}],48:[function(require,module,exports){
+},{"../../facade/async":17,"../../facade/collection":19,"../validators":49,"./control_value_accessor":30,"./ng_control":32,"./shared":45,"@angular/core":153}],38:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4565,7 +3740,7 @@ var NgFormModel = (function (_super) {
 }(control_container_1.ControlContainer));
 exports.NgFormModel = NgFormModel;
 
-},{"../../facade/async":27,"../../facade/collection":29,"../../facade/exceptions":31,"../../facade/lang":33,"../validators":59,"./control_container":39,"./shared":55,"@angular/core":163}],49:[function(require,module,exports){
+},{"../../facade/async":17,"../../facade/collection":19,"../../facade/exceptions":21,"../../facade/lang":23,"../validators":49,"./control_container":29,"./shared":45,"@angular/core":153}],39:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4661,7 +3836,7 @@ var NgModel = (function (_super) {
 }(ng_control_1.NgControl));
 exports.NgModel = NgModel;
 
-},{"../../facade/async":27,"../model":58,"../validators":59,"./control_value_accessor":40,"./ng_control":42,"./shared":55,"@angular/core":163}],50:[function(require,module,exports){
+},{"../../facade/async":17,"../model":48,"../validators":49,"./control_value_accessor":30,"./ng_control":32,"./shared":45,"@angular/core":153}],40:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4689,7 +3864,7 @@ function normalizeAsyncValidator(validator) {
 }
 exports.normalizeAsyncValidator = normalizeAsyncValidator;
 
-},{}],51:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4741,7 +3916,7 @@ var NumberValueAccessor = (function () {
 }());
 exports.NumberValueAccessor = NumberValueAccessor;
 
-},{"../../facade/lang":33,"./control_value_accessor":40,"@angular/core":163}],52:[function(require,module,exports){
+},{"../../facade/lang":23,"./control_value_accessor":30,"@angular/core":153}],42:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -4861,7 +4036,7 @@ var RadioControlValueAccessor = (function () {
 }());
 exports.RadioControlValueAccessor = RadioControlValueAccessor;
 
-},{"../../facade/collection":29,"../../facade/lang":33,"./control_value_accessor":40,"./ng_control":42,"@angular/core":163}],53:[function(require,module,exports){
+},{"../../facade/collection":19,"../../facade/lang":23,"./control_value_accessor":30,"./ng_control":32,"@angular/core":153}],43:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5002,7 +4177,7 @@ var NgSelectOption = (function () {
 }());
 exports.NgSelectOption = NgSelectOption;
 
-},{"../../facade/collection":29,"../../facade/lang":33,"./control_value_accessor":40,"@angular/core":163}],54:[function(require,module,exports){
+},{"../../facade/collection":19,"../../facade/lang":23,"./control_value_accessor":30,"@angular/core":153}],44:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5184,7 +4359,7 @@ var NgSelectMultipleOption = (function () {
 exports.NgSelectMultipleOption = NgSelectMultipleOption;
 exports.SELECT_DIRECTIVES = [SelectMultipleControlValueAccessor, NgSelectMultipleOption];
 
-},{"../../facade/collection":29,"../../facade/lang":33,"./control_value_accessor":40,"@angular/core":163}],55:[function(require,module,exports){
+},{"../../facade/collection":19,"../../facade/lang":23,"./control_value_accessor":30,"@angular/core":153}],45:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5295,7 +4470,7 @@ function selectValueAccessor(dir, valueAccessors) {
 }
 exports.selectValueAccessor = selectValueAccessor;
 
-},{"../../facade/collection":29,"../../facade/exceptions":31,"../../facade/lang":33,"../validators":59,"./checkbox_value_accessor":38,"./default_value_accessor":41,"./normalize_validator":50,"./number_value_accessor":51,"./radio_control_value_accessor":52,"./select_control_value_accessor":53,"./select_multiple_control_value_accessor":54}],56:[function(require,module,exports){
+},{"../../facade/collection":19,"../../facade/exceptions":21,"../../facade/lang":23,"../validators":49,"./checkbox_value_accessor":28,"./default_value_accessor":31,"./normalize_validator":40,"./number_value_accessor":41,"./radio_control_value_accessor":42,"./select_control_value_accessor":43,"./select_multiple_control_value_accessor":44}],46:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5413,7 +4588,7 @@ var PatternValidator = (function () {
 }());
 exports.PatternValidator = PatternValidator;
 
-},{"../../facade/lang":33,"../validators":59,"@angular/core":163}],57:[function(require,module,exports){
+},{"../../facade/lang":23,"../validators":49,"@angular/core":153}],47:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5495,7 +4670,7 @@ var FormBuilder = (function () {
 }());
 exports.FormBuilder = FormBuilder;
 
-},{"../facade/collection":29,"../facade/lang":33,"./model":58,"@angular/core":163}],58:[function(require,module,exports){
+},{"../facade/collection":19,"../facade/lang":23,"./model":48,"@angular/core":153}],48:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6021,7 +5196,7 @@ var ControlArray = (function (_super) {
 }(AbstractControl));
 exports.ControlArray = ControlArray;
 
-},{"../facade/async":27,"../facade/collection":29,"../facade/lang":33}],59:[function(require,module,exports){
+},{"../facade/async":17,"../facade/collection":19,"../facade/lang":23}],49:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6170,7 +5345,7 @@ function _mergeErrors(arrayOfErrors) {
     return collection_1.StringMapWrapper.isEmpty(res) ? null : res;
 }
 
-},{"../facade/async":27,"../facade/collection":29,"../facade/lang":33,"../facade/promise":34,"@angular/core":163}],60:[function(require,module,exports){
+},{"../facade/async":17,"../facade/collection":19,"../facade/lang":23,"../facade/promise":24,"@angular/core":153}],50:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6201,7 +5376,7 @@ function getPluralCategory(value, cases, ngLocalization) {
 }
 exports.getPluralCategory = getPluralCategory;
 
-},{}],61:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6219,7 +5394,7 @@ __export(require('./location/hash_location_strategy'));
 __export(require('./location/path_location_strategy'));
 __export(require('./location/location'));
 
-},{"./location/hash_location_strategy":62,"./location/location":63,"./location/location_strategy":64,"./location/path_location_strategy":65,"./location/platform_location":66}],62:[function(require,module,exports){
+},{"./location/hash_location_strategy":52,"./location/location":53,"./location/location_strategy":54,"./location/path_location_strategy":55,"./location/platform_location":56}],52:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6298,7 +5473,7 @@ var HashLocationStrategy = (function (_super) {
 }(location_strategy_1.LocationStrategy));
 exports.HashLocationStrategy = HashLocationStrategy;
 
-},{"../facade/lang":33,"./location":63,"./location_strategy":64,"./platform_location":66,"@angular/core":163}],63:[function(require,module,exports){
+},{"../facade/lang":23,"./location":53,"./location_strategy":54,"./platform_location":56,"@angular/core":153}],53:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6456,7 +5631,7 @@ function _stripIndexHtml(url) {
     return url;
 }
 
-},{"../facade/async":27,"./location_strategy":64,"@angular/core":163}],64:[function(require,module,exports){
+},{"../facade/async":17,"./location_strategy":54,"@angular/core":153}],54:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6522,7 +5697,7 @@ exports.LocationStrategy = LocationStrategy;
  */
 exports.APP_BASE_HREF = new core_1.OpaqueToken('appBaseHref');
 
-},{"@angular/core":163}],65:[function(require,module,exports){
+},{"@angular/core":153}],55:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6593,7 +5768,7 @@ var PathLocationStrategy = (function (_super) {
 }(location_strategy_1.LocationStrategy));
 exports.PathLocationStrategy = PathLocationStrategy;
 
-},{"../facade/exceptions":31,"../facade/lang":33,"./location":63,"./location_strategy":64,"./platform_location":66,"@angular/core":163}],66:[function(require,module,exports){
+},{"../facade/exceptions":21,"../facade/lang":23,"./location":53,"./location_strategy":54,"./platform_location":56,"@angular/core":153}],56:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6650,7 +5825,7 @@ var PlatformLocation = (function () {
 }());
 exports.PlatformLocation = PlatformLocation;
 
-},{}],67:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6689,7 +5864,7 @@ exports.SlicePipe = slice_pipe_1.SlicePipe;
 var uppercase_pipe_1 = require('./pipes/uppercase_pipe');
 exports.UpperCasePipe = uppercase_pipe_1.UpperCasePipe;
 
-},{"./pipes/async_pipe":68,"./pipes/common_pipes":69,"./pipes/date_pipe":70,"./pipes/i18n_plural_pipe":71,"./pipes/i18n_select_pipe":72,"./pipes/json_pipe":74,"./pipes/lowercase_pipe":75,"./pipes/number_pipe":76,"./pipes/replace_pipe":77,"./pipes/slice_pipe":78,"./pipes/uppercase_pipe":79}],68:[function(require,module,exports){
+},{"./pipes/async_pipe":58,"./pipes/common_pipes":59,"./pipes/date_pipe":60,"./pipes/i18n_plural_pipe":61,"./pipes/i18n_select_pipe":62,"./pipes/json_pipe":64,"./pipes/lowercase_pipe":65,"./pipes/number_pipe":66,"./pipes/replace_pipe":67,"./pipes/slice_pipe":68,"./pipes/uppercase_pipe":69}],58:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6809,7 +5984,7 @@ var AsyncPipe = (function () {
 }());
 exports.AsyncPipe = AsyncPipe;
 
-},{"../facade/async":27,"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],69:[function(require,module,exports){
+},{"../facade/async":17,"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],59:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6857,7 +6032,7 @@ exports.COMMON_PIPES = [
     i18n_select_pipe_1.I18nSelectPipe,
 ];
 
-},{"./async_pipe":68,"./date_pipe":70,"./i18n_plural_pipe":71,"./i18n_select_pipe":72,"./json_pipe":74,"./lowercase_pipe":75,"./number_pipe":76,"./replace_pipe":77,"./slice_pipe":78,"./uppercase_pipe":79}],70:[function(require,module,exports){
+},{"./async_pipe":58,"./date_pipe":60,"./i18n_plural_pipe":61,"./i18n_select_pipe":62,"./json_pipe":64,"./lowercase_pipe":65,"./number_pipe":66,"./replace_pipe":67,"./slice_pipe":68,"./uppercase_pipe":69}],60:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6922,7 +6097,7 @@ var DatePipe = (function () {
 }());
 exports.DatePipe = DatePipe;
 
-},{"../facade/collection":29,"../facade/intl":32,"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],71:[function(require,module,exports){
+},{"../facade/collection":19,"../facade/intl":22,"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],61:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6961,7 +6136,7 @@ var I18nPluralPipe = (function () {
 }());
 exports.I18nPluralPipe = I18nPluralPipe;
 
-},{"../facade/lang":33,"../localization":60,"./invalid_pipe_argument_exception":73,"@angular/core":163}],72:[function(require,module,exports){
+},{"../facade/lang":23,"../localization":50,"./invalid_pipe_argument_exception":63,"@angular/core":153}],62:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6992,7 +6167,7 @@ var I18nSelectPipe = (function () {
 }());
 exports.I18nSelectPipe = I18nSelectPipe;
 
-},{"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],73:[function(require,module,exports){
+},{"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],63:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7017,7 +6192,7 @@ var InvalidPipeArgumentException = (function (_super) {
 }(exceptions_1.BaseException));
 exports.InvalidPipeArgumentException = InvalidPipeArgumentException;
 
-},{"../facade/exceptions":31,"../facade/lang":33}],74:[function(require,module,exports){
+},{"../facade/exceptions":21,"../facade/lang":23}],64:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7040,7 +6215,7 @@ var JsonPipe = (function () {
 }());
 exports.JsonPipe = JsonPipe;
 
-},{"../facade/lang":33,"@angular/core":163}],75:[function(require,module,exports){
+},{"../facade/lang":23,"@angular/core":153}],65:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7071,7 +6246,7 @@ var LowerCasePipe = (function () {
 }());
 exports.LowerCasePipe = LowerCasePipe;
 
-},{"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],76:[function(require,module,exports){
+},{"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],66:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7167,7 +6342,7 @@ var CurrencyPipe = (function () {
 }());
 exports.CurrencyPipe = CurrencyPipe;
 
-},{"../facade/exceptions":31,"../facade/intl":32,"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],77:[function(require,module,exports){
+},{"../facade/exceptions":21,"../facade/intl":22,"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],67:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7221,7 +6396,7 @@ var ReplacePipe = (function () {
 }());
 exports.ReplacePipe = ReplacePipe;
 
-},{"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],78:[function(require,module,exports){
+},{"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],68:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7258,7 +6433,7 @@ var SlicePipe = (function () {
 }());
 exports.SlicePipe = SlicePipe;
 
-},{"../facade/collection":29,"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],79:[function(require,module,exports){
+},{"../facade/collection":19,"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],69:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7289,7 +6464,7 @@ var UpperCasePipe = (function () {
 }());
 exports.UpperCasePipe = UpperCasePipe;
 
-},{"../facade/lang":33,"./invalid_pipe_argument_exception":73,"@angular/core":163}],80:[function(require,module,exports){
+},{"../facade/lang":23,"./invalid_pipe_argument_exception":63,"@angular/core":153}],70:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7339,7 +6514,7 @@ exports.ElementSchemaRegistry = element_schema_registry_1.ElementSchemaRegistry;
 __export(require('./src/template_ast'));
 __export(require('./private_export'));
 
-},{"./private_export":83,"./src/compiler":91,"./src/schema/element_schema_registry":136,"./src/template_ast":141}],81:[function(require,module,exports){
+},{"./private_export":73,"./src/compiler":81,"./src/schema/element_schema_registry":126,"./src/template_ast":131}],71:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7413,7 +6588,7 @@ exports.clearStyles = core_1.__core_private__.clearStyles;
 exports.collectAndResolveStyles = core_1.__core_private__.collectAndResolveStyles;
 exports.renderStyles = core_1.__core_private__.renderStyles;
 
-},{"@angular/core":163}],82:[function(require,module,exports){
+},{"@angular/core":153}],72:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7427,7 +6602,7 @@ function __export(m) {
 }
 __export(require('./compiler'));
 
-},{"./compiler":80}],83:[function(require,module,exports){
+},{"./compiler":70}],73:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7483,7 +6658,7 @@ var __compiler_private__;
     __compiler_private__.TypeScriptEmitter = ts_emitter.TypeScriptEmitter;
 })(__compiler_private__ = exports.__compiler_private__ || (exports.__compiler_private__ = {}));
 
-},{"./src/directive_normalizer":94,"./src/expression_parser/lexer":97,"./src/expression_parser/parser":98,"./src/html_parser":109,"./src/i18n/i18n_html_parser":112,"./src/i18n/message":113,"./src/i18n/message_extractor":114,"./src/i18n/xmb_serializer":116,"./src/metadata_resolver":119,"./src/output/path_util":128,"./src/output/ts_emitter":129,"./src/parse_util":130,"./src/schema/dom_element_schema_registry":134,"./src/selector":137,"./src/style_compiler":139,"./src/template_parser":142,"./src/view_compiler/view_compiler":160}],84:[function(require,module,exports){
+},{"./src/directive_normalizer":84,"./src/expression_parser/lexer":87,"./src/expression_parser/parser":88,"./src/html_parser":99,"./src/i18n/i18n_html_parser":102,"./src/i18n/message":103,"./src/i18n/message_extractor":104,"./src/i18n/xmb_serializer":106,"./src/metadata_resolver":109,"./src/output/path_util":118,"./src/output/ts_emitter":119,"./src/parse_util":120,"./src/schema/dom_element_schema_registry":124,"./src/selector":127,"./src/style_compiler":129,"./src/template_parser":132,"./src/view_compiler/view_compiler":150}],74:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7634,7 +6809,7 @@ var AnimationSequenceAst = (function (_super) {
 }(AnimationWithStepsAst));
 exports.AnimationSequenceAst = AnimationSequenceAst;
 
-},{}],85:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7928,7 +7103,7 @@ function _getStylesArray(obj) {
     return obj.styles.styles;
 }
 
-},{"../../core_private":81,"../facade/collection":101,"../facade/exceptions":103,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"./animation_ast":84,"./animation_parser":86}],86:[function(require,module,exports){
+},{"../../core_private":71,"../facade/collection":91,"../facade/exceptions":93,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"./animation_ast":74,"./animation_parser":76}],76:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8404,7 +7579,7 @@ function _createStartKeyframeFromEndKeyframe(endKeyframe, startTime, duration, c
     return new animation_ast_1.AnimationKeyframeAst(_INITIAL_KEYFRAME, new animation_ast_1.AnimationStylesAst([values]));
 }
 
-},{"../../core_private":81,"../compile_metadata":90,"../facade/collection":101,"../facade/lang":104,"../facade/math":105,"../parse_util":130,"./animation_ast":84,"./styles_collection":87}],87:[function(require,module,exports){
+},{"../../core_private":71,"../compile_metadata":80,"../facade/collection":91,"../facade/lang":94,"../facade/math":95,"../parse_util":120,"./animation_ast":74,"./styles_collection":77}],77:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8468,7 +7643,7 @@ var StylesCollection = (function () {
 }());
 exports.StylesCollection = StylesCollection;
 
-},{"../facade/collection":101,"../facade/lang":104}],88:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/lang":94}],78:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8517,7 +7692,7 @@ function assertInterpolationSymbols(identifier, value) {
 }
 exports.assertInterpolationSymbols = assertInterpolationSymbols;
 
-},{"../src/facade/exceptions":103,"../src/facade/lang":104,"@angular/core":163}],89:[function(require,module,exports){
+},{"../src/facade/exceptions":93,"../src/facade/lang":94,"@angular/core":153}],79:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8601,7 +7776,7 @@ function isAsciiHexDigit(code) {
 }
 exports.isAsciiHexDigit = isAsciiHexDigit;
 
-},{}],90:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9498,7 +8673,7 @@ function _normalizeArray(obj) {
     return lang_1.isPresent(obj) ? obj : [];
 }
 
-},{"../core_private":81,"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104,"./selector":137,"./url_resolver":144,"./util":145,"@angular/core":163}],91:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94,"./selector":127,"./url_resolver":134,"./util":135,"@angular/core":153}],81:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9562,7 +8737,7 @@ exports.COMPILER_PROVIDERS =
     url_resolver_2.UrlResolver, view_resolver_2.ViewResolver, directive_resolver_2.DirectiveResolver, pipe_resolver_2.PipeResolver
 ];
 
-},{"./compile_metadata":90,"./config":92,"./directive_normalizer":94,"./directive_resolver":95,"./expression_parser/lexer":97,"./expression_parser/parser":98,"./html_parser":109,"./metadata_resolver":119,"./offline_compiler":120,"./pipe_resolver":131,"./runtime_compiler":133,"./schema/dom_element_schema_registry":134,"./schema/element_schema_registry":136,"./style_compiler":139,"./template_ast":141,"./template_parser":142,"./url_resolver":144,"./view_compiler/view_compiler":160,"./view_resolver":161,"./xhr":162,"@angular/core":163}],92:[function(require,module,exports){
+},{"./compile_metadata":80,"./config":82,"./directive_normalizer":84,"./directive_resolver":85,"./expression_parser/lexer":87,"./expression_parser/parser":88,"./html_parser":99,"./metadata_resolver":109,"./offline_compiler":110,"./pipe_resolver":121,"./runtime_compiler":123,"./schema/dom_element_schema_registry":124,"./schema/element_schema_registry":126,"./style_compiler":129,"./template_ast":131,"./template_parser":132,"./url_resolver":134,"./view_compiler/view_compiler":150,"./view_resolver":151,"./xhr":152,"@angular/core":153}],82:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9656,7 +8831,7 @@ var DefaultRenderTypes = (function () {
 }());
 exports.DefaultRenderTypes = DefaultRenderTypes;
 
-},{"../src/facade/exceptions":103,"./identifiers":117,"@angular/core":163}],93:[function(require,module,exports){
+},{"../src/facade/exceptions":93,"./identifiers":107,"@angular/core":153}],83:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9695,7 +8870,7 @@ function hasLifecycleHook(hook, token) {
 }
 exports.hasLifecycleHook = hasLifecycleHook;
 
-},{"../core_private":81,"../src/facade/collection":101,"@angular/core":163}],94:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/collection":91,"@angular/core":153}],84:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9947,7 +9122,7 @@ function _cloneDirectiveWithTemplate(directive, template) {
     });
 }
 
-},{"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104,"./compile_metadata":90,"./config":92,"./html_ast":107,"./html_parser":109,"./style_url_resolver":140,"./template_preparser":143,"./url_resolver":144,"./xhr":162,"@angular/core":163}],95:[function(require,module,exports){
+},{"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94,"./compile_metadata":80,"./config":82,"./html_ast":97,"./html_parser":99,"./style_url_resolver":130,"./template_preparser":133,"./url_resolver":134,"./xhr":152,"@angular/core":153}],85:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -10081,7 +9256,7 @@ var DirectiveResolver = (function () {
 exports.DirectiveResolver = DirectiveResolver;
 exports.CODEGEN_DIRECTIVE_RESOLVER = new DirectiveResolver(core_private_1.reflector);
 
-},{"../core_private":81,"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104,"@angular/core":163}],96:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94,"@angular/core":153}],86:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -10576,7 +9751,7 @@ var AstTransformer = (function () {
 }());
 exports.AstTransformer = AstTransformer;
 
-},{"../facade/collection":101}],97:[function(require,module,exports){
+},{"../facade/collection":91}],87:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -10956,7 +10131,7 @@ function unescape(code) {
     }
 }
 
-},{"../chars":89,"../facade/exceptions":103,"../facade/lang":104,"@angular/core":163}],98:[function(require,module,exports){
+},{"../chars":79,"../facade/exceptions":93,"../facade/lang":94,"@angular/core":153}],88:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -11636,17 +10811,17 @@ var SimpleExpressionChecker = (function () {
     return SimpleExpressionChecker;
 }());
 
-},{"../chars":89,"../facade/collection":101,"../facade/exceptions":103,"../facade/lang":104,"../interpolation_config":118,"./ast":96,"./lexer":97,"@angular/core":163}],99:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"./lang":104,"./promise":106,"dup":27,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],100:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],101:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":104,"dup":29}],102:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":100,"./collection":101,"./lang":104,"dup":30}],103:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":100,"./exception_handler":102,"dup":31}],104:[function(require,module,exports){
+},{"../chars":79,"../facade/collection":91,"../facade/exceptions":93,"../facade/lang":94,"../interpolation_config":108,"./ast":86,"./lexer":87,"@angular/core":153}],89:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"./lang":94,"./promise":96,"dup":17,"rxjs/Observable":562,"rxjs/Subject":564,"rxjs/observable/PromiseObservable":568,"rxjs/operator/toPromise":569}],90:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],91:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"./lang":94,"dup":19}],92:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./base_wrapped_exception":90,"./collection":91,"./lang":94,"dup":20}],93:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":90,"./exception_handler":92,"dup":21}],94:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -12115,7 +11290,7 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],105:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -12128,9 +11303,9 @@ var lang_1 = require('./lang');
 exports.Math = lang_1.global.Math;
 exports.NaN = typeof exports.NaN;
 
-},{"./lang":104}],106:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],107:[function(require,module,exports){
+},{"./lang":94}],96:[function(require,module,exports){
+arguments[4][24][0].apply(exports,arguments)
+},{"dup":24}],97:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -12222,7 +11397,7 @@ function htmlVisitAll(visitor, asts, context) {
 }
 exports.htmlVisitAll = htmlVisitAll;
 
-},{"../src/facade/lang":104}],108:[function(require,module,exports){
+},{"../src/facade/lang":94}],98:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -12883,7 +12058,7 @@ function mergeTextTokens(srcTokens) {
     return dstTokens;
 }
 
-},{"./chars":89,"./facade/lang":104,"./html_tags":110,"./interpolation_config":118,"./parse_util":130}],109:[function(require,module,exports){
+},{"./chars":79,"./facade/lang":94,"./html_tags":100,"./interpolation_config":108,"./parse_util":120}],99:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -13255,7 +12430,7 @@ function lastOnStack(stack, element) {
     return stack.length > 0 && stack[stack.length - 1] === element;
 }
 
-},{"../src/facade/collection":101,"../src/facade/lang":104,"./html_ast":107,"./html_lexer":108,"./html_tags":110,"./parse_util":130,"@angular/core":163}],110:[function(require,module,exports){
+},{"../src/facade/collection":91,"../src/facade/lang":94,"./html_ast":97,"./html_lexer":98,"./html_tags":100,"./parse_util":120,"@angular/core":153}],100:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -13642,7 +12817,7 @@ function mergeNsAndName(prefix, localName) {
 }
 exports.mergeNsAndName = mergeNsAndName;
 
-},{"../src/facade/lang":104}],111:[function(require,module,exports){
+},{"../src/facade/lang":94}],101:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -13741,7 +12916,7 @@ function _expandDefaultForm(ast, errors) {
     return new html_ast_1.HtmlElementAst('ng-container', [switchAttr], children, ast.sourceSpan, ast.sourceSpan, ast.sourceSpan);
 }
 
-},{"../facade/exceptions":103,"../html_ast":107,"./shared":115}],112:[function(require,module,exports){
+},{"../facade/exceptions":93,"../html_ast":97,"./shared":105}],102:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14021,7 +13196,7 @@ var _CreateNodeMapping = (function () {
     return _CreateNodeMapping;
 }());
 
-},{"../facade/collection":101,"../facade/exceptions":103,"../facade/lang":104,"../html_ast":107,"../html_parser":109,"../interpolation_config":118,"./expander":111,"./message":113,"./shared":115}],113:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/exceptions":93,"../facade/lang":94,"../html_ast":97,"../html_parser":99,"../interpolation_config":108,"./expander":101,"./message":103,"./shared":105}],103:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14058,7 +13233,7 @@ function id(m) {
 }
 exports.id = id;
 
-},{"../facade/lang":104}],114:[function(require,module,exports){
+},{"../facade/lang":94}],104:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14232,7 +13407,7 @@ var MessageExtractor = (function () {
 }());
 exports.MessageExtractor = MessageExtractor;
 
-},{"../facade/collection":101,"../facade/lang":104,"../html_ast":107,"../interpolation_config":118,"./message":113,"./shared":115}],115:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/lang":94,"../html_ast":97,"../interpolation_config":108,"./message":103,"./shared":105}],105:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14446,7 +13621,7 @@ var _StringifyVisitor = (function () {
     return _StringifyVisitor;
 }());
 
-},{"../facade/lang":104,"../html_ast":107,"../parse_util":130,"./message":113}],116:[function(require,module,exports){
+},{"../facade/lang":94,"../html_ast":97,"../parse_util":120,"./message":103}],106:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14557,7 +13732,7 @@ function _escapeXml(value) {
     return _XML_ESCAPED_CHARS.reduce(function (value, escape) { return value.replace(escape[0], escape[1]); }, value);
 }
 
-},{"../facade/lang":104,"../html_ast":107,"../html_parser":109,"../parse_util":130,"./message":113}],117:[function(require,module,exports){
+},{"../facade/lang":94,"../html_ast":97,"../html_parser":99,"../parse_util":120,"./message":103}],107:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14765,7 +13940,7 @@ function identifierToken(identifier) {
 }
 exports.identifierToken = identifierToken;
 
-},{"../core_private":81,"./compile_metadata":90,"./util":145,"@angular/core":163}],118:[function(require,module,exports){
+},{"../core_private":71,"./compile_metadata":80,"./util":135,"@angular/core":153}],108:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14779,7 +13954,7 @@ exports.DEFAULT_INTERPOLATION_CONFIG = {
     end: '}}'
 };
 
-},{}],119:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -15286,7 +14461,7 @@ var _CompileValueConverter = (function (_super) {
     return _CompileValueConverter;
 }(util_1.ValueTransformer));
 
-},{"../core_private":81,"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104,"./assertions":88,"./compile_metadata":90,"./config":92,"./directive_lifecycle_reflector":93,"./directive_resolver":95,"./pipe_resolver":131,"./url_resolver":144,"./util":145,"./view_resolver":161,"@angular/core":163}],120:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94,"./assertions":78,"./compile_metadata":80,"./config":82,"./directive_lifecycle_reflector":83,"./directive_resolver":85,"./pipe_resolver":121,"./url_resolver":134,"./util":135,"./view_resolver":151,"@angular/core":153}],110:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -15442,7 +14617,7 @@ function _splitLastSuffix(path) {
     }
 }
 
-},{"./compile_metadata":90,"./facade/collection":101,"./facade/exceptions":103,"./output/output_ast":125,"./util":145,"./view_compiler/view_compiler":160,"@angular/core":163}],121:[function(require,module,exports){
+},{"./compile_metadata":80,"./facade/collection":91,"./facade/exceptions":93,"./output/output_ast":115,"./util":135,"./view_compiler/view_compiler":150,"@angular/core":153}],111:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -15861,7 +15036,7 @@ function _createIndent(count) {
     return res;
 }
 
-},{"../facade/exceptions":103,"../facade/lang":104,"./output_ast":125}],122:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"./output_ast":115}],112:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -16033,7 +15208,7 @@ var AbstractJsEmitterVisitor = (function (_super) {
 }(abstract_emitter_1.AbstractEmitterVisitor));
 exports.AbstractJsEmitterVisitor = AbstractJsEmitterVisitor;
 
-},{"../facade/exceptions":103,"../facade/lang":104,"./abstract_emitter":121,"./output_ast":125}],123:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"./abstract_emitter":111,"./output_ast":115}],113:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -16422,7 +15597,7 @@ function isConstType(type) {
     return lang_1.isPresent(type) && type.hasModifier(o.TypeModifier.Const);
 }
 
-},{"../facade/exceptions":103,"../facade/lang":104,"./abstract_emitter":121,"./output_ast":125}],124:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"./abstract_emitter":111,"./output_ast":115}],114:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -16523,7 +15698,7 @@ var _InterpretiveAppView = (function (_super) {
     return _InterpretiveAppView;
 }(core_private_1.DebugAppView));
 
-},{"../../core_private":81,"../facade/exceptions":103,"../facade/lang":104}],125:[function(require,module,exports){
+},{"../../core_private":71,"../facade/exceptions":93,"../facade/lang":94}],115:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -17510,7 +16685,7 @@ function fn(params, body, type) {
 }
 exports.fn = fn;
 
-},{"../facade/lang":104}],126:[function(require,module,exports){
+},{"../facade/lang":94}],116:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -17968,7 +17143,7 @@ function _declareFn(varNames, statements, ctx, visitor) {
 var CATCH_ERROR_VAR = 'error';
 var CATCH_STACK_VAR = 'stack';
 
-},{"../../core_private":81,"../facade/async":99,"../facade/collection":101,"../facade/exceptions":103,"../facade/lang":104,"./dart_emitter":123,"./output_ast":125,"./ts_emitter":129}],127:[function(require,module,exports){
+},{"../../core_private":71,"../facade/async":89,"../facade/collection":91,"../facade/exceptions":93,"../facade/lang":94,"./dart_emitter":113,"./output_ast":115,"./ts_emitter":119}],117:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18022,7 +17197,7 @@ var JitEmitterVisitor = (function (_super) {
     return JitEmitterVisitor;
 }(abstract_js_emitter_1.AbstractJsEmitterVisitor));
 
-},{"../facade/lang":104,"../util":145,"./abstract_emitter":121,"./abstract_js_emitter":122}],128:[function(require,module,exports){
+},{"../facade/lang":94,"../util":135,"./abstract_emitter":111,"./abstract_js_emitter":112}],118:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18066,7 +17241,7 @@ var AssetUrl = (function () {
 }());
 exports.AssetUrl = AssetUrl;
 
-},{"../facade/exceptions":103,"../facade/lang":104}],129:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94}],119:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18379,7 +17554,7 @@ var _TsEmitterVisitor = (function (_super) {
     return _TsEmitterVisitor;
 }(abstract_emitter_1.AbstractEmitterVisitor));
 
-},{"../facade/exceptions":103,"../facade/lang":104,"./abstract_emitter":121,"./output_ast":125}],130:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"./abstract_emitter":111,"./output_ast":115}],120:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18467,7 +17642,7 @@ var ParseError = (function () {
 }());
 exports.ParseError = ParseError;
 
-},{}],131:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18513,7 +17688,7 @@ var PipeResolver = (function () {
 }());
 exports.PipeResolver = PipeResolver;
 
-},{"../core_private":81,"../src/facade/exceptions":103,"../src/facade/lang":104,"@angular/core":163}],132:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/exceptions":93,"../src/facade/lang":94,"@angular/core":153}],122:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -18897,7 +18072,7 @@ function _addQueryToTokenMap(map, query) {
     });
 }
 
-},{"../src/facade/collection":101,"../src/facade/lang":104,"./compile_metadata":90,"./identifiers":117,"./parse_util":130,"./template_ast":141}],133:[function(require,module,exports){
+},{"../src/facade/collection":91,"../src/facade/lang":94,"./compile_metadata":80,"./identifiers":107,"./parse_util":120,"./template_ast":131}],123:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -19153,7 +18328,7 @@ function assertComponent(meta) {
     }
 }
 
-},{"../src/facade/async":99,"../src/facade/exceptions":103,"../src/facade/lang":104,"./compile_metadata":90,"./config":92,"./directive_normalizer":94,"./metadata_resolver":119,"./output/interpretive_view":124,"./output/output_ast":125,"./output/output_interpreter":126,"./output/output_jit":127,"./style_compiler":139,"./template_parser":142,"./view_compiler/view_compiler":160,"@angular/core":163}],134:[function(require,module,exports){
+},{"../src/facade/async":89,"../src/facade/exceptions":93,"../src/facade/lang":94,"./compile_metadata":80,"./config":82,"./directive_normalizer":84,"./metadata_resolver":109,"./output/interpretive_view":114,"./output/output_ast":115,"./output/output_interpreter":116,"./output/output_jit":117,"./style_compiler":129,"./template_parser":132,"./view_compiler/view_compiler":150,"@angular/core":153}],124:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -19475,7 +18650,7 @@ var DomElementSchemaRegistry = (function (_super) {
 }(element_schema_registry_1.ElementSchemaRegistry));
 exports.DomElementSchemaRegistry = DomElementSchemaRegistry;
 
-},{"../../core_private":81,"../facade/collection":101,"../facade/lang":104,"./dom_security_schema":135,"./element_schema_registry":136,"@angular/core":163}],135:[function(require,module,exports){
+},{"../../core_private":71,"../facade/collection":91,"../facade/lang":94,"./dom_security_schema":125,"./element_schema_registry":126,"@angular/core":153}],125:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -19534,7 +18709,7 @@ registerContext(core_private_1.SecurityContext.RESOURCE_URL, [
     'track|src',
 ]);
 
-},{"../../core_private":81}],136:[function(require,module,exports){
+},{"../../core_private":71}],126:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -19550,7 +18725,7 @@ var ElementSchemaRegistry = (function () {
 }());
 exports.ElementSchemaRegistry = ElementSchemaRegistry;
 
-},{}],137:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -19916,7 +19091,7 @@ var SelectorContext = (function () {
 }());
 exports.SelectorContext = SelectorContext;
 
-},{"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104}],138:[function(require,module,exports){
+},{"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94}],128:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20424,7 +19599,7 @@ function escapeBlocks(input) {
     return new StringWithEscapedBlocks(resultParts.join(''), escapedBlocks);
 }
 
-},{"../src/facade/collection":101,"../src/facade/lang":104}],139:[function(require,module,exports){
+},{"../src/facade/collection":91,"../src/facade/lang":94}],129:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20529,7 +19704,7 @@ function getStylesVarName(component) {
     return result;
 }
 
-},{"./compile_metadata":90,"./output/output_ast":125,"./shadow_css":138,"./url_resolver":144,"@angular/core":163}],140:[function(require,module,exports){
+},{"./compile_metadata":80,"./output/output_ast":115,"./shadow_css":128,"./url_resolver":134,"@angular/core":153}],130:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20579,7 +19754,7 @@ var _cssImportRe = /@import\s+(?:url\()?\s*(?:(?:['"]([^'"]*))|([^;\)\s]*))[^;]*
 //       https://github.com/angular/angular/issues/4596
 var _urlWithSchemaRe = /^([a-zA-Z\-\+\.]+):/g;
 
-},{"../src/facade/lang":104}],141:[function(require,module,exports){
+},{"../src/facade/lang":94}],131:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20868,7 +20043,7 @@ function templateVisitAll(visitor, asts, context) {
 }
 exports.templateVisitAll = templateVisitAll;
 
-},{"../src/facade/lang":104}],142:[function(require,module,exports){
+},{"../src/facade/lang":94}],132:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -21703,7 +20878,7 @@ function removeDuplicates(items) {
     return res;
 }
 
-},{"../core_private":81,"../src/facade/collection":101,"../src/facade/exceptions":103,"../src/facade/lang":104,"./expression_parser/ast":96,"./expression_parser/parser":98,"./html_ast":107,"./html_parser":109,"./html_tags":110,"./identifiers":117,"./parse_util":130,"./provider_parser":132,"./schema/element_schema_registry":136,"./selector":137,"./style_url_resolver":140,"./template_ast":141,"./template_preparser":143,"./util":145,"@angular/core":163}],143:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/collection":91,"../src/facade/exceptions":93,"../src/facade/lang":94,"./expression_parser/ast":86,"./expression_parser/parser":88,"./html_ast":97,"./html_parser":99,"./html_tags":100,"./identifiers":107,"./parse_util":120,"./provider_parser":122,"./schema/element_schema_registry":126,"./selector":127,"./style_url_resolver":130,"./template_ast":131,"./template_preparser":133,"./util":135,"@angular/core":153}],133:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -21794,7 +20969,7 @@ function normalizeNgContentSelect(selectAttr) {
     return selectAttr;
 }
 
-},{"../src/facade/lang":104,"./html_tags":110}],144:[function(require,module,exports){
+},{"../src/facade/lang":94,"./html_tags":100}],134:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22117,7 +21292,7 @@ function _resolveUrl(base, url) {
     return _joinAndCanonicalizePath(parts);
 }
 
-},{"../src/facade/lang":104,"@angular/core":163}],145:[function(require,module,exports){
+},{"../src/facade/lang":94,"@angular/core":153}],135:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22205,7 +21380,7 @@ function assetUrl(pkg, path, type) {
 }
 exports.assetUrl = assetUrl;
 
-},{"./facade/collection":101,"./facade/lang":104}],146:[function(require,module,exports){
+},{"./facade/collection":91,"./facade/lang":94}],136:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22223,7 +21398,7 @@ var CompileBinding = (function () {
 }());
 exports.CompileBinding = CompileBinding;
 
-},{}],147:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22634,7 +21809,7 @@ var _ValueOutputAstTransformer = (function (_super) {
     return _ValueOutputAstTransformer;
 }(util_2.ValueTransformer));
 
-},{"../compile_metadata":90,"../facade/collection":101,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"../template_ast":141,"../util":145,"./compile_method":148,"./compile_query":150,"./constants":152,"./util":157,"@angular/core":163}],148:[function(require,module,exports){
+},{"../compile_metadata":80,"../facade/collection":91,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"../template_ast":131,"../util":135,"./compile_method":138,"./compile_query":140,"./constants":142,"./util":147,"@angular/core":153}],138:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22706,7 +21881,7 @@ var CompileMethod = (function () {
 }());
 exports.CompileMethod = CompileMethod;
 
-},{"../facade/collection":101,"../facade/lang":104,"../output/output_ast":125}],149:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/lang":94,"../output/output_ast":115}],139:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22813,7 +21988,7 @@ function _findPipeMeta(view, name) {
     return pipeMeta;
 }
 
-},{"../facade/exceptions":103,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"./util":157}],150:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"./util":147}],140:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -22934,7 +22109,7 @@ function addQueryToTokenMap(map, query) {
 }
 exports.addQueryToTokenMap = addQueryToTokenMap;
 
-},{"../facade/collection":101,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"./util":157}],151:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"./util":147}],141:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23103,7 +22278,7 @@ function getViewType(component, embeddedTemplateIndex) {
     }
 }
 
-},{"../../core_private":81,"../compile_metadata":90,"../facade/collection":101,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"./compile_method":148,"./compile_pipe":149,"./compile_query":150,"./constants":152,"./util":157}],152:[function(require,module,exports){
+},{"../../core_private":71,"../compile_metadata":80,"../facade/collection":91,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"./compile_method":138,"./compile_pipe":139,"./compile_query":140,"./constants":142,"./util":147}],142:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23223,7 +22398,7 @@ var DetectChangesVars = (function () {
 }());
 exports.DetectChangesVars = DetectChangesVars;
 
-},{"../../core_private":81,"../compile_metadata":90,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"@angular/core":163}],153:[function(require,module,exports){
+},{"../../core_private":71,"../compile_metadata":80,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"@angular/core":153}],143:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23365,7 +22540,7 @@ function santitizeEventName(name) {
     return lang_1.StringWrapper.replaceAll(name, /[^a-zA-Z_]/g, '_');
 }
 
-},{"../facade/collection":101,"../facade/lang":104,"../output/output_ast":125,"./compile_binding":146,"./compile_method":148,"./constants":152,"./expression_converter":154}],154:[function(require,module,exports){
+},{"../facade/collection":91,"../facade/lang":94,"../output/output_ast":115,"./compile_binding":136,"./compile_method":138,"./constants":142,"./expression_converter":144}],144:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23610,7 +22785,7 @@ function flattenStatements(arg, output) {
     }
 }
 
-},{"../facade/exceptions":103,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125}],155:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115}],145:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23681,7 +22856,7 @@ function bindPipeDestroyLifecycleCallbacks(pipeMeta, pipeInstance, view) {
 }
 exports.bindPipeDestroyLifecycleCallbacks = bindPipeDestroyLifecycleCallbacks;
 
-},{"../../core_private":81,"../output/output_ast":125,"./constants":152}],156:[function(require,module,exports){
+},{"../../core_private":71,"../output/output_ast":115,"./constants":142}],146:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23900,7 +23075,7 @@ function logBindingUpdateStmt(renderNode, propName, value) {
         .toStmt();
 }
 
-},{"../../core_private":81,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"../template_ast":141,"../util":145,"./compile_binding":146,"./constants":152,"./expression_converter":154,"@angular/core":163}],157:[function(require,module,exports){
+},{"../../core_private":71,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"../template_ast":131,"../util":135,"./compile_binding":136,"./constants":142,"./expression_converter":144,"@angular/core":153}],147:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23998,7 +23173,7 @@ function createPureProxy(fn, argCount, pureProxyProp, view) {
 }
 exports.createPureProxy = createPureProxy;
 
-},{"../facade/exceptions":103,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125}],158:[function(require,module,exports){
+},{"../facade/exceptions":93,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115}],148:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24083,7 +23258,7 @@ var ViewBinderVisitor = (function () {
     return ViewBinderVisitor;
 }());
 
-},{"../facade/collection":101,"../template_ast":141,"./event_binder":153,"./lifecycle_binder":155,"./property_binder":156}],159:[function(require,module,exports){
+},{"../facade/collection":91,"../template_ast":131,"./event_binder":143,"./lifecycle_binder":145,"./property_binder":146}],149:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24596,7 +23771,7 @@ function getChangeDetectionMode(view) {
     return mode;
 }
 
-},{"../../core_private":81,"../animation/animation_compiler":85,"../compile_metadata":90,"../facade/collection":101,"../facade/lang":104,"../identifiers":117,"../output/output_ast":125,"../template_ast":141,"./compile_element":147,"./compile_view":151,"./constants":152,"./util":157,"@angular/core":163}],160:[function(require,module,exports){
+},{"../../core_private":71,"../animation/animation_compiler":75,"../compile_metadata":80,"../facade/collection":91,"../facade/lang":94,"../identifiers":107,"../output/output_ast":115,"../template_ast":131,"./compile_element":137,"./compile_view":141,"./constants":142,"./util":147,"@angular/core":153}],150:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24657,7 +23832,7 @@ var ViewCompiler = (function () {
 }());
 exports.ViewCompiler = ViewCompiler;
 
-},{"../animation/animation_compiler":85,"../config":92,"./compile_element":147,"./compile_view":151,"./view_binder":158,"./view_builder":159,"@angular/core":163}],161:[function(require,module,exports){
+},{"../animation/animation_compiler":75,"../config":82,"./compile_element":137,"./compile_view":141,"./view_binder":148,"./view_builder":149,"@angular/core":153}],151:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24716,7 +23891,7 @@ var ViewResolver = (function () {
 }());
 exports.ViewResolver = ViewResolver;
 
-},{"../core_private":81,"../src/facade/exceptions":103,"../src/facade/lang":104,"@angular/core":163}],162:[function(require,module,exports){
+},{"../core_private":71,"../src/facade/exceptions":93,"../src/facade/lang":94,"@angular/core":153}],152:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24738,7 +23913,7 @@ var XHR = (function () {
 }());
 exports.XHR = XHR;
 
-},{}],163:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24807,7 +23982,7 @@ __export(require('./src/animation/metadata'));
 var animation_player_1 = require('./src/animation/animation_player');
 exports.AnimationPlayer = animation_player_1.AnimationPlayer;
 
-},{"./private_export":164,"./src/animation/animation_player":170,"./src/animation/metadata":174,"./src/application_common_providers":175,"./src/application_ref":176,"./src/application_tokens":177,"./src/change_detection":178,"./src/debug/debug_node":188,"./src/di":190,"./src/facade/async":202,"./src/facade/exceptions":206,"./src/facade/lang":207,"./src/linker":210,"./src/metadata":229,"./src/platform_common_providers":234,"./src/platform_directives_and_pipes":235,"./src/profile/profile":236,"./src/render":243,"./src/testability/testability":246,"./src/util":247,"./src/zone":249}],164:[function(require,module,exports){
+},{"./private_export":154,"./src/animation/animation_player":160,"./src/animation/metadata":164,"./src/application_common_providers":165,"./src/application_ref":166,"./src/application_tokens":167,"./src/change_detection":168,"./src/debug/debug_node":178,"./src/di":180,"./src/facade/async":192,"./src/facade/exceptions":196,"./src/facade/lang":197,"./src/linker":200,"./src/metadata":219,"./src/platform_common_providers":224,"./src/platform_directives_and_pipes":225,"./src/profile/profile":226,"./src/render":233,"./src/testability/testability":236,"./src/util":237,"./src/zone":239}],154:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24918,7 +24093,7 @@ exports.__core_private__ = {
     FILL_STYLE_FLAG: animation_constants_1.FILL_STYLE_FLAG
 };
 
-},{"./src/animation/animation_constants":166,"./src/animation/animation_driver":167,"./src/animation/animation_group_player":168,"./src/animation/animation_keyframe":169,"./src/animation/animation_player":170,"./src/animation/animation_sequence_player":171,"./src/animation/animation_style_util":172,"./src/animation/animation_styles":173,"./src/change_detection/change_detection_util":180,"./src/change_detection/constants":182,"./src/console":187,"./src/debug/debug_renderer":189,"./src/di/provider_util":197,"./src/di/reflective_provider":201,"./src/linker/component_factory_resolver":213,"./src/linker/component_resolver":214,"./src/linker/debug_context":215,"./src/linker/element":217,"./src/linker/template_ref":223,"./src/linker/view":224,"./src/linker/view_type":227,"./src/linker/view_utils":228,"./src/metadata/lifecycle_hooks":232,"./src/metadata/view":233,"./src/profile/wtf_init":238,"./src/reflection/reflection":239,"./src/reflection/reflection_capabilities":240,"./src/reflection/reflector_reader":242,"./src/render/api":244,"./src/security":245,"./src/util/decorators":248}],165:[function(require,module,exports){
+},{"./src/animation/animation_constants":156,"./src/animation/animation_driver":157,"./src/animation/animation_group_player":158,"./src/animation/animation_keyframe":159,"./src/animation/animation_player":160,"./src/animation/animation_sequence_player":161,"./src/animation/animation_style_util":162,"./src/animation/animation_styles":163,"./src/change_detection/change_detection_util":170,"./src/change_detection/constants":172,"./src/console":177,"./src/debug/debug_renderer":179,"./src/di/provider_util":187,"./src/di/reflective_provider":191,"./src/linker/component_factory_resolver":203,"./src/linker/component_resolver":204,"./src/linker/debug_context":205,"./src/linker/element":207,"./src/linker/template_ref":213,"./src/linker/view":214,"./src/linker/view_type":217,"./src/linker/view_utils":218,"./src/metadata/lifecycle_hooks":222,"./src/metadata/view":223,"./src/profile/wtf_init":228,"./src/reflection/reflection":229,"./src/reflection/reflection_capabilities":230,"./src/reflection/reflector_reader":232,"./src/render/api":234,"./src/security":235,"./src/util/decorators":238}],155:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24980,7 +24155,7 @@ var ActiveAnimationPlayersMap = (function () {
 }());
 exports.ActiveAnimationPlayersMap = ActiveAnimationPlayersMap;
 
-},{"../facade/collection":204,"../facade/lang":207}],166:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197}],156:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -24994,7 +24169,7 @@ exports.ANY_STATE = '*';
 exports.DEFAULT_STATE = '*';
 exports.EMPTY_STATE = 'void';
 
-},{}],167:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25027,7 +24202,7 @@ var NoOpAnimationDriver = (function (_super) {
 }(AnimationDriver));
 exports.NoOpAnimationDriver = NoOpAnimationDriver;
 
-},{"./animation_player":170}],168:[function(require,module,exports){
+},{"./animation_player":160}],158:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25099,7 +24274,7 @@ var AnimationGroupPlayer = (function () {
 }());
 exports.AnimationGroupPlayer = AnimationGroupPlayer;
 
-},{"../facade/lang":207,"../facade/math":208}],169:[function(require,module,exports){
+},{"../facade/lang":197,"../facade/math":198}],159:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25117,7 +24292,7 @@ var AnimationKeyframe = (function () {
 }());
 exports.AnimationKeyframe = AnimationKeyframe;
 
-},{}],170:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25170,7 +24345,7 @@ var NoOpAnimationPlayer = (function () {
 }());
 exports.NoOpAnimationPlayer = NoOpAnimationPlayer;
 
-},{"../facade/exceptions":206,"../facade/lang":207}],171:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197}],161:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25247,7 +24422,7 @@ var AnimationSequencePlayer = (function () {
 }());
 exports.AnimationSequencePlayer = AnimationSequencePlayer;
 
-},{"../facade/lang":207,"./animation_player":170}],172:[function(require,module,exports){
+},{"../facade/lang":197,"./animation_player":160}],162:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25354,7 +24529,7 @@ function flattenStyles(styles) {
 }
 exports.flattenStyles = flattenStyles;
 
-},{"../facade/collection":204,"../facade/lang":207,"./animation_constants":166,"./metadata":174}],173:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197,"./animation_constants":156,"./metadata":164}],163:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -25371,7 +24546,7 @@ var AnimationStyles = (function () {
 }());
 exports.AnimationStyles = AnimationStyles;
 
-},{}],174:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26050,7 +25225,7 @@ function trigger(name, animation) {
 }
 exports.trigger = trigger;
 
-},{"../facade/exceptions":206,"../facade/lang":207}],175:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197}],165:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26084,7 +25259,7 @@ exports.APPLICATION_COMMON_PROVIDERS =
     /* @ts2dart_Provider */ { provide: dynamic_component_loader_1.DynamicComponentLoader, useClass: dynamic_component_loader_1.DynamicComponentLoader_ },
 ];
 
-},{"./application_ref":176,"./application_tokens":177,"./change_detection/change_detection":179,"./linker/component_factory_resolver":213,"./linker/component_resolver":214,"./linker/dynamic_component_loader":216,"./linker/view_utils":228}],176:[function(require,module,exports){
+},{"./application_ref":166,"./application_tokens":167,"./change_detection/change_detection":169,"./linker/component_factory_resolver":203,"./linker/component_resolver":204,"./linker/dynamic_component_loader":206,"./linker/view_utils":218}],166:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26567,7 +25742,7 @@ exports.APPLICATION_CORE_PROVIDERS = [
     /* @ts2dart_Provider */ { provide: ApplicationRef, useExisting: ApplicationRef_ },
 ];
 
-},{"../src/facade/async":202,"../src/facade/collection":204,"../src/facade/exceptions":206,"../src/facade/lang":207,"./application_tokens":177,"./console":187,"./di":190,"./linker/component_resolver":214,"./profile/profile":236,"./testability/testability":246,"./zone/ng_zone":250}],177:[function(require,module,exports){
+},{"../src/facade/async":192,"../src/facade/collection":194,"../src/facade/exceptions":196,"../src/facade/lang":197,"./application_tokens":167,"./console":177,"./di":180,"./linker/component_resolver":204,"./profile/profile":226,"./testability/testability":236,"./zone/ng_zone":240}],167:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26624,7 +25799,7 @@ exports.APP_INITIALIZER =
 exports.PACKAGE_ROOT_URL =
 /*@ts2dart_const*/ new di_1.OpaqueToken('Application Packages Root URL');
 
-},{"../src/facade/lang":207,"./di":190}],178:[function(require,module,exports){
+},{"../src/facade/lang":197,"./di":180}],168:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26649,7 +25824,7 @@ exports.KeyValueDiffers = change_detection_1.KeyValueDiffers;
 exports.SimpleChange = change_detection_1.SimpleChange;
 exports.WrappedValue = change_detection_1.WrappedValue;
 
-},{"./change_detection/change_detection":179}],179:[function(require,module,exports){
+},{"./change_detection/change_detection":169}],169:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26701,7 +25876,7 @@ exports.iterableDiff =
 exports.defaultIterableDiffers = new iterable_differs_1.IterableDiffers(exports.iterableDiff);
 exports.defaultKeyValueDiffers = new keyvalue_differs_1.KeyValueDiffers(exports.keyValDiff);
 
-},{"./change_detection_util":180,"./change_detector_ref":181,"./constants":182,"./differs/default_iterable_differ":183,"./differs/default_keyvalue_differ":184,"./differs/iterable_differs":185,"./differs/keyvalue_differs":186}],180:[function(require,module,exports){
+},{"./change_detection_util":170,"./change_detector_ref":171,"./constants":172,"./differs/default_iterable_differ":173,"./differs/default_keyvalue_differ":174,"./differs/iterable_differs":175,"./differs/keyvalue_differs":176}],170:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26789,7 +25964,7 @@ var SimpleChange = (function () {
 }());
 exports.SimpleChange = SimpleChange;
 
-},{"../facade/collection":204,"../facade/lang":207}],181:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197}],171:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26808,7 +25983,7 @@ var ChangeDetectorRef = (function () {
 }());
 exports.ChangeDetectorRef = ChangeDetectorRef;
 
-},{}],182:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26894,7 +26069,7 @@ function isDefaultChangeDetectionStrategy(changeDetectionStrategy) {
 }
 exports.isDefaultChangeDetectionStrategy = isDefaultChangeDetectionStrategy;
 
-},{"../facade/lang":207}],183:[function(require,module,exports){
+},{"../facade/lang":197}],173:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -27562,7 +26737,7 @@ var _DuplicateMap = (function () {
     return _DuplicateMap;
 }());
 
-},{"../../facade/collection":204,"../../facade/exceptions":206,"../../facade/lang":207}],184:[function(require,module,exports){
+},{"../../facade/collection":194,"../../facade/exceptions":196,"../../facade/lang":197}],174:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -27930,7 +27105,7 @@ var KeyValueChangeRecord = (function () {
 }());
 exports.KeyValueChangeRecord = KeyValueChangeRecord;
 
-},{"../../facade/collection":204,"../../facade/exceptions":206,"../../facade/lang":207}],185:[function(require,module,exports){
+},{"../../facade/collection":194,"../../facade/exceptions":196,"../../facade/lang":197}],175:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28010,7 +27185,7 @@ var IterableDiffers = (function () {
 }());
 exports.IterableDiffers = IterableDiffers;
 
-},{"../../di":190,"../../facade/collection":204,"../../facade/exceptions":206,"../../facade/lang":207}],186:[function(require,module,exports){
+},{"../../di":180,"../../facade/collection":194,"../../facade/exceptions":196,"../../facade/lang":197}],176:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28090,7 +27265,7 @@ var KeyValueDiffers = (function () {
 }());
 exports.KeyValueDiffers = KeyValueDiffers;
 
-},{"../../di":190,"../../facade/collection":204,"../../facade/exceptions":206,"../../facade/lang":207}],187:[function(require,module,exports){
+},{"../../di":180,"../../facade/collection":194,"../../facade/exceptions":196,"../../facade/lang":197}],177:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28118,7 +27293,7 @@ var Console = (function () {
 }());
 exports.Console = Console;
 
-},{"./di/decorators":191,"./facade/lang":207}],188:[function(require,module,exports){
+},{"./di/decorators":181,"./facade/lang":197}],178:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28334,7 +27509,7 @@ function removeDebugNodeFromIndex(node) {
 }
 exports.removeDebugNodeFromIndex = removeDebugNodeFromIndex;
 
-},{"../facade/collection":204,"../facade/lang":207}],189:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197}],179:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28470,7 +27645,7 @@ var DebugDomRenderer = (function () {
 }());
 exports.DebugDomRenderer = DebugDomRenderer;
 
-},{"../facade/lang":207,"./debug_node":188}],190:[function(require,module,exports){
+},{"../facade/lang":197,"./debug_node":178}],180:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28524,7 +27699,7 @@ exports.OutOfBoundsError = reflective_exceptions_1.OutOfBoundsError;
 var opaque_token_1 = require('./di/opaque_token');
 exports.OpaqueToken = opaque_token_1.OpaqueToken;
 
-},{"./di/decorators":191,"./di/forward_ref":192,"./di/injector":193,"./di/metadata":194,"./di/opaque_token":195,"./di/provider":196,"./di/reflective_exceptions":198,"./di/reflective_injector":199,"./di/reflective_key":200,"./di/reflective_provider":201}],191:[function(require,module,exports){
+},{"./di/decorators":181,"./di/forward_ref":182,"./di/injector":183,"./di/metadata":184,"./di/opaque_token":185,"./di/provider":186,"./di/reflective_exceptions":188,"./di/reflective_injector":189,"./di/reflective_key":190,"./di/reflective_provider":191}],181:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28572,7 +27747,7 @@ exports.Host = decorators_1.makeParamDecorator(metadata_1.HostMetadata);
  */
 exports.SkipSelf = decorators_1.makeParamDecorator(metadata_1.SkipSelfMetadata);
 
-},{"../util/decorators":248,"./metadata":194}],192:[function(require,module,exports){
+},{"../util/decorators":238,"./metadata":184}],182:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28627,7 +27802,7 @@ function resolveForwardRef(type) {
 }
 exports.resolveForwardRef = resolveForwardRef;
 
-},{"../facade/lang":207}],193:[function(require,module,exports){
+},{"../facade/lang":197}],183:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28675,7 +27850,7 @@ var Injector = (function () {
 }());
 exports.Injector = Injector;
 
-},{"../facade/exceptions":206}],194:[function(require,module,exports){
+},{"../facade/exceptions":196}],184:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28955,7 +28130,7 @@ var HostMetadata = (function () {
 }());
 exports.HostMetadata = HostMetadata;
 
-},{"../facade/lang":207}],195:[function(require,module,exports){
+},{"../facade/lang":197}],185:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -28996,7 +28171,7 @@ var OpaqueToken = (function () {
 }());
 exports.OpaqueToken = OpaqueToken;
 
-},{}],196:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -29288,7 +28463,7 @@ function provide(token, _a) {
 }
 exports.provide = provide;
 
-},{"../facade/exceptions":206,"../facade/lang":207}],197:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197}],187:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -29307,7 +28482,7 @@ function createProvider(obj) {
 }
 exports.createProvider = createProvider;
 
-},{"./provider":196}],198:[function(require,module,exports){
+},{"./provider":186}],188:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -29598,7 +28773,7 @@ var MixingMultiProvidersWithRegularProvidersError = (function (_super) {
 }(exceptions_1.BaseException));
 exports.MixingMultiProvidersWithRegularProvidersError = MixingMultiProvidersWithRegularProvidersError;
 
-},{"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207}],199:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197}],189:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -30437,7 +29612,7 @@ function _mapProviders(injector, fn) {
     return res;
 }
 
-},{"../facade/collection":204,"../facade/exceptions":206,"./injector":193,"./metadata":194,"./reflective_exceptions":198,"./reflective_key":200,"./reflective_provider":201}],200:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/exceptions":196,"./injector":183,"./metadata":184,"./reflective_exceptions":188,"./reflective_key":190,"./reflective_provider":191}],190:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -30528,7 +29703,7 @@ var KeyRegistry = (function () {
 exports.KeyRegistry = KeyRegistry;
 var _globalKeyRegistry = new KeyRegistry();
 
-},{"../facade/exceptions":206,"../facade/lang":207,"./forward_ref":192}],201:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197,"./forward_ref":182}],191:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -30775,17 +29950,17 @@ function _createDependency(token /** TODO #9100 */, optional /** TODO #9100 */, 
     return new ReflectiveDependency(reflective_key_1.ReflectiveKey.get(token), optional, lowerBoundVisibility, upperBoundVisibility, depProps);
 }
 
-},{"../facade/collection":204,"../facade/lang":207,"../reflection/reflection":239,"./forward_ref":192,"./metadata":194,"./provider":196,"./provider_util":197,"./reflective_exceptions":198,"./reflective_key":200}],202:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"./lang":207,"./promise":209,"dup":27,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],203:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],204:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":207,"dup":29}],205:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":203,"./collection":204,"./lang":207,"dup":30}],206:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":203,"./exception_handler":205,"dup":31}],207:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197,"../reflection/reflection":229,"./forward_ref":182,"./metadata":184,"./provider":186,"./provider_util":187,"./reflective_exceptions":188,"./reflective_key":190}],192:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"./lang":197,"./promise":199,"dup":17,"rxjs/Observable":562,"rxjs/Subject":564,"rxjs/observable/PromiseObservable":568,"rxjs/operator/toPromise":569}],193:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],194:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"./lang":197,"dup":19}],195:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./base_wrapped_exception":193,"./collection":194,"./lang":197,"dup":20}],196:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":193,"./exception_handler":195,"dup":21}],197:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -31254,11 +30429,11 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],208:[function(require,module,exports){
-arguments[4][105][0].apply(exports,arguments)
-},{"./lang":207,"dup":105}],209:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],210:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
+arguments[4][95][0].apply(exports,arguments)
+},{"./lang":197,"dup":95}],199:[function(require,module,exports){
+arguments[4][24][0].apply(exports,arguments)
+},{"dup":24}],200:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31297,7 +30472,7 @@ var view_ref_1 = require('./linker/view_ref');
 exports.EmbeddedViewRef = view_ref_1.EmbeddedViewRef;
 exports.ViewRef = view_ref_1.ViewRef;
 
-},{"./linker/compiler":211,"./linker/component_factory":212,"./linker/component_factory_resolver":213,"./linker/component_resolver":214,"./linker/dynamic_component_loader":216,"./linker/element_ref":219,"./linker/exceptions":220,"./linker/query_list":221,"./linker/systemjs_component_resolver":222,"./linker/template_ref":223,"./linker/view_container_ref":225,"./linker/view_ref":226}],211:[function(require,module,exports){
+},{"./linker/compiler":201,"./linker/component_factory":202,"./linker/component_factory_resolver":203,"./linker/component_resolver":204,"./linker/dynamic_component_loader":206,"./linker/element_ref":209,"./linker/exceptions":210,"./linker/query_list":211,"./linker/systemjs_component_resolver":212,"./linker/template_ref":213,"./linker/view_container_ref":215,"./linker/view_ref":216}],201:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31342,7 +30517,7 @@ var Compiler = (function () {
 }());
 exports.Compiler = Compiler;
 
-},{"../facade/exceptions":206,"../facade/lang":207}],212:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197}],202:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31506,7 +30681,7 @@ var ComponentFactory = (function () {
 }());
 exports.ComponentFactory = ComponentFactory;
 
-},{"../facade/exceptions":206,"../facade/lang":207,"./view_utils":228}],213:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197,"./view_utils":218}],203:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31572,7 +30747,7 @@ var CodegenComponentFactoryResolver = (function () {
 }());
 exports.CodegenComponentFactoryResolver = CodegenComponentFactoryResolver;
 
-},{"../facade/exceptions":206,"../facade/lang":207}],214:[function(require,module,exports){
+},{"../facade/exceptions":196,"../facade/lang":197}],204:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31631,7 +30806,7 @@ var ReflectorComponentResolver = (function (_super) {
 }(ComponentResolver));
 exports.ReflectorComponentResolver = ReflectorComponentResolver;
 
-},{"../di/decorators":191,"../facade/async":202,"../facade/exceptions":206,"../facade/lang":207,"../reflection/reflection":239,"./component_factory":212}],215:[function(require,module,exports){
+},{"../di/decorators":181,"../facade/async":192,"../facade/exceptions":196,"../facade/lang":197,"../reflection/reflection":229,"./component_factory":202}],205:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31757,7 +30932,7 @@ var DebugContext = (function () {
 }());
 exports.DebugContext = DebugContext;
 
-},{"../facade/collection":204,"../facade/lang":207,"./view_type":227}],216:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/lang":197,"./view_type":217}],206:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31824,7 +30999,7 @@ var DynamicComponentLoader_ = (function (_super) {
 }(DynamicComponentLoader));
 exports.DynamicComponentLoader_ = DynamicComponentLoader_;
 
-},{"../di/decorators":191,"../di/reflective_injector":199,"../facade/lang":207,"./component_resolver":214}],217:[function(require,module,exports){
+},{"../di/decorators":181,"../di/reflective_injector":189,"../facade/lang":197,"./component_resolver":204}],207:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31925,7 +31100,7 @@ var AppElement = (function () {
 }());
 exports.AppElement = AppElement;
 
-},{"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207,"./element_ref":219,"./view_container_ref":225,"./view_type":227}],218:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197,"./element_ref":209,"./view_container_ref":215,"./view_type":217}],208:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31963,7 +31138,7 @@ var ElementInjector = (function (_super) {
 }(injector_1.Injector));
 exports.ElementInjector = ElementInjector;
 
-},{"../di/injector":193}],219:[function(require,module,exports){
+},{"../di/injector":183}],209:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -31995,7 +31170,7 @@ var ElementRef = (function () {
 }());
 exports.ElementRef = ElementRef;
 
-},{}],220:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32085,7 +31260,7 @@ var ViewDestroyedException = (function (_super) {
 }(exceptions_1.BaseException));
 exports.ViewDestroyedException = ViewDestroyedException;
 
-},{"../facade/exceptions":206}],221:[function(require,module,exports){
+},{"../facade/exceptions":196}],211:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32197,7 +31372,7 @@ var QueryList = (function () {
 }());
 exports.QueryList = QueryList;
 
-},{"../facade/async":202,"../facade/collection":204,"../facade/lang":207}],222:[function(require,module,exports){
+},{"../facade/async":192,"../facade/collection":194,"../facade/lang":197}],212:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32257,7 +31432,7 @@ var SystemJsCmpFactoryResolver = (function () {
 }());
 exports.SystemJsCmpFactoryResolver = SystemJsCmpFactoryResolver;
 
-},{"../facade/lang":207}],223:[function(require,module,exports){
+},{"../facade/lang":197}],213:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32333,7 +31508,7 @@ var TemplateRef_ = (function (_super) {
 }(TemplateRef));
 exports.TemplateRef_ = TemplateRef_;
 
-},{"../facade/lang":207}],224:[function(require,module,exports){
+},{"../facade/lang":197}],214:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32740,7 +31915,7 @@ function _findLastRenderNode(node) {
     return lastNode;
 }
 
-},{"../animation/active_animation_players_map":165,"../animation/animation_group_player":168,"../change_detection/change_detection":179,"../facade/async":202,"../facade/collection":204,"../facade/lang":207,"../profile/profile":236,"./debug_context":215,"./element":217,"./element_injector":218,"./exceptions":220,"./view_ref":226,"./view_type":227,"./view_utils":228}],225:[function(require,module,exports){
+},{"../animation/active_animation_players_map":155,"../animation/animation_group_player":158,"../change_detection/change_detection":169,"../facade/async":192,"../facade/collection":194,"../facade/lang":197,"../profile/profile":226,"./debug_context":205,"./element":207,"./element_injector":208,"./exceptions":210,"./view_ref":216,"./view_type":217,"./view_utils":218}],215:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -32902,7 +32077,7 @@ var ViewContainerRef_ = (function () {
 }());
 exports.ViewContainerRef_ = ViewContainerRef_;
 
-},{"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207,"../profile/profile":236}],226:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197,"../profile/profile":226}],216:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -33045,7 +32220,7 @@ var ViewRef_ = (function () {
 }());
 exports.ViewRef_ = ViewRef_;
 
-},{"../change_detection/constants":182,"../facade/exceptions":206}],227:[function(require,module,exports){
+},{"../change_detection/constants":172,"../facade/exceptions":196}],217:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -33067,7 +32242,7 @@ exports.ViewRef_ = ViewRef_;
 })(exports.ViewType || (exports.ViewType = {}));
 var ViewType = exports.ViewType;
 
-},{}],228:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -33429,7 +32604,7 @@ function pureProxy10(fn) {
 }
 exports.pureProxy10 = pureProxy10;
 
-},{"../application_tokens":177,"../change_detection/change_detection":179,"../change_detection/change_detection_util":180,"../di/decorators":191,"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207,"../render/api":244,"../security":245,"./element":217,"./exceptions":220}],229:[function(require,module,exports){
+},{"../application_tokens":167,"../change_detection/change_detection":169,"../change_detection/change_detection_util":170,"../di/decorators":181,"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197,"../render/api":234,"../security":235,"./element":207,"./exceptions":210}],219:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -34475,7 +33650,7 @@ exports.HostBinding = decorators_1.makePropDecorator(directives_1.HostBindingMet
  */
 exports.HostListener = decorators_1.makePropDecorator(directives_1.HostListenerMetadata);
 
-},{"./metadata/di":230,"./metadata/directives":231,"./metadata/lifecycle_hooks":232,"./metadata/view":233,"./util/decorators":248}],230:[function(require,module,exports){
+},{"./metadata/di":220,"./metadata/directives":221,"./metadata/lifecycle_hooks":222,"./metadata/view":223,"./util/decorators":238}],220:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -34978,7 +34153,7 @@ var ViewChildMetadata = (function (_super) {
 }(ViewQueryMetadata));
 exports.ViewChildMetadata = ViewChildMetadata;
 
-},{"../di/forward_ref":192,"../di/metadata":194,"../facade/lang":207}],231:[function(require,module,exports){
+},{"../di/forward_ref":182,"../di/metadata":184,"../facade/lang":197}],221:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -35880,7 +35055,7 @@ var HostListenerMetadata = (function () {
 }());
 exports.HostListenerMetadata = HostListenerMetadata;
 
-},{"../change_detection/constants":182,"../di/metadata":194,"../facade/lang":207}],232:[function(require,module,exports){
+},{"../change_detection/constants":172,"../di/metadata":184,"../facade/lang":197}],222:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36400,7 +35575,7 @@ var AfterViewChecked = (function () {
 }());
 exports.AfterViewChecked = AfterViewChecked;
 
-},{}],233:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36488,7 +35663,7 @@ var ViewMetadata = (function () {
 }());
 exports.ViewMetadata = ViewMetadata;
 
-},{}],234:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36517,7 +35692,7 @@ exports.PLATFORM_COMMON_PROVIDERS = [
     console_1.Console
 ];
 
-},{"./application_ref":176,"./console":187,"./reflection/reflection":239,"./reflection/reflector_reader":242,"./testability/testability":246}],235:[function(require,module,exports){
+},{"./application_ref":166,"./console":177,"./reflection/reflection":229,"./reflection/reflector_reader":232,"./testability/testability":236}],225:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36581,7 +35756,7 @@ exports.PLATFORM_DIRECTIVES =
   */
 exports.PLATFORM_PIPES = new di_1.OpaqueToken('Platform Pipes');
 
-},{"./di":190}],236:[function(require,module,exports){
+},{"./di":180}],226:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36662,7 +35837,7 @@ exports.wtfStartTimeRange = exports.wtfEnabled ? wtf_impl_1.startTimeRange : fun
  */
 exports.wtfEndTimeRange = exports.wtfEnabled ? wtf_impl_1.endTimeRange : function (r) { return null; };
 
-},{"./wtf_impl":237}],237:[function(require,module,exports){
+},{"./wtf_impl":227}],227:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36705,7 +35880,7 @@ function endTimeRange(range) {
 }
 exports.endTimeRange = endTimeRange;
 
-},{"../facade/lang":207}],238:[function(require,module,exports){
+},{"../facade/lang":197}],228:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36720,7 +35895,7 @@ exports.endTimeRange = endTimeRange;
 function wtfInit() { }
 exports.wtfInit = wtfInit;
 
-},{}],239:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36740,7 +35915,7 @@ exports.Reflector = reflector_2.Reflector;
  */
 exports.reflector = new reflector_1.Reflector(new reflection_capabilities_1.ReflectionCapabilities());
 
-},{"./reflection_capabilities":240,"./reflector":241}],240:[function(require,module,exports){
+},{"./reflection_capabilities":230,"./reflector":231}],230:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -36979,7 +36154,7 @@ function convertTsickleDecoratorIntoMetadata(decoratorInvocations) {
     });
 }
 
-},{"../facade/lang":207}],241:[function(require,module,exports){
+},{"../facade/lang":197}],231:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37154,7 +36329,7 @@ function _mergeMaps(target, config) {
     collection_1.StringMapWrapper.forEach(config, function (v, k) { return target.set(k, v); });
 }
 
-},{"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207,"./reflector_reader":242}],242:[function(require,module,exports){
+},{"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197,"./reflector_reader":232}],232:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37174,7 +36349,7 @@ var ReflectorReader = (function () {
 }());
 exports.ReflectorReader = ReflectorReader;
 
-},{}],243:[function(require,module,exports){
+},{}],233:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37189,7 +36364,7 @@ exports.RenderComponentType = api_1.RenderComponentType;
 exports.Renderer = api_1.Renderer;
 exports.RootRenderer = api_1.RootRenderer;
 
-},{"./render/api":244}],244:[function(require,module,exports){
+},{"./render/api":234}],234:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37278,7 +36453,7 @@ var RootRenderer = (function () {
 }());
 exports.RootRenderer = RootRenderer;
 
-},{"../facade/exceptions":206}],245:[function(require,module,exports){
+},{"../facade/exceptions":196}],235:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37318,7 +36493,7 @@ var SanitizationService = (function () {
 }());
 exports.SanitizationService = SanitizationService;
 
-},{}],246:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37470,7 +36645,7 @@ function setTestabilityGetter(getter) {
 exports.setTestabilityGetter = setTestabilityGetter;
 var _testabilityGetter = new _NoopGetTestability();
 
-},{"../di/decorators":191,"../facade/async":202,"../facade/collection":204,"../facade/exceptions":206,"../facade/lang":207,"../zone/ng_zone":250}],247:[function(require,module,exports){
+},{"../di/decorators":181,"../facade/async":192,"../facade/collection":194,"../facade/exceptions":196,"../facade/lang":197,"../zone/ng_zone":240}],237:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37483,7 +36658,7 @@ var _testabilityGetter = new _NoopGetTestability();
 var decorators_1 = require('./util/decorators');
 exports.Class = decorators_1.Class;
 
-},{"./util/decorators":248}],248:[function(require,module,exports){
+},{"./util/decorators":238}],238:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37750,7 +36925,7 @@ function makePropDecorator(annotationCls /** TODO #9100 */) {
 }
 exports.makePropDecorator = makePropDecorator;
 
-},{"../facade/lang":207}],249:[function(require,module,exports){
+},{"../facade/lang":197}],239:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -37764,7 +36939,7 @@ var ng_zone_1 = require('./zone/ng_zone');
 exports.NgZone = ng_zone_1.NgZone;
 exports.NgZoneError = ng_zone_1.NgZoneError;
 
-},{"./zone/ng_zone":250}],250:[function(require,module,exports){
+},{"./zone/ng_zone":240}],240:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38022,7 +37197,7 @@ var NgZone = (function () {
 }());
 exports.NgZone = NgZone;
 
-},{"../facade/async":202,"../facade/exceptions":206,"./ng_zone_impl":251}],251:[function(require,module,exports){
+},{"../facade/async":192,"../facade/exceptions":196,"./ng_zone_impl":241}],241:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38116,7 +37291,7 @@ var NgZoneImpl = (function () {
 }());
 exports.NgZoneImpl = NgZoneImpl;
 
-},{}],252:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38130,7 +37305,7 @@ function __export(m) {
 }
 __export(require('./src/forms'));
 
-},{"./src/forms":286}],253:[function(require,module,exports){
+},{"./src/forms":277}],243:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38139,6 +37314,7 @@ __export(require('./src/forms'));
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
+var core_1 = require('@angular/core');
 var checkbox_value_accessor_1 = require('./directives/checkbox_value_accessor');
 var default_value_accessor_1 = require('./directives/default_value_accessor');
 var ng_control_status_1 = require('./directives/ng_control_status');
@@ -38147,7 +37323,6 @@ var ng_model_1 = require('./directives/ng_model');
 var ng_model_group_1 = require('./directives/ng_model_group');
 var number_value_accessor_1 = require('./directives/number_value_accessor');
 var radio_control_value_accessor_1 = require('./directives/radio_control_value_accessor');
-var form_array_name_1 = require('./directives/reactive_directives/form_array_name');
 var form_control_directive_1 = require('./directives/reactive_directives/form_control_directive');
 var form_control_name_1 = require('./directives/reactive_directives/form_control_name');
 var form_group_directive_1 = require('./directives/reactive_directives/form_group_directive');
@@ -38173,8 +37348,6 @@ var number_value_accessor_2 = require('./directives/number_value_accessor');
 exports.NumberValueAccessor = number_value_accessor_2.NumberValueAccessor;
 var radio_control_value_accessor_2 = require('./directives/radio_control_value_accessor');
 exports.RadioControlValueAccessor = radio_control_value_accessor_2.RadioControlValueAccessor;
-var form_array_name_2 = require('./directives/reactive_directives/form_array_name');
-exports.FormArrayName = form_array_name_2.FormArrayName;
 var form_control_directive_2 = require('./directives/reactive_directives/form_control_directive');
 exports.FormControlDirective = form_control_directive_2.FormControlDirective;
 var form_control_name_2 = require('./directives/reactive_directives/form_control_name');
@@ -38182,6 +37355,7 @@ exports.FormControlName = form_control_name_2.FormControlName;
 var form_group_directive_2 = require('./directives/reactive_directives/form_group_directive');
 exports.FormGroupDirective = form_group_directive_2.FormGroupDirective;
 var form_group_name_2 = require('./directives/reactive_directives/form_group_name');
+exports.FormArrayName = form_group_name_2.FormArrayName;
 exports.FormGroupName = form_group_name_2.FormGroupName;
 var select_control_value_accessor_2 = require('./directives/select_control_value_accessor');
 exports.NgSelectOption = select_control_value_accessor_2.NgSelectOption;
@@ -38194,6 +37368,14 @@ exports.MaxLengthValidator = validators_2.MaxLengthValidator;
 exports.MinLengthValidator = validators_2.MinLengthValidator;
 exports.PatternValidator = validators_2.PatternValidator;
 exports.RequiredValidator = validators_2.RequiredValidator;
+exports.SHARED_FORM_DIRECTIVES = [
+    select_control_value_accessor_1.NgSelectOption, select_multiple_control_value_accessor_1.NgSelectMultipleOption, default_value_accessor_1.DefaultValueAccessor, number_value_accessor_1.NumberValueAccessor,
+    checkbox_value_accessor_1.CheckboxControlValueAccessor, select_control_value_accessor_1.SelectControlValueAccessor, select_multiple_control_value_accessor_1.SelectMultipleControlValueAccessor,
+    radio_control_value_accessor_1.RadioControlValueAccessor, ng_control_status_1.NgControlStatus, validators_1.RequiredValidator, validators_1.MinLengthValidator,
+    validators_1.MaxLengthValidator, validators_1.PatternValidator
+];
+exports.TEMPLATE_DRIVEN_DIRECTIVES = [ng_model_1.NgModel, ng_model_group_1.NgModelGroup, ng_form_1.NgForm];
+exports.REACTIVE_DRIVEN_DIRECTIVES = [form_control_directive_1.FormControlDirective, form_group_directive_1.FormGroupDirective, form_control_name_1.FormControlName, form_group_name_1.FormGroupName, form_group_name_1.FormArrayName];
 /**
  *
  * A list of all the form directives used as part of a `@Component` annotation.
@@ -38211,22 +37393,23 @@ exports.RequiredValidator = validators_2.RequiredValidator;
  * ```
  * @experimental
  */
-exports.FORM_DIRECTIVES = [
-    ng_model_1.NgModel, ng_model_group_1.NgModelGroup, ng_form_1.NgForm,
-    select_control_value_accessor_1.NgSelectOption, select_multiple_control_value_accessor_1.NgSelectMultipleOption, default_value_accessor_1.DefaultValueAccessor, number_value_accessor_1.NumberValueAccessor,
-    checkbox_value_accessor_1.CheckboxControlValueAccessor, select_control_value_accessor_1.SelectControlValueAccessor, select_multiple_control_value_accessor_1.SelectMultipleControlValueAccessor,
-    radio_control_value_accessor_1.RadioControlValueAccessor, ng_control_status_1.NgControlStatus,
-    validators_1.RequiredValidator, validators_1.MinLengthValidator, validators_1.MaxLengthValidator, validators_1.PatternValidator
-];
+exports.FORM_DIRECTIVES = [exports.TEMPLATE_DRIVEN_DIRECTIVES, exports.SHARED_FORM_DIRECTIVES];
 /**
  * @experimental
  */
-exports.REACTIVE_FORM_DIRECTIVES =
-/*@ts2dart_const*/ [
-    form_control_directive_1.FormControlDirective, form_group_directive_1.FormGroupDirective, form_control_name_1.FormControlName, form_group_name_1.FormGroupName, form_array_name_1.FormArrayName
-];
+exports.REACTIVE_FORM_DIRECTIVES = [exports.REACTIVE_DRIVEN_DIRECTIVES, exports.SHARED_FORM_DIRECTIVES];
+var InternalFormsSharedModule = (function () {
+    function InternalFormsSharedModule() {
+    }
+    /** @nocollapse */
+    InternalFormsSharedModule.decorators = [
+        { type: core_1.NgModule, args: [{ declarations: exports.SHARED_FORM_DIRECTIVES, exports: exports.SHARED_FORM_DIRECTIVES },] },
+    ];
+    return InternalFormsSharedModule;
+}());
+exports.InternalFormsSharedModule = InternalFormsSharedModule;
 
-},{"./directives/checkbox_value_accessor":256,"./directives/default_value_accessor":259,"./directives/ng_control":260,"./directives/ng_control_status":261,"./directives/ng_form":262,"./directives/ng_model":263,"./directives/ng_model_group":264,"./directives/number_value_accessor":266,"./directives/radio_control_value_accessor":267,"./directives/reactive_directives/form_array_name":268,"./directives/reactive_directives/form_control_directive":269,"./directives/reactive_directives/form_control_name":270,"./directives/reactive_directives/form_group_directive":271,"./directives/reactive_directives/form_group_name":272,"./directives/select_control_value_accessor":273,"./directives/select_multiple_control_value_accessor":274,"./directives/validators":276}],254:[function(require,module,exports){
+},{"./directives/checkbox_value_accessor":246,"./directives/default_value_accessor":249,"./directives/ng_control":251,"./directives/ng_control_status":252,"./directives/ng_form":253,"./directives/ng_model":254,"./directives/ng_model_group":255,"./directives/number_value_accessor":257,"./directives/radio_control_value_accessor":258,"./directives/reactive_directives/form_control_directive":259,"./directives/reactive_directives/form_control_name":260,"./directives/reactive_directives/form_group_directive":261,"./directives/reactive_directives/form_group_name":262,"./directives/select_control_value_accessor":264,"./directives/select_multiple_control_value_accessor":265,"./directives/validators":268,"@angular/core":153}],244:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38259,6 +37442,16 @@ var AbstractControlDirective = (function () {
     });
     Object.defineProperty(AbstractControlDirective.prototype, "valid", {
         get: function () { return lang_1.isPresent(this.control) ? this.control.valid : null; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AbstractControlDirective.prototype, "invalid", {
+        get: function () { return lang_1.isPresent(this.control) ? this.control.invalid : null; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AbstractControlDirective.prototype, "pending", {
+        get: function () { return lang_1.isPresent(this.control) ? this.control.pending : null; },
         enumerable: true,
         configurable: true
     });
@@ -38308,11 +37501,16 @@ var AbstractControlDirective = (function () {
         enumerable: true,
         configurable: true
     });
+    AbstractControlDirective.prototype.reset = function (value) {
+        if (value === void 0) { value = undefined; }
+        if (lang_1.isPresent(this.control))
+            this.control.reset(value);
+    };
     return AbstractControlDirective;
 }());
 exports.AbstractControlDirective = AbstractControlDirective;
 
-},{"../facade/exceptions":281,"../facade/lang":282}],255:[function(require,module,exports){
+},{"../facade/exceptions":273,"../facade/lang":274}],245:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38329,14 +37527,19 @@ var __extends = (this && this.__extends) || function (d, b) {
 var control_container_1 = require('./control_container');
 var shared_1 = require('./shared');
 /**
-  This is a base class for code shared between {@link NgModelGroup} and {@link FormGroupName}.
+ * This is a base class for code shared between {@link NgModelGroup} and {@link FormGroupName}.
+ *
+ * @experimental
  */
 var AbstractFormGroupDirective = (function (_super) {
     __extends(AbstractFormGroupDirective, _super);
     function AbstractFormGroupDirective() {
         _super.apply(this, arguments);
     }
-    AbstractFormGroupDirective.prototype.ngOnInit = function () { this.formDirective.addFormGroup(this); };
+    AbstractFormGroupDirective.prototype.ngOnInit = function () {
+        this._checkParentType();
+        this.formDirective.addFormGroup(this);
+    };
     AbstractFormGroupDirective.prototype.ngOnDestroy = function () { this.formDirective.removeFormGroup(this); };
     Object.defineProperty(AbstractFormGroupDirective.prototype, "control", {
         /**
@@ -38372,11 +37575,13 @@ var AbstractFormGroupDirective = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    /** @internal */
+    AbstractFormGroupDirective.prototype._checkParentType = function () { };
     return AbstractFormGroupDirective;
 }(control_container_1.ControlContainer));
 exports.AbstractFormGroupDirective = AbstractFormGroupDirective;
 
-},{"./control_container":257,"./shared":275}],256:[function(require,module,exports){
+},{"./control_container":247,"./shared":266}],246:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38421,11 +37626,27 @@ var CheckboxControlValueAccessor = (function () {
 }());
 exports.CheckboxControlValueAccessor = CheckboxControlValueAccessor;
 
-},{"./control_value_accessor":258,"@angular/core":163}],257:[function(require,module,exports){
-arguments[4][39][0].apply(exports,arguments)
-},{"./abstract_control_directive":254,"dup":39}],258:[function(require,module,exports){
-arguments[4][40][0].apply(exports,arguments)
-},{"@angular/core":163,"dup":40}],259:[function(require,module,exports){
+},{"./control_value_accessor":248,"@angular/core":153}],247:[function(require,module,exports){
+arguments[4][29][0].apply(exports,arguments)
+},{"./abstract_control_directive":244,"dup":29}],248:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var core_1 = require('@angular/core');
+/**
+ * Used to provide a {@link ControlValueAccessor} for form controls.
+ *
+ * See {@link DefaultValueAccessor} for how to implement one.
+ * @experimental
+ */
+exports.NG_VALUE_ACCESSOR = new core_1.OpaqueToken('NgValueAccessor');
+
+},{"@angular/core":153}],249:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38437,8 +37658,7 @@ arguments[4][40][0].apply(exports,arguments)
 var core_1 = require('@angular/core');
 var lang_1 = require('../facade/lang');
 var control_value_accessor_1 = require('./control_value_accessor');
-exports.DEFAULT_VALUE_ACCESSOR =
-/* @ts2dart_Provider */ {
+exports.DEFAULT_VALUE_ACCESSOR = {
     provide: control_value_accessor_1.NG_VALUE_ACCESSOR,
     useExisting: core_1.forwardRef(function () { return DefaultValueAccessor; }),
     multi: true
@@ -38476,7 +37696,24 @@ var DefaultValueAccessor = (function () {
 }());
 exports.DefaultValueAccessor = DefaultValueAccessor;
 
-},{"../facade/lang":282,"./control_value_accessor":258,"@angular/core":163}],260:[function(require,module,exports){
+},{"../facade/lang":274,"./control_value_accessor":248,"@angular/core":153}],250:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+exports.FormErrorExamples = {
+    formControlName: "\n    <div [formGroup]=\"myGroup\">\n      <input formControlName=\"firstName\">\n    </div>\n\n    In your class:\n\n    this.myGroup = new FormGroup({\n       firstName: new FormControl()\n    });",
+    formGroupName: "\n    <div [formGroup]=\"myGroup\">\n       <div formGroupName=\"person\">\n          <input formControlName=\"firstName\">\n       </div>\n    </div>\n\n    In your class:\n\n    this.myGroup = new FormGroup({\n       person: new FormGroup({ firstName: new FormControl() })\n    });",
+    formArrayName: "\n    <div [formGroup]=\"myGroup\">\n      <div formArrayName=\"cities\">\n        <div *ngFor=\"let city of cityArray.controls; let i=index\">\n          <input [formControlName]=\"i\">\n        </div>\n      </div>\n    </div>\n\n    In your class:\n\n    this.cityArray = new FormArray([new FormControl('SF')]);\n    this.myGroup = new FormGroup({\n      cities: this.cityArray\n    });",
+    ngModelGroup: "\n    <form>\n       <div ngModelGroup=\"person\">\n          <input [(ngModel)]=\"person.name\" name=\"firstName\">\n       </div>\n    </form>",
+    ngModelWithFormGroup: "\n    <div [formGroup]=\"myGroup\">\n       <input formControlName=\"firstName\">\n       <input [(ngModel)]=\"showMoreControls\" [ngModelOptions]=\"{standalone: true}\">\n    </div>\n  "
+};
+
+},{}],251:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38521,7 +37758,7 @@ var NgControl = (function (_super) {
 }(abstract_control_directive_1.AbstractControlDirective));
 exports.NgControl = NgControl;
 
-},{"../facade/exceptions":281,"./abstract_control_directive":254}],261:[function(require,module,exports){
+},{"../facade/exceptions":273,"./abstract_control_directive":244}],252:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38601,7 +37838,7 @@ var NgControlStatus = (function () {
 }());
 exports.NgControlStatus = NgControlStatus;
 
-},{"../facade/lang":282,"./ng_control":260,"@angular/core":163}],262:[function(require,module,exports){
+},{"../facade/lang":274,"./ng_control":251,"@angular/core":153}],253:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38623,8 +37860,11 @@ var model_1 = require('../model');
 var validators_1 = require('../validators');
 var control_container_1 = require('./control_container');
 var shared_1 = require('./shared');
-exports.formDirectiveProvider =
-/*@ts2dart_const*/ { provide: control_container_1.ControlContainer, useExisting: core_1.forwardRef(function () { return NgForm; }) };
+exports.formDirectiveProvider = {
+    provide: control_container_1.ControlContainer,
+    useExisting: core_1.forwardRef(function () { return NgForm; })
+};
+var resolvedPromise = Promise.resolve(null);
 var NgForm = (function (_super) {
     __extends(NgForm, _super);
     function NgForm(validators, asyncValidators) {
@@ -38660,17 +37900,17 @@ var NgForm = (function (_super) {
     });
     NgForm.prototype.addControl = function (dir) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () {
+        resolvedPromise.then(function () {
             var container = _this._findContainer(dir.path);
             dir._control = container.registerControl(dir.name, dir.control);
             shared_1.setUpControl(dir.control, dir);
             dir.control.updateValueAndValidity({ emitEvent: false });
         });
     };
-    NgForm.prototype.getControl = function (dir) { return this.form.find(dir.path); };
+    NgForm.prototype.getControl = function (dir) { return this.form.get(dir.path); };
     NgForm.prototype.removeControl = function (dir) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () {
+        resolvedPromise.then(function () {
             var container = _this._findContainer(dir.path);
             if (lang_1.isPresent(container)) {
                 container.removeControl(dir.name);
@@ -38679,7 +37919,7 @@ var NgForm = (function (_super) {
     };
     NgForm.prototype.addFormGroup = function (dir) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () {
+        resolvedPromise.then(function () {
             var container = _this._findContainer(dir.path);
             var group = new model_1.FormGroup({});
             shared_1.setUpFormContainer(group, dir);
@@ -38689,39 +37929,39 @@ var NgForm = (function (_super) {
     };
     NgForm.prototype.removeFormGroup = function (dir) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () {
+        resolvedPromise.then(function () {
             var container = _this._findContainer(dir.path);
             if (lang_1.isPresent(container)) {
                 container.removeControl(dir.name);
             }
         });
     };
-    NgForm.prototype.getFormGroup = function (dir) { return this.form.find(dir.path); };
+    NgForm.prototype.getFormGroup = function (dir) { return this.form.get(dir.path); };
     NgForm.prototype.updateModel = function (dir, value) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () {
-            var ctrl = _this.form.find(dir.path);
-            ctrl.updateValue(value);
+        resolvedPromise.then(function () {
+            var ctrl = _this.form.get(dir.path);
+            ctrl.setValue(value);
         });
     };
+    NgForm.prototype.setValue = function (value) { this.control.setValue(value); };
     NgForm.prototype.onSubmit = function () {
         this._submitted = true;
-        async_1.ObservableWrapper.callEmit(this.ngSubmit, null);
+        this.ngSubmit.emit(null);
         return false;
     };
+    NgForm.prototype.onReset = function () { this.form.reset(); };
     /** @internal */
     NgForm.prototype._findContainer = function (path) {
         path.pop();
-        return collection_1.ListWrapper.isEmpty(path) ? this.form : this.form.find(path);
+        return collection_1.ListWrapper.isEmpty(path) ? this.form : this.form.get(path);
     };
     /** @nocollapse */
     NgForm.decorators = [
         { type: core_1.Directive, args: [{
                     selector: 'form:not([ngNoForm]):not([formGroup]),ngForm,[ngForm]',
                     providers: [exports.formDirectiveProvider],
-                    host: {
-                        '(submit)': 'onSubmit()',
-                    },
+                    host: { '(submit)': 'onSubmit()', '(reset)': 'onReset()' },
                     outputs: ['ngSubmit'],
                     exportAs: 'ngForm'
                 },] },
@@ -38735,7 +37975,7 @@ var NgForm = (function (_super) {
 }(control_container_1.ControlContainer));
 exports.NgForm = NgForm;
 
-},{"../facade/async":277,"../facade/collection":279,"../facade/lang":282,"../model":287,"../validators":288,"./control_container":257,"./shared":275,"@angular/core":163}],263:[function(require,module,exports){
+},{"../facade/async":269,"../facade/collection":271,"../facade/lang":274,"../model":278,"../validators":279,"./control_container":247,"./shared":266,"@angular/core":153}],254:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38751,18 +37991,21 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var core_1 = require('@angular/core');
 var async_1 = require('../facade/async');
-var exceptions_1 = require('../facade/exceptions');
 var model_1 = require('../model');
 var validators_1 = require('../validators');
+var abstract_form_group_directive_1 = require('./abstract_form_group_directive');
 var control_container_1 = require('./control_container');
 var control_value_accessor_1 = require('./control_value_accessor');
 var ng_control_1 = require('./ng_control');
+var ng_form_1 = require('./ng_form');
+var ng_model_group_1 = require('./ng_model_group');
 var shared_1 = require('./shared');
-exports.formControlBinding =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+var template_driven_errors_1 = require('./template_driven_errors');
+exports.formControlBinding = {
     provide: ng_control_1.NgControl,
     useExisting: core_1.forwardRef(function () { return NgModel; })
 };
+var resolvedPromise = Promise.resolve(null);
 var NgModel = (function (_super) {
     __extends(NgModel, _super);
     function NgModel(_parent, _validators, _asyncValidators, valueAccessors) {
@@ -38778,7 +38021,7 @@ var NgModel = (function (_super) {
         this.valueAccessor = shared_1.selectValueAccessor(this, valueAccessors);
     }
     NgModel.prototype.ngOnChanges = function (changes) {
-        this._checkName();
+        this._checkForErrors();
         if (!this._registered)
             this._setUpControl();
         if (shared_1.isPropertyUpdated(changes, this.viewModel)) {
@@ -38794,7 +38037,7 @@ var NgModel = (function (_super) {
     });
     Object.defineProperty(NgModel.prototype, "path", {
         get: function () {
-            return this._parent ? shared_1.controlPath(this.name, this._parent) : [];
+            return this._parent ? shared_1.controlPath(this.name, this._parent) : [this.name];
         },
         enumerable: true,
         configurable: true
@@ -38818,7 +38061,7 @@ var NgModel = (function (_super) {
     });
     NgModel.prototype.viewToModelUpdate = function (newValue) {
         this.viewModel = newValue;
-        async_1.ObservableWrapper.callEmit(this.update, newValue);
+        this.update.emit(newValue);
     };
     NgModel.prototype._setUpControl = function () {
         this._isStandalone() ? this._setUpStandalone() :
@@ -38832,16 +38075,31 @@ var NgModel = (function (_super) {
         shared_1.setUpControl(this._control, this);
         this._control.updateValueAndValidity({ emitEvent: false });
     };
+    NgModel.prototype._checkForErrors = function () {
+        if (!this._isStandalone()) {
+            this._checkParentType();
+        }
+        this._checkName();
+    };
+    NgModel.prototype._checkParentType = function () {
+        if (!(this._parent instanceof ng_model_group_1.NgModelGroup) &&
+            this._parent instanceof abstract_form_group_directive_1.AbstractFormGroupDirective) {
+            template_driven_errors_1.TemplateDrivenErrors.formGroupNameException();
+        }
+        else if (!(this._parent instanceof ng_model_group_1.NgModelGroup) && !(this._parent instanceof ng_form_1.NgForm)) {
+            template_driven_errors_1.TemplateDrivenErrors.modelParentException();
+        }
+    };
     NgModel.prototype._checkName = function () {
         if (this.options && this.options.name)
             this.name = this.options.name;
         if (!this._isStandalone() && !this.name) {
-            throw new exceptions_1.BaseException("If ngModel is used within a form tag, either the name attribute must be set\n                      or the form control must be defined as 'standalone' in ngModelOptions.\n\n                      Example 1: <input [(ngModel)]=\"person.firstName\" name=\"first\">\n                      Example 2: <input [(ngModel)]=\"person.firstName\" [ngModelOptions]=\"{standalone: true}\">\n                   ");
+            template_driven_errors_1.TemplateDrivenErrors.missingNameException();
         }
     };
     NgModel.prototype._updateValue = function (value) {
         var _this = this;
-        async_1.PromiseWrapper.scheduleMicrotask(function () { _this.control.updateValue(value); });
+        resolvedPromise.then(function () { _this.control.setValue(value, { emitViewToModelChange: false }); });
     };
     /** @nocollapse */
     NgModel.decorators = [
@@ -38869,7 +38127,7 @@ var NgModel = (function (_super) {
 }(ng_control_1.NgControl));
 exports.NgModel = NgModel;
 
-},{"../facade/async":277,"../facade/exceptions":281,"../model":287,"../validators":288,"./control_container":257,"./control_value_accessor":258,"./ng_control":260,"./shared":275,"@angular/core":163}],264:[function(require,module,exports){
+},{"../facade/async":269,"../model":278,"../validators":279,"./abstract_form_group_directive":245,"./control_container":247,"./control_value_accessor":248,"./ng_control":251,"./ng_form":253,"./ng_model_group":255,"./shared":266,"./template_driven_errors":267,"@angular/core":153}],255:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38887,8 +38145,9 @@ var core_1 = require('@angular/core');
 var validators_1 = require('../validators');
 var abstract_form_group_directive_1 = require('./abstract_form_group_directive');
 var control_container_1 = require('./control_container');
-exports.modelGroupProvider =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+var ng_form_1 = require('./ng_form');
+var template_driven_errors_1 = require('./template_driven_errors');
+exports.modelGroupProvider = {
     provide: control_container_1.ControlContainer,
     useExisting: core_1.forwardRef(function () { return NgModelGroup; })
 };
@@ -38900,6 +38159,12 @@ var NgModelGroup = (function (_super) {
         this._validators = validators;
         this._asyncValidators = asyncValidators;
     }
+    /** @internal */
+    NgModelGroup.prototype._checkParentType = function () {
+        if (!(this._parent instanceof NgModelGroup) && !(this._parent instanceof ng_form_1.NgForm)) {
+            template_driven_errors_1.TemplateDrivenErrors.modelGroupParentException();
+        }
+    };
     /** @nocollapse */
     NgModelGroup.decorators = [
         { type: core_1.Directive, args: [{ selector: '[ngModelGroup]', providers: [exports.modelGroupProvider], exportAs: 'ngModelGroup' },] },
@@ -38918,9 +38183,9 @@ var NgModelGroup = (function (_super) {
 }(abstract_form_group_directive_1.AbstractFormGroupDirective));
 exports.NgModelGroup = NgModelGroup;
 
-},{"../validators":288,"./abstract_form_group_directive":255,"./control_container":257,"@angular/core":163}],265:[function(require,module,exports){
-arguments[4][50][0].apply(exports,arguments)
-},{"dup":50}],266:[function(require,module,exports){
+},{"../validators":279,"./abstract_form_group_directive":245,"./control_container":247,"./ng_form":253,"./template_driven_errors":267,"@angular/core":153}],256:[function(require,module,exports){
+arguments[4][40][0].apply(exports,arguments)
+},{"dup":40}],257:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38945,7 +38210,9 @@ var NumberValueAccessor = (function () {
         this.onTouched = function () { };
     }
     NumberValueAccessor.prototype.writeValue = function (value) {
-        this._renderer.setElementProperty(this._elementRef.nativeElement, 'value', value);
+        // The value needs to be normalized for IE9, otherwise it is set to 'null' when null
+        var normalizedValue = lang_1.isBlank(value) ? '' : value;
+        this._renderer.setElementProperty(this._elementRef.nativeElement, 'value', normalizedValue);
     };
     NumberValueAccessor.prototype.registerOnChange = function (fn) {
         this.onChange = function (value) { fn(value == '' ? null : lang_1.NumberWrapper.parseFloat(value)); };
@@ -38972,7 +38239,7 @@ var NumberValueAccessor = (function () {
 }());
 exports.NumberValueAccessor = NumberValueAccessor;
 
-},{"../facade/lang":282,"./control_value_accessor":258,"@angular/core":163}],267:[function(require,module,exports){
+},{"../facade/lang":274,"./control_value_accessor":248,"@angular/core":153}],258:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39095,83 +38362,7 @@ var RadioControlValueAccessor = (function () {
 }());
 exports.RadioControlValueAccessor = RadioControlValueAccessor;
 
-},{"../facade/collection":279,"../facade/exceptions":281,"../facade/lang":282,"./control_value_accessor":258,"./ng_control":260,"@angular/core":163}],268:[function(require,module,exports){
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var core_1 = require('@angular/core');
-var validators_1 = require('../../validators');
-var control_container_1 = require('../control_container');
-var shared_1 = require('../shared');
-exports.formArrayNameProvider =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
-    provide: control_container_1.ControlContainer,
-    useExisting: core_1.forwardRef(function () { return FormArrayName; })
-};
-var FormArrayName = (function (_super) {
-    __extends(FormArrayName, _super);
-    function FormArrayName(parent, validators, asyncValidators) {
-        _super.call(this);
-        this._parent = parent;
-        this._validators = validators;
-        this._asyncValidators = asyncValidators;
-    }
-    FormArrayName.prototype.ngOnInit = function () { this.formDirective.addFormArray(this); };
-    FormArrayName.prototype.ngOnDestroy = function () { this.formDirective.removeFormArray(this); };
-    Object.defineProperty(FormArrayName.prototype, "control", {
-        get: function () { return this.formDirective.getFormArray(this); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FormArrayName.prototype, "formDirective", {
-        get: function () { return this._parent.formDirective; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FormArrayName.prototype, "path", {
-        get: function () { return shared_1.controlPath(this.name, this._parent); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FormArrayName.prototype, "validator", {
-        get: function () { return shared_1.composeValidators(this._validators); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(FormArrayName.prototype, "asyncValidator", {
-        get: function () { return shared_1.composeAsyncValidators(this._asyncValidators); },
-        enumerable: true,
-        configurable: true
-    });
-    /** @nocollapse */
-    FormArrayName.decorators = [
-        { type: core_1.Directive, args: [{ selector: '[formArrayName]', providers: [exports.formArrayNameProvider] },] },
-    ];
-    /** @nocollapse */
-    FormArrayName.ctorParameters = [
-        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Host }, { type: core_1.SkipSelf },] },
-        { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_VALIDATORS,] },] },
-        { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_ASYNC_VALIDATORS,] },] },
-    ];
-    /** @nocollapse */
-    FormArrayName.propDecorators = {
-        'name': [{ type: core_1.Input, args: ['formArrayName',] },],
-    };
-    return FormArrayName;
-}(control_container_1.ControlContainer));
-exports.FormArrayName = FormArrayName;
-
-},{"../../validators":288,"../control_container":257,"../shared":275,"@angular/core":163}],269:[function(require,module,exports){
+},{"../facade/collection":271,"../facade/exceptions":273,"../facade/lang":274,"./control_value_accessor":248,"./ng_control":251,"@angular/core":153}],259:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39192,8 +38383,7 @@ var validators_1 = require('../../validators');
 var control_value_accessor_1 = require('../control_value_accessor');
 var ng_control_1 = require('../ng_control');
 var shared_1 = require('../shared');
-exports.formControlBinding =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+exports.formControlBinding = {
     provide: ng_control_1.NgControl,
     useExisting: core_1.forwardRef(function () { return FormControlDirective; })
 };
@@ -39212,7 +38402,7 @@ var FormControlDirective = (function (_super) {
             this.form.updateValueAndValidity({ emitEvent: false });
         }
         if (shared_1.isPropertyUpdated(changes, this.viewModel)) {
-            this.form.updateValue(this.model);
+            this.form.setValue(this.model);
             this.viewModel = this.model;
         }
     };
@@ -39240,7 +38430,7 @@ var FormControlDirective = (function (_super) {
     });
     FormControlDirective.prototype.viewToModelUpdate = function (newValue) {
         this.viewModel = newValue;
-        async_1.ObservableWrapper.callEmit(this.update, newValue);
+        this.update.emit(newValue);
     };
     FormControlDirective.prototype._isControlChanged = function (changes) {
         return collection_1.StringMapWrapper.contains(changes, 'form');
@@ -39265,7 +38455,7 @@ var FormControlDirective = (function (_super) {
 }(ng_control_1.NgControl));
 exports.FormControlDirective = FormControlDirective;
 
-},{"../../facade/async":277,"../../facade/collection":279,"../../validators":288,"../control_value_accessor":258,"../ng_control":260,"../shared":275,"@angular/core":163}],270:[function(require,module,exports){
+},{"../../facade/async":269,"../../facade/collection":271,"../../validators":279,"../control_value_accessor":248,"../ng_control":251,"../shared":266,"@angular/core":153}],260:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39282,12 +38472,15 @@ var __extends = (this && this.__extends) || function (d, b) {
 var core_1 = require('@angular/core');
 var async_1 = require('../../facade/async');
 var validators_1 = require('../../validators');
+var abstract_form_group_directive_1 = require('../abstract_form_group_directive');
 var control_container_1 = require('../control_container');
 var control_value_accessor_1 = require('../control_value_accessor');
 var ng_control_1 = require('../ng_control');
+var reactive_errors_1 = require('../reactive_errors');
 var shared_1 = require('../shared');
-exports.controlNameBinding =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+var form_group_directive_1 = require('./form_group_directive');
+var form_group_name_1 = require('./form_group_name');
+exports.controlNameBinding = {
     provide: ng_control_1.NgControl,
     useExisting: core_1.forwardRef(function () { return FormControlName; })
 };
@@ -39304,6 +38497,7 @@ var FormControlName = (function (_super) {
     }
     FormControlName.prototype.ngOnChanges = function (changes) {
         if (!this._added) {
+            this._checkParentType();
             this.formDirective.addControl(this);
             this._added = true;
         }
@@ -39315,7 +38509,7 @@ var FormControlName = (function (_super) {
     FormControlName.prototype.ngOnDestroy = function () { this.formDirective.removeControl(this); };
     FormControlName.prototype.viewToModelUpdate = function (newValue) {
         this.viewModel = newValue;
-        async_1.ObservableWrapper.callEmit(this.update, newValue);
+        this.update.emit(newValue);
     };
     Object.defineProperty(FormControlName.prototype, "path", {
         get: function () { return shared_1.controlPath(this.name, this._parent); },
@@ -39344,13 +38538,24 @@ var FormControlName = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    FormControlName.prototype._checkParentType = function () {
+        if (!(this._parent instanceof form_group_name_1.FormGroupName) &&
+            this._parent instanceof abstract_form_group_directive_1.AbstractFormGroupDirective) {
+            reactive_errors_1.ReactiveErrors.ngModelGroupException();
+        }
+        else if (!(this._parent instanceof form_group_name_1.FormGroupName) &&
+            !(this._parent instanceof form_group_directive_1.FormGroupDirective) &&
+            !(this._parent instanceof form_group_name_1.FormArrayName)) {
+            reactive_errors_1.ReactiveErrors.controlParentException();
+        }
+    };
     /** @nocollapse */
     FormControlName.decorators = [
         { type: core_1.Directive, args: [{ selector: '[formControlName]', providers: [exports.controlNameBinding] },] },
     ];
     /** @nocollapse */
     FormControlName.ctorParameters = [
-        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Host }, { type: core_1.SkipSelf },] },
+        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Optional }, { type: core_1.Host }, { type: core_1.SkipSelf },] },
         { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_VALIDATORS,] },] },
         { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_ASYNC_VALIDATORS,] },] },
         { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [control_value_accessor_1.NG_VALUE_ACCESSOR,] },] },
@@ -39365,7 +38570,7 @@ var FormControlName = (function (_super) {
 }(ng_control_1.NgControl));
 exports.FormControlName = FormControlName;
 
-},{"../../facade/async":277,"../../validators":288,"../control_container":257,"../control_value_accessor":258,"../ng_control":260,"../shared":275,"@angular/core":163}],271:[function(require,module,exports){
+},{"../../facade/async":269,"../../validators":279,"../abstract_form_group_directive":245,"../control_container":247,"../control_value_accessor":248,"../ng_control":251,"../reactive_errors":263,"../shared":266,"./form_group_directive":261,"./form_group_name":262,"@angular/core":153}],261:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39382,13 +38587,12 @@ var __extends = (this && this.__extends) || function (d, b) {
 var core_1 = require('@angular/core');
 var async_1 = require('../../facade/async');
 var collection_1 = require('../../facade/collection');
-var exceptions_1 = require('../../facade/exceptions');
 var lang_1 = require('../../facade/lang');
 var validators_1 = require('../../validators');
 var control_container_1 = require('../control_container');
+var reactive_errors_1 = require('../reactive_errors');
 var shared_1 = require('../shared');
-exports.formDirectiveProvider =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+exports.formDirectiveProvider = {
     provide: control_container_1.ControlContainer,
     useExisting: core_1.forwardRef(function () { return FormGroupDirective; })
 };
@@ -39435,47 +38639,48 @@ var FormGroupDirective = (function (_super) {
         configurable: true
     });
     FormGroupDirective.prototype.addControl = function (dir) {
-        var ctrl = this.form.find(dir.path);
+        var ctrl = this.form.get(dir.path);
         shared_1.setUpControl(ctrl, dir);
         ctrl.updateValueAndValidity({ emitEvent: false });
         this.directives.push(dir);
     };
-    FormGroupDirective.prototype.getControl = function (dir) { return this.form.find(dir.path); };
+    FormGroupDirective.prototype.getControl = function (dir) { return this.form.get(dir.path); };
     FormGroupDirective.prototype.removeControl = function (dir) { collection_1.ListWrapper.remove(this.directives, dir); };
     FormGroupDirective.prototype.addFormGroup = function (dir) {
-        var ctrl = this.form.find(dir.path);
+        var ctrl = this.form.get(dir.path);
         shared_1.setUpFormContainer(ctrl, dir);
         ctrl.updateValueAndValidity({ emitEvent: false });
     };
     FormGroupDirective.prototype.removeFormGroup = function (dir) { };
-    FormGroupDirective.prototype.getFormGroup = function (dir) { return this.form.find(dir.path); };
+    FormGroupDirective.prototype.getFormGroup = function (dir) { return this.form.get(dir.path); };
     FormGroupDirective.prototype.addFormArray = function (dir) {
-        var ctrl = this.form.find(dir.path);
+        var ctrl = this.form.get(dir.path);
         shared_1.setUpFormContainer(ctrl, dir);
         ctrl.updateValueAndValidity({ emitEvent: false });
     };
     FormGroupDirective.prototype.removeFormArray = function (dir) { };
-    FormGroupDirective.prototype.getFormArray = function (dir) { return this.form.find(dir.path); };
+    FormGroupDirective.prototype.getFormArray = function (dir) { return this.form.get(dir.path); };
     FormGroupDirective.prototype.updateModel = function (dir, value) {
-        var ctrl = this.form.find(dir.path);
-        ctrl.updateValue(value);
+        var ctrl = this.form.get(dir.path);
+        ctrl.setValue(value);
     };
     FormGroupDirective.prototype.onSubmit = function () {
         this._submitted = true;
-        async_1.ObservableWrapper.callEmit(this.ngSubmit, null);
+        this.ngSubmit.emit(null);
         return false;
     };
+    FormGroupDirective.prototype.onReset = function () { this.form.reset(); };
     /** @internal */
     FormGroupDirective.prototype._updateDomValue = function () {
         var _this = this;
         this.directives.forEach(function (dir) {
-            var ctrl = _this.form.find(dir.path);
+            var ctrl = _this.form.get(dir.path);
             dir.valueAccessor.writeValue(ctrl.value);
         });
     };
     FormGroupDirective.prototype._checkFormPresent = function () {
         if (lang_1.isBlank(this.form)) {
-            throw new exceptions_1.BaseException("formGroup expects a FormGroup instance. Please pass one in.\n           Example: <form [formGroup]=\"myFormGroup\">\n      ");
+            reactive_errors_1.ReactiveErrors.missingFormException();
         }
     };
     /** @nocollapse */
@@ -39483,7 +38688,7 @@ var FormGroupDirective = (function (_super) {
         { type: core_1.Directive, args: [{
                     selector: '[formGroup]',
                     providers: [exports.formDirectiveProvider],
-                    host: { '(submit)': 'onSubmit()' },
+                    host: { '(submit)': 'onSubmit()', '(reset)': 'onReset()' },
                     exportAs: 'ngForm'
                 },] },
     ];
@@ -39501,7 +38706,7 @@ var FormGroupDirective = (function (_super) {
 }(control_container_1.ControlContainer));
 exports.FormGroupDirective = FormGroupDirective;
 
-},{"../../facade/async":277,"../../facade/collection":279,"../../facade/exceptions":281,"../../facade/lang":282,"../../validators":288,"../control_container":257,"../shared":275,"@angular/core":163}],272:[function(require,module,exports){
+},{"../../facade/async":269,"../../facade/collection":271,"../../facade/lang":274,"../../validators":279,"../control_container":247,"../reactive_errors":263,"../shared":266,"@angular/core":153}],262:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39519,8 +38724,10 @@ var core_1 = require('@angular/core');
 var validators_1 = require('../../validators');
 var abstract_form_group_directive_1 = require('../abstract_form_group_directive');
 var control_container_1 = require('../control_container');
-exports.formGroupNameProvider =
-/*@ts2dart_const*/ /* @ts2dart_Provider */ {
+var reactive_errors_1 = require('../reactive_errors');
+var shared_1 = require('../shared');
+var form_group_directive_1 = require('./form_group_directive');
+exports.formGroupNameProvider = {
     provide: control_container_1.ControlContainer,
     useExisting: core_1.forwardRef(function () { return FormGroupName; })
 };
@@ -39532,13 +38739,19 @@ var FormGroupName = (function (_super) {
         this._validators = validators;
         this._asyncValidators = asyncValidators;
     }
+    /** @internal */
+    FormGroupName.prototype._checkParentType = function () {
+        if (_hasInvalidParent(this._parent)) {
+            reactive_errors_1.ReactiveErrors.groupParentException();
+        }
+    };
     /** @nocollapse */
     FormGroupName.decorators = [
         { type: core_1.Directive, args: [{ selector: '[formGroupName]', providers: [exports.formGroupNameProvider] },] },
     ];
     /** @nocollapse */
     FormGroupName.ctorParameters = [
-        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Host }, { type: core_1.SkipSelf },] },
+        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Optional }, { type: core_1.Host }, { type: core_1.SkipSelf },] },
         { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_VALIDATORS,] },] },
         { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_ASYNC_VALIDATORS,] },] },
     ];
@@ -39549,8 +38762,109 @@ var FormGroupName = (function (_super) {
     return FormGroupName;
 }(abstract_form_group_directive_1.AbstractFormGroupDirective));
 exports.FormGroupName = FormGroupName;
+exports.formArrayNameProvider = {
+    provide: control_container_1.ControlContainer,
+    useExisting: core_1.forwardRef(function () { return FormArrayName; })
+};
+var FormArrayName = (function (_super) {
+    __extends(FormArrayName, _super);
+    function FormArrayName(parent, validators, asyncValidators) {
+        _super.call(this);
+        this._parent = parent;
+        this._validators = validators;
+        this._asyncValidators = asyncValidators;
+    }
+    FormArrayName.prototype.ngOnInit = function () {
+        this._checkParentType();
+        this.formDirective.addFormArray(this);
+    };
+    FormArrayName.prototype.ngOnDestroy = function () { this.formDirective.removeFormArray(this); };
+    Object.defineProperty(FormArrayName.prototype, "control", {
+        get: function () { return this.formDirective.getFormArray(this); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FormArrayName.prototype, "formDirective", {
+        get: function () { return this._parent.formDirective; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FormArrayName.prototype, "path", {
+        get: function () { return shared_1.controlPath(this.name, this._parent); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FormArrayName.prototype, "validator", {
+        get: function () { return shared_1.composeValidators(this._validators); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FormArrayName.prototype, "asyncValidator", {
+        get: function () { return shared_1.composeAsyncValidators(this._asyncValidators); },
+        enumerable: true,
+        configurable: true
+    });
+    FormArrayName.prototype._checkParentType = function () {
+        if (_hasInvalidParent(this._parent)) {
+            reactive_errors_1.ReactiveErrors.arrayParentException();
+        }
+    };
+    /** @nocollapse */
+    FormArrayName.decorators = [
+        { type: core_1.Directive, args: [{ selector: '[formArrayName]', providers: [exports.formArrayNameProvider] },] },
+    ];
+    /** @nocollapse */
+    FormArrayName.ctorParameters = [
+        { type: control_container_1.ControlContainer, decorators: [{ type: core_1.Optional }, { type: core_1.Host }, { type: core_1.SkipSelf },] },
+        { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_VALIDATORS,] },] },
+        { type: Array, decorators: [{ type: core_1.Optional }, { type: core_1.Self }, { type: core_1.Inject, args: [validators_1.NG_ASYNC_VALIDATORS,] },] },
+    ];
+    /** @nocollapse */
+    FormArrayName.propDecorators = {
+        'name': [{ type: core_1.Input, args: ['formArrayName',] },],
+    };
+    return FormArrayName;
+}(control_container_1.ControlContainer));
+exports.FormArrayName = FormArrayName;
+function _hasInvalidParent(parent) {
+    return !(parent instanceof FormGroupName) && !(parent instanceof form_group_directive_1.FormGroupDirective) &&
+        !(parent instanceof FormArrayName);
+}
 
-},{"../../validators":288,"../abstract_form_group_directive":255,"../control_container":257,"@angular/core":163}],273:[function(require,module,exports){
+},{"../../validators":279,"../abstract_form_group_directive":245,"../control_container":247,"../reactive_errors":263,"../shared":266,"./form_group_directive":261,"@angular/core":153}],263:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var exceptions_1 = require('../facade/exceptions');
+var error_examples_1 = require('./error_examples');
+var ReactiveErrors = (function () {
+    function ReactiveErrors() {
+    }
+    ReactiveErrors.controlParentException = function () {
+        throw new exceptions_1.BaseException("formControlName must be used with a parent formGroup directive.  You'll want to add a formGroup\n       directive and pass it an existing FormGroup instance (you can create one in your class).\n\n      Example:\n\n      " + error_examples_1.FormErrorExamples.formControlName);
+    };
+    ReactiveErrors.ngModelGroupException = function () {
+        throw new exceptions_1.BaseException("formControlName cannot be used with an ngModelGroup parent. It is only compatible with parents\n       that also have a \"form\" prefix: formGroupName, formArrayName, or formGroup.\n\n       Option 1:  Update the parent to be formGroupName (reactive form strategy)\n\n        " + error_examples_1.FormErrorExamples.formGroupName + "\n\n        Option 2: Use ngModel instead of formControlName (template-driven strategy)\n\n        " + error_examples_1.FormErrorExamples.ngModelGroup);
+    };
+    ReactiveErrors.missingFormException = function () {
+        throw new exceptions_1.BaseException("formGroup expects a FormGroup instance. Please pass one in.\n\n       Example:\n\n       " + error_examples_1.FormErrorExamples.formControlName);
+    };
+    ReactiveErrors.groupParentException = function () {
+        throw new exceptions_1.BaseException("formGroupName must be used with a parent formGroup directive.  You'll want to add a formGroup\n      directive and pass it an existing FormGroup instance (you can create one in your class).\n\n      Example:\n\n      " + error_examples_1.FormErrorExamples.formGroupName);
+    };
+    ReactiveErrors.arrayParentException = function () {
+        throw new exceptions_1.BaseException("formArrayName must be used with a parent formGroup directive.  You'll want to add a formGroup\n       directive and pass it an existing FormGroup instance (you can create one in your class).\n\n        Example:\n\n        " + error_examples_1.FormErrorExamples.formArrayName);
+    };
+    return ReactiveErrors;
+}());
+exports.ReactiveErrors = ReactiveErrors;
+
+},{"../facade/exceptions":273,"./error_examples":250}],264:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39691,7 +39005,7 @@ var NgSelectOption = (function () {
 }());
 exports.NgSelectOption = NgSelectOption;
 
-},{"../facade/collection":279,"../facade/lang":282,"./control_value_accessor":258,"@angular/core":163}],274:[function(require,module,exports){
+},{"../facade/collection":271,"../facade/lang":274,"./control_value_accessor":248,"@angular/core":153}],265:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39704,7 +39018,7 @@ var core_1 = require('@angular/core');
 var collection_1 = require('../facade/collection');
 var lang_1 = require('../facade/lang');
 var control_value_accessor_1 = require('./control_value_accessor');
-var SELECT_MULTIPLE_VALUE_ACCESSOR = {
+exports.SELECT_MULTIPLE_VALUE_ACCESSOR = {
     provide: control_value_accessor_1.NG_VALUE_ACCESSOR,
     useExisting: core_1.forwardRef(function () { return SelectMultipleControlValueAccessor; }),
     multi: true
@@ -39796,8 +39110,8 @@ var SelectMultipleControlValueAccessor = (function () {
     SelectMultipleControlValueAccessor.decorators = [
         { type: core_1.Directive, args: [{
                     selector: 'select[multiple][formControlName],select[multiple][formControl],select[multiple][ngModel]',
-                    host: { '(input)': 'onChange($event.target)', '(blur)': 'onTouched()' },
-                    providers: [SELECT_MULTIPLE_VALUE_ACCESSOR]
+                    host: { '(change)': 'onChange($event.target)', '(blur)': 'onTouched()' },
+                    providers: [exports.SELECT_MULTIPLE_VALUE_ACCESSOR]
                 },] },
     ];
     /** @nocollapse */
@@ -39873,7 +39187,7 @@ var NgSelectMultipleOption = (function () {
 exports.NgSelectMultipleOption = NgSelectMultipleOption;
 exports.SELECT_DIRECTIVES = [SelectMultipleControlValueAccessor, NgSelectMultipleOption];
 
-},{"../facade/collection":279,"../facade/lang":282,"./control_value_accessor":258,"@angular/core":163}],275:[function(require,module,exports){
+},{"../facade/collection":271,"../facade/lang":274,"./control_value_accessor":248,"@angular/core":153}],266:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39901,34 +39215,48 @@ function controlPath(name, parent) {
 exports.controlPath = controlPath;
 function setUpControl(control, dir) {
     if (lang_1.isBlank(control))
-        _throwError(dir, 'Cannot find control');
+        _throwError(dir, 'Cannot find control with');
     if (lang_1.isBlank(dir.valueAccessor))
-        _throwError(dir, 'No value accessor for');
+        _throwError(dir, 'No value accessor for form control with');
     control.validator = validators_1.Validators.compose([control.validator, dir.validator]);
     control.asyncValidator = validators_1.Validators.composeAsync([control.asyncValidator, dir.asyncValidator]);
     dir.valueAccessor.writeValue(control.value);
     // view -> model
     dir.valueAccessor.registerOnChange(function (newValue) {
         dir.viewToModelUpdate(newValue);
-        control.updateValue(newValue, { emitModelToViewChange: false });
         control.markAsDirty();
+        control.setValue(newValue, { emitModelToViewChange: false });
     });
-    // model -> view
-    control.registerOnChange(function (newValue) { return dir.valueAccessor.writeValue(newValue); });
+    control.registerOnChange(function (newValue, emitModelEvent) {
+        // control -> view
+        dir.valueAccessor.writeValue(newValue);
+        // control -> ngModel
+        if (emitModelEvent)
+            dir.viewToModelUpdate(newValue);
+    });
     // touched
     dir.valueAccessor.registerOnTouched(function () { return control.markAsTouched(); });
 }
 exports.setUpControl = setUpControl;
 function setUpFormContainer(control, dir) {
     if (lang_1.isBlank(control))
-        _throwError(dir, 'Cannot find control');
+        _throwError(dir, 'Cannot find control with');
     control.validator = validators_1.Validators.compose([control.validator, dir.validator]);
     control.asyncValidator = validators_1.Validators.composeAsync([control.asyncValidator, dir.asyncValidator]);
 }
 exports.setUpFormContainer = setUpFormContainer;
 function _throwError(dir, message) {
-    var path = dir.path.join(' -> ');
-    throw new exceptions_1.BaseException(message + " '" + path + "'");
+    var messageEnd;
+    if (dir.path.length > 1) {
+        messageEnd = "path: '" + dir.path.join(' -> ') + "'";
+    }
+    else if (dir.path[0]) {
+        messageEnd = "name: '" + dir.path + "'";
+    }
+    else {
+        messageEnd = 'unspecified name attribute';
+    }
+    throw new exceptions_1.BaseException(message + " " + messageEnd);
 }
 function composeValidators(validators) {
     return lang_1.isPresent(validators) ? validators_1.Validators.compose(validators.map(normalize_validator_1.normalizeValidator)) : null;
@@ -39964,12 +39292,12 @@ function selectValueAccessor(dir, valueAccessors) {
             lang_1.hasConstructor(v, select_multiple_control_value_accessor_1.SelectMultipleControlValueAccessor) ||
             lang_1.hasConstructor(v, radio_control_value_accessor_1.RadioControlValueAccessor)) {
             if (lang_1.isPresent(builtinAccessor))
-                _throwError(dir, 'More than one built-in value accessor matches');
+                _throwError(dir, 'More than one built-in value accessor matches form control with');
             builtinAccessor = v;
         }
         else {
             if (lang_1.isPresent(customAccessor))
-                _throwError(dir, 'More than one custom value accessor matches');
+                _throwError(dir, 'More than one custom value accessor matches form control with');
             customAccessor = v;
         }
     });
@@ -39979,12 +39307,42 @@ function selectValueAccessor(dir, valueAccessors) {
         return builtinAccessor;
     if (lang_1.isPresent(defaultAccessor))
         return defaultAccessor;
-    _throwError(dir, 'No valid value accessor for');
+    _throwError(dir, 'No valid value accessor for form control with');
     return null;
 }
 exports.selectValueAccessor = selectValueAccessor;
 
-},{"../facade/collection":279,"../facade/exceptions":281,"../facade/lang":282,"../validators":288,"./checkbox_value_accessor":256,"./default_value_accessor":259,"./normalize_validator":265,"./number_value_accessor":266,"./radio_control_value_accessor":267,"./select_control_value_accessor":273,"./select_multiple_control_value_accessor":274}],276:[function(require,module,exports){
+},{"../facade/collection":271,"../facade/exceptions":273,"../facade/lang":274,"../validators":279,"./checkbox_value_accessor":246,"./default_value_accessor":249,"./normalize_validator":256,"./number_value_accessor":257,"./radio_control_value_accessor":258,"./select_control_value_accessor":264,"./select_multiple_control_value_accessor":265}],267:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var exceptions_1 = require('../facade/exceptions');
+var error_examples_1 = require('./error_examples');
+var TemplateDrivenErrors = (function () {
+    function TemplateDrivenErrors() {
+    }
+    TemplateDrivenErrors.modelParentException = function () {
+        throw new exceptions_1.BaseException("\n      ngModel cannot be used to register form controls with a parent formGroup directive.  Try using\n      formGroup's partner directive \"formControlName\" instead.  Example:\n\n      " + error_examples_1.FormErrorExamples.formControlName + "\n\n      Or, if you'd like to avoid registering this form control, indicate that it's standalone in ngModelOptions:\n\n      Example:\n\n      " + error_examples_1.FormErrorExamples.ngModelWithFormGroup);
+    };
+    TemplateDrivenErrors.formGroupNameException = function () {
+        throw new exceptions_1.BaseException("\n      ngModel cannot be used to register form controls with a parent formGroupName or formArrayName directive.\n\n      Option 1: Use formControlName instead of ngModel (reactive strategy):\n\n      " + error_examples_1.FormErrorExamples.formGroupName + "\n\n      Option 2:  Update ngModel's parent be ngModelGroup (template-driven strategy):\n\n      " + error_examples_1.FormErrorExamples.ngModelGroup);
+    };
+    TemplateDrivenErrors.missingNameException = function () {
+        throw new exceptions_1.BaseException("If ngModel is used within a form tag, either the name attribute must be set or the form\n      control must be defined as 'standalone' in ngModelOptions.\n\n      Example 1: <input [(ngModel)]=\"person.firstName\" name=\"first\">\n      Example 2: <input [(ngModel)]=\"person.firstName\" [ngModelOptions]=\"{standalone: true}\">");
+    };
+    TemplateDrivenErrors.modelGroupParentException = function () {
+        throw new exceptions_1.BaseException("\n      ngModelGroup cannot be used with a parent formGroup directive.\n\n      Option 1: Use formGroupName instead of ngModelGroup (reactive strategy):\n\n      " + error_examples_1.FormErrorExamples.formGroupName + "\n\n      Option 2:  Use a regular form tag instead of the formGroup directive (template-driven strategy):\n\n      " + error_examples_1.FormErrorExamples.ngModelGroup);
+    };
+    return TemplateDrivenErrors;
+}());
+exports.TemplateDrivenErrors = TemplateDrivenErrors;
+
+},{"../facade/exceptions":273,"./error_examples":250}],268:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -39996,10 +39354,10 @@ exports.selectValueAccessor = selectValueAccessor;
 var core_1 = require('@angular/core');
 var lang_1 = require('../facade/lang');
 var validators_1 = require('../validators');
-var REQUIRED = validators_1.Validators.required;
+exports.REQUIRED = validators_1.Validators.required;
 exports.REQUIRED_VALIDATOR = {
     provide: validators_1.NG_VALIDATORS,
-    useValue: REQUIRED,
+    useValue: exports.REQUIRED,
     multi: true
 };
 var RequiredValidator = (function () {
@@ -40016,7 +39374,7 @@ var RequiredValidator = (function () {
 }());
 exports.RequiredValidator = RequiredValidator;
 /**
- * Provivder which adds {@link MinLengthValidator} to {@link NG_VALIDATORS}.
+ * Provider which adds {@link MinLengthValidator} to {@link NG_VALIDATORS}.
  *
  * ## Example:
  *
@@ -40102,17 +39460,640 @@ var PatternValidator = (function () {
 }());
 exports.PatternValidator = PatternValidator;
 
-},{"../facade/lang":282,"../validators":288,"@angular/core":163}],277:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"./lang":282,"./promise":283,"dup":27,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],278:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],279:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":282,"dup":29}],280:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":278,"./collection":279,"./lang":282,"dup":30}],281:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":278,"./exception_handler":280,"dup":31}],282:[function(require,module,exports){
+},{"../facade/lang":274,"../validators":279,"@angular/core":153}],269:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Subject_1 = require('rxjs/Subject');
+var Observable_1 = require('rxjs/Observable');
+exports.Observable = Observable_1.Observable;
+var Subject_2 = require('rxjs/Subject');
+exports.Subject = Subject_2.Subject;
+/**
+ * Use by directives and components to emit custom Events.
+ *
+ * ### Examples
+ *
+ * In the following example, `Zippy` alternatively emits `open` and `close` events when its
+ * title gets clicked:
+ *
+ * ```
+ * @Component({
+ *   selector: 'zippy',
+ *   template: `
+ *   <div class="zippy">
+ *     <div (click)="toggle()">Toggle</div>
+ *     <div [hidden]="!visible">
+ *       <ng-content></ng-content>
+ *     </div>
+ *  </div>`})
+ * export class Zippy {
+ *   visible: boolean = true;
+ *   @Output() open: EventEmitter<any> = new EventEmitter();
+ *   @Output() close: EventEmitter<any> = new EventEmitter();
+ *
+ *   toggle() {
+ *     this.visible = !this.visible;
+ *     if (this.visible) {
+ *       this.open.emit(null);
+ *     } else {
+ *       this.close.emit(null);
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * The events payload can be accessed by the parameter `$event` on the components output event
+ * handler:
+ *
+ * ```
+ * <zippy (open)="onOpen($event)" (close)="onClose($event)"></zippy>
+ * ```
+ *
+ * Uses Rx.Observable but provides an adapter to make it work as specified here:
+ * https://github.com/jhusain/observable-spec
+ *
+ * Once a reference implementation of the spec is available, switch to it.
+ * @stable
+ */
+var EventEmitter = (function (_super) {
+    __extends(EventEmitter, _super);
+    /**
+     * Creates an instance of [EventEmitter], which depending on [isAsync],
+     * delivers events synchronously or asynchronously.
+     */
+    function EventEmitter(isAsync) {
+        if (isAsync === void 0) { isAsync = false; }
+        _super.call(this);
+        this.__isAsync = isAsync;
+    }
+    EventEmitter.prototype.emit = function (value) { _super.prototype.next.call(this, value); };
+    /**
+     * @deprecated - use .emit(value) instead
+     */
+    EventEmitter.prototype.next = function (value) { _super.prototype.next.call(this, value); };
+    EventEmitter.prototype.subscribe = function (generatorOrNext, error, complete) {
+        var schedulerFn;
+        var errorFn = function (err) { return null; };
+        var completeFn = function () { return null; };
+        if (generatorOrNext && typeof generatorOrNext === 'object') {
+            schedulerFn = this.__isAsync ? function (value /** TODO #9100 */) {
+                setTimeout(function () { return generatorOrNext.next(value); });
+            } : function (value /** TODO #9100 */) { generatorOrNext.next(value); };
+            if (generatorOrNext.error) {
+                errorFn = this.__isAsync ? function (err) { setTimeout(function () { return generatorOrNext.error(err); }); } :
+                    function (err) { generatorOrNext.error(err); };
+            }
+            if (generatorOrNext.complete) {
+                completeFn = this.__isAsync ? function () { setTimeout(function () { return generatorOrNext.complete(); }); } :
+                    function () { generatorOrNext.complete(); };
+            }
+        }
+        else {
+            schedulerFn = this.__isAsync ? function (value /** TODO #9100 */) {
+                setTimeout(function () { return generatorOrNext(value); });
+            } : function (value /** TODO #9100 */) { generatorOrNext(value); };
+            if (error) {
+                errorFn =
+                    this.__isAsync ? function (err) { setTimeout(function () { return error(err); }); } : function (err) { error(err); };
+            }
+            if (complete) {
+                completeFn =
+                    this.__isAsync ? function () { setTimeout(function () { return complete(); }); } : function () { complete(); };
+            }
+        }
+        return _super.prototype.subscribe.call(this, schedulerFn, errorFn, completeFn);
+    };
+    return EventEmitter;
+}(Subject_1.Subject));
+exports.EventEmitter = EventEmitter;
+
+},{"rxjs/Observable":562,"rxjs/Subject":564}],270:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],271:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var lang_1 = require('./lang');
+exports.Map = lang_1.global.Map;
+exports.Set = lang_1.global.Set;
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Map constructor.  We work around that by manually adding the items.
+var createMapFromPairs = (function () {
+    try {
+        if (new exports.Map([[1, 2]]).size === 1) {
+            return function createMapFromPairs(pairs) { return new exports.Map(pairs); };
+        }
+    }
+    catch (e) {
+    }
+    return function createMapAndPopulateFromPairs(pairs) {
+        var map = new exports.Map();
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i];
+            map.set(pair[0], pair[1]);
+        }
+        return map;
+    };
+})();
+var createMapFromMap = (function () {
+    try {
+        if (new exports.Map(new exports.Map())) {
+            return function createMapFromMap(m) { return new exports.Map(m); };
+        }
+    }
+    catch (e) {
+    }
+    return function createMapAndPopulateFromMap(m) {
+        var map = new exports.Map();
+        m.forEach(function (v, k) { map.set(k, v); });
+        return map;
+    };
+})();
+var _clearValues = (function () {
+    if ((new exports.Map()).keys().next) {
+        return function _clearValues(m) {
+            var keyIterator = m.keys();
+            var k;
+            while (!((k = keyIterator.next()).done)) {
+                m.set(k.value, null);
+            }
+        };
+    }
+    else {
+        return function _clearValuesWithForeEach(m) {
+            m.forEach(function (v, k) { m.set(k, null); });
+        };
+    }
+})();
+// Safari doesn't implement MapIterator.next(), which is used is Traceur's polyfill of Array.from
+// TODO(mlaval): remove the work around once we have a working polyfill of Array.from
+var _arrayFromMap = (function () {
+    try {
+        if ((new exports.Map()).values().next) {
+            return function createArrayFromMap(m, getValues) {
+                return getValues ? Array.from(m.values()) : Array.from(m.keys());
+            };
+        }
+    }
+    catch (e) {
+    }
+    return function createArrayFromMapWithForeach(m, getValues) {
+        var res = ListWrapper.createFixedSize(m.size), i = 0;
+        m.forEach(function (v, k) {
+            res[i] = getValues ? v : k;
+            i++;
+        });
+        return res;
+    };
+})();
+var MapWrapper = (function () {
+    function MapWrapper() {
+    }
+    MapWrapper.clone = function (m) { return createMapFromMap(m); };
+    MapWrapper.createFromStringMap = function (stringMap) {
+        var result = new exports.Map();
+        for (var prop in stringMap) {
+            result.set(prop, stringMap[prop]);
+        }
+        return result;
+    };
+    MapWrapper.toStringMap = function (m) {
+        var r = {};
+        m.forEach(function (v, k) { return r[k] = v; });
+        return r;
+    };
+    MapWrapper.createFromPairs = function (pairs) { return createMapFromPairs(pairs); };
+    MapWrapper.clearValues = function (m) { _clearValues(m); };
+    MapWrapper.iterable = function (m) { return m; };
+    MapWrapper.keys = function (m) { return _arrayFromMap(m, false); };
+    MapWrapper.values = function (m) { return _arrayFromMap(m, true); };
+    return MapWrapper;
+}());
+exports.MapWrapper = MapWrapper;
+/**
+ * Wraps Javascript Objects
+ */
+var StringMapWrapper = (function () {
+    function StringMapWrapper() {
+    }
+    StringMapWrapper.create = function () {
+        // Note: We are not using Object.create(null) here due to
+        // performance!
+        // http://jsperf.com/ng2-object-create-null
+        return {};
+    };
+    StringMapWrapper.contains = function (map, key) {
+        return map.hasOwnProperty(key);
+    };
+    StringMapWrapper.get = function (map, key) {
+        return map.hasOwnProperty(key) ? map[key] : undefined;
+    };
+    StringMapWrapper.set = function (map, key, value) { map[key] = value; };
+    StringMapWrapper.keys = function (map) { return Object.keys(map); };
+    StringMapWrapper.values = function (map) {
+        return Object.keys(map).map(function (k) { return map[k]; });
+    };
+    StringMapWrapper.isEmpty = function (map) {
+        for (var prop in map) {
+            return false;
+        }
+        return true;
+    };
+    StringMapWrapper.delete = function (map, key) { delete map[key]; };
+    StringMapWrapper.forEach = function (map, callback) {
+        for (var _i = 0, _a = Object.keys(map); _i < _a.length; _i++) {
+            var k = _a[_i];
+            callback(map[k], k);
+        }
+    };
+    StringMapWrapper.merge = function (m1, m2) {
+        var m = {};
+        for (var _i = 0, _a = Object.keys(m1); _i < _a.length; _i++) {
+            var k = _a[_i];
+            m[k] = m1[k];
+        }
+        for (var _b = 0, _c = Object.keys(m2); _b < _c.length; _b++) {
+            var k = _c[_b];
+            m[k] = m2[k];
+        }
+        return m;
+    };
+    StringMapWrapper.equals = function (m1, m2) {
+        var k1 = Object.keys(m1);
+        var k2 = Object.keys(m2);
+        if (k1.length != k2.length) {
+            return false;
+        }
+        var key;
+        for (var i = 0; i < k1.length; i++) {
+            key = k1[i];
+            if (m1[key] !== m2[key]) {
+                return false;
+            }
+        }
+        return true;
+    };
+    return StringMapWrapper;
+}());
+exports.StringMapWrapper = StringMapWrapper;
+var ListWrapper = (function () {
+    function ListWrapper() {
+    }
+    // JS has no way to express a statically fixed size list, but dart does so we
+    // keep both methods.
+    ListWrapper.createFixedSize = function (size) { return new Array(size); };
+    ListWrapper.createGrowableSize = function (size) { return new Array(size); };
+    ListWrapper.clone = function (array) { return array.slice(0); };
+    ListWrapper.forEachWithIndex = function (array, fn) {
+        for (var i = 0; i < array.length; i++) {
+            fn(array[i], i);
+        }
+    };
+    ListWrapper.first = function (array) {
+        if (!array)
+            return null;
+        return array[0];
+    };
+    ListWrapper.last = function (array) {
+        if (!array || array.length == 0)
+            return null;
+        return array[array.length - 1];
+    };
+    ListWrapper.indexOf = function (array, value, startIndex) {
+        if (startIndex === void 0) { startIndex = 0; }
+        return array.indexOf(value, startIndex);
+    };
+    ListWrapper.contains = function (list, el) { return list.indexOf(el) !== -1; };
+    ListWrapper.reversed = function (array) {
+        var a = ListWrapper.clone(array);
+        return a.reverse();
+    };
+    ListWrapper.concat = function (a, b) { return a.concat(b); };
+    ListWrapper.insert = function (list, index, value) { list.splice(index, 0, value); };
+    ListWrapper.removeAt = function (list, index) {
+        var res = list[index];
+        list.splice(index, 1);
+        return res;
+    };
+    ListWrapper.removeAll = function (list, items) {
+        for (var i = 0; i < items.length; ++i) {
+            var index = list.indexOf(items[i]);
+            list.splice(index, 1);
+        }
+    };
+    ListWrapper.remove = function (list, el) {
+        var index = list.indexOf(el);
+        if (index > -1) {
+            list.splice(index, 1);
+            return true;
+        }
+        return false;
+    };
+    ListWrapper.clear = function (list) { list.length = 0; };
+    ListWrapper.isEmpty = function (list) { return list.length == 0; };
+    ListWrapper.fill = function (list, value, start, end) {
+        if (start === void 0) { start = 0; }
+        if (end === void 0) { end = null; }
+        list.fill(value, start, end === null ? list.length : end);
+    };
+    ListWrapper.equals = function (a, b) {
+        if (a.length != b.length)
+            return false;
+        for (var i = 0; i < a.length; ++i) {
+            if (a[i] !== b[i])
+                return false;
+        }
+        return true;
+    };
+    ListWrapper.slice = function (l, from, to) {
+        if (from === void 0) { from = 0; }
+        if (to === void 0) { to = null; }
+        return l.slice(from, to === null ? undefined : to);
+    };
+    ListWrapper.splice = function (l, from, length) { return l.splice(from, length); };
+    ListWrapper.sort = function (l, compareFn) {
+        if (lang_1.isPresent(compareFn)) {
+            l.sort(compareFn);
+        }
+        else {
+            l.sort();
+        }
+    };
+    ListWrapper.toString = function (l) { return l.toString(); };
+    ListWrapper.toJSON = function (l) { return JSON.stringify(l); };
+    ListWrapper.maximum = function (list, predicate) {
+        if (list.length == 0) {
+            return null;
+        }
+        var solution = null;
+        var maxValue = -Infinity;
+        for (var index = 0; index < list.length; index++) {
+            var candidate = list[index];
+            if (lang_1.isBlank(candidate)) {
+                continue;
+            }
+            var candidateValue = predicate(candidate);
+            if (candidateValue > maxValue) {
+                solution = candidate;
+                maxValue = candidateValue;
+            }
+        }
+        return solution;
+    };
+    ListWrapper.flatten = function (list) {
+        var target = [];
+        _flattenArray(list, target);
+        return target;
+    };
+    ListWrapper.addAll = function (list, source) {
+        for (var i = 0; i < source.length; i++) {
+            list.push(source[i]);
+        }
+    };
+    return ListWrapper;
+}());
+exports.ListWrapper = ListWrapper;
+function _flattenArray(source, target) {
+    if (lang_1.isPresent(source)) {
+        for (var i = 0; i < source.length; i++) {
+            var item = source[i];
+            if (lang_1.isArray(item)) {
+                _flattenArray(item, target);
+            }
+            else {
+                target.push(item);
+            }
+        }
+    }
+    return target;
+}
+function isListLikeIterable(obj) {
+    if (!lang_1.isJsObject(obj))
+        return false;
+    return lang_1.isArray(obj) ||
+        (!(obj instanceof exports.Map) &&
+            lang_1.getSymbolIterator() in obj); // JS Iterable have a Symbol.iterator prop
+}
+exports.isListLikeIterable = isListLikeIterable;
+function areIterablesEqual(a, b, comparator) {
+    var iterator1 = a[lang_1.getSymbolIterator()]();
+    var iterator2 = b[lang_1.getSymbolIterator()]();
+    while (true) {
+        var item1 = iterator1.next();
+        var item2 = iterator2.next();
+        if (item1.done && item2.done)
+            return true;
+        if (item1.done || item2.done)
+            return false;
+        if (!comparator(item1.value, item2.value))
+            return false;
+    }
+}
+exports.areIterablesEqual = areIterablesEqual;
+function iterateListLike(obj, fn) {
+    if (lang_1.isArray(obj)) {
+        for (var i = 0; i < obj.length; i++) {
+            fn(obj[i]);
+        }
+    }
+    else {
+        var iterator = obj[lang_1.getSymbolIterator()]();
+        var item;
+        while (!((item = iterator.next()).done)) {
+            fn(item.value);
+        }
+    }
+}
+exports.iterateListLike = iterateListLike;
+// Safari and Internet Explorer do not support the iterable parameter to the
+// Set constructor.  We work around that by manually adding the items.
+var createSetFromList = (function () {
+    var test = new exports.Set([1, 2, 3]);
+    if (test.size === 3) {
+        return function createSetFromList(lst) { return new exports.Set(lst); };
+    }
+    else {
+        return function createSetAndPopulateFromList(lst) {
+            var res = new exports.Set(lst);
+            if (res.size !== lst.length) {
+                for (var i = 0; i < lst.length; i++) {
+                    res.add(lst[i]);
+                }
+            }
+            return res;
+        };
+    }
+})();
+var SetWrapper = (function () {
+    function SetWrapper() {
+    }
+    SetWrapper.createFromList = function (lst) { return createSetFromList(lst); };
+    SetWrapper.has = function (s, key) { return s.has(key); };
+    SetWrapper.delete = function (m, k) { m.delete(k); };
+    return SetWrapper;
+}());
+exports.SetWrapper = SetWrapper;
+
+},{"./lang":274}],272:[function(require,module,exports){
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+"use strict";
+var base_wrapped_exception_1 = require('./base_wrapped_exception');
+var collection_1 = require('./collection');
+var lang_1 = require('./lang');
+var _ArrayLogger = (function () {
+    function _ArrayLogger() {
+        this.res = [];
+    }
+    _ArrayLogger.prototype.log = function (s) { this.res.push(s); };
+    _ArrayLogger.prototype.logError = function (s) { this.res.push(s); };
+    _ArrayLogger.prototype.logGroup = function (s) { this.res.push(s); };
+    _ArrayLogger.prototype.logGroupEnd = function () { };
+    ;
+    return _ArrayLogger;
+}());
+/**
+ * Provides a hook for centralized exception handling.
+ *
+ * The default implementation of `ExceptionHandler` prints error messages to the `Console`. To
+ * intercept error handling,
+ * write a custom exception handler that replaces this default as appropriate for your app.
+ *
+ * ### Example
+ *
+ * ```javascript
+ *
+ * class MyExceptionHandler implements ExceptionHandler {
+ *   call(error, stackTrace = null, reason = null) {
+ *     // do something with the exception
+ *   }
+ * }
+ *
+ * bootstrap(MyApp, [{provide: ExceptionHandler, useClass: MyExceptionHandler}])
+ *
+ * ```
+ * @stable
+ */
+var ExceptionHandler = (function () {
+    function ExceptionHandler(_logger, _rethrowException) {
+        if (_rethrowException === void 0) { _rethrowException = true; }
+        this._logger = _logger;
+        this._rethrowException = _rethrowException;
+    }
+    ExceptionHandler.exceptionToString = function (exception, stackTrace, reason) {
+        if (stackTrace === void 0) { stackTrace = null; }
+        if (reason === void 0) { reason = null; }
+        var l = new _ArrayLogger();
+        var e = new ExceptionHandler(l, false);
+        e.call(exception, stackTrace, reason);
+        return l.res.join('\n');
+    };
+    ExceptionHandler.prototype.call = function (exception, stackTrace, reason) {
+        if (stackTrace === void 0) { stackTrace = null; }
+        if (reason === void 0) { reason = null; }
+        var originalException = this._findOriginalException(exception);
+        var originalStack = this._findOriginalStack(exception);
+        var context = this._findContext(exception);
+        this._logger.logGroup("EXCEPTION: " + this._extractMessage(exception));
+        if (lang_1.isPresent(stackTrace) && lang_1.isBlank(originalStack)) {
+            this._logger.logError('STACKTRACE:');
+            this._logger.logError(this._longStackTrace(stackTrace));
+        }
+        if (lang_1.isPresent(reason)) {
+            this._logger.logError("REASON: " + reason);
+        }
+        if (lang_1.isPresent(originalException)) {
+            this._logger.logError("ORIGINAL EXCEPTION: " + this._extractMessage(originalException));
+        }
+        if (lang_1.isPresent(originalStack)) {
+            this._logger.logError('ORIGINAL STACKTRACE:');
+            this._logger.logError(this._longStackTrace(originalStack));
+        }
+        if (lang_1.isPresent(context)) {
+            this._logger.logError('ERROR CONTEXT:');
+            this._logger.logError(context);
+        }
+        this._logger.logGroupEnd();
+        // We rethrow exceptions, so operations like 'bootstrap' will result in an error
+        // when an exception happens. If we do not rethrow, bootstrap will always succeed.
+        if (this._rethrowException)
+            throw exception;
+    };
+    /** @internal */
+    ExceptionHandler.prototype._extractMessage = function (exception) {
+        return exception instanceof base_wrapped_exception_1.BaseWrappedException ? exception.wrapperMessage :
+            exception.toString();
+    };
+    /** @internal */
+    ExceptionHandler.prototype._longStackTrace = function (stackTrace) {
+        return collection_1.isListLikeIterable(stackTrace) ? stackTrace.join('\n\n-----async gap-----\n') :
+            stackTrace.toString();
+    };
+    /** @internal */
+    ExceptionHandler.prototype._findContext = function (exception) {
+        try {
+            if (!(exception instanceof base_wrapped_exception_1.BaseWrappedException))
+                return null;
+            return lang_1.isPresent(exception.context) ? exception.context :
+                this._findContext(exception.originalException);
+        }
+        catch (e) {
+            // exception.context can throw an exception. if it happens, we ignore the context.
+            return null;
+        }
+    };
+    /** @internal */
+    ExceptionHandler.prototype._findOriginalException = function (exception) {
+        if (!(exception instanceof base_wrapped_exception_1.BaseWrappedException))
+            return null;
+        var e = exception.originalException;
+        while (e instanceof base_wrapped_exception_1.BaseWrappedException && lang_1.isPresent(e.originalException)) {
+            e = e.originalException;
+        }
+        return e;
+    };
+    /** @internal */
+    ExceptionHandler.prototype._findOriginalStack = function (exception) {
+        if (!(exception instanceof base_wrapped_exception_1.BaseWrappedException))
+            return null;
+        var e = exception;
+        var stack = exception.originalStack;
+        while (e instanceof base_wrapped_exception_1.BaseWrappedException && lang_1.isPresent(e.originalException)) {
+            e = e.originalException;
+            if (e instanceof base_wrapped_exception_1.BaseWrappedException && lang_1.isPresent(e.originalException)) {
+                stack = e.originalStack;
+            }
+        }
+        return stack;
+    };
+    return ExceptionHandler;
+}());
+exports.ExceptionHandler = ExceptionHandler;
+
+},{"./base_wrapped_exception":270,"./collection":271,"./lang":274}],273:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":270,"./exception_handler":272,"dup":21}],274:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -40144,7 +40125,6 @@ function scheduleMicroTask(fn) {
     Zone.current.scheduleMicroTask('scheduleMicrotask', fn);
 }
 exports.scheduleMicroTask = scheduleMicroTask;
-exports.IS_DART = false;
 // Need to declare a new variable for global here since TypeScript
 // exports the original value of the symbol.
 var _global = globalScope;
@@ -40211,7 +40191,9 @@ function isStrictStringMap(obj) {
 }
 exports.isStrictStringMap = isStrictStringMap;
 function isPromise(obj) {
-    return obj instanceof _global.Promise;
+    // allow any Promise/A+ compliant thenable.
+    // It's up to the caller to ensure that obj.then conforms to the spec
+    return isPresent(obj) && isFunction(obj.then);
 }
 exports.isPromise = isPromise;
 function isArray(obj) {
@@ -40231,11 +40213,11 @@ function stringify(token) {
     if (token === undefined || token === null) {
         return '' + token;
     }
-    if (token.name) {
-        return token.name;
-    }
     if (token.overriddenName) {
         return token.overriddenName;
+    }
+    if (token.name) {
+        return token.name;
     }
     var res = token.toString();
     var newLineIndex = res.indexOf('\n');
@@ -40390,57 +40372,6 @@ var NumberWrapper = (function () {
 }());
 exports.NumberWrapper = NumberWrapper;
 exports.RegExp = _global.RegExp;
-var RegExpWrapper = (function () {
-    function RegExpWrapper() {
-    }
-    RegExpWrapper.create = function (regExpStr, flags) {
-        if (flags === void 0) { flags = ''; }
-        flags = flags.replace(/g/g, '');
-        return new _global.RegExp(regExpStr, flags + 'g');
-    };
-    RegExpWrapper.firstMatch = function (regExp, input) {
-        // Reset multimatch regex state
-        regExp.lastIndex = 0;
-        return regExp.exec(input);
-    };
-    RegExpWrapper.test = function (regExp, input) {
-        regExp.lastIndex = 0;
-        return regExp.test(input);
-    };
-    RegExpWrapper.matcher = function (regExp, input) {
-        // Reset regex state for the case
-        // someone did not loop over all matches
-        // last time.
-        regExp.lastIndex = 0;
-        return { re: regExp, input: input };
-    };
-    RegExpWrapper.replaceAll = function (regExp, input, replace) {
-        var c = regExp.exec(input);
-        var res = '';
-        regExp.lastIndex = 0;
-        var prev = 0;
-        while (c) {
-            res += input.substring(prev, c.index);
-            res += replace(c);
-            prev = c.index + c[0].length;
-            regExp.lastIndex = prev;
-            c = regExp.exec(input);
-        }
-        res += input.substring(prev);
-        return res;
-    };
-    return RegExpWrapper;
-}());
-exports.RegExpWrapper = RegExpWrapper;
-var RegExpMatcherWrapper = (function () {
-    function RegExpMatcherWrapper() {
-    }
-    RegExpMatcherWrapper.next = function (matcher) {
-        return matcher.re.exec(matcher.input);
-    };
-    return RegExpMatcherWrapper;
-}());
-exports.RegExpMatcherWrapper = RegExpMatcherWrapper;
 var FunctionWrapper = (function () {
     function FunctionWrapper() {
     }
@@ -40581,9 +40512,7 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],283:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],284:[function(require,module,exports){
+},{}],275:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -40665,7 +40594,7 @@ var FormBuilder = (function () {
 }());
 exports.FormBuilder = FormBuilder;
 
-},{"./facade/collection":279,"./facade/lang":282,"./model":287,"@angular/core":163}],285:[function(require,module,exports){
+},{"./facade/collection":271,"./facade/lang":274,"./model":278,"@angular/core":153}],276:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -40674,63 +40603,66 @@ exports.FormBuilder = FormBuilder;
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
-var common_1 = require('@angular/common');
-var compiler_1 = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var directives_1 = require('./directives');
 var radio_control_value_accessor_1 = require('./directives/radio_control_value_accessor');
-var collection_1 = require('./facade/collection');
 var form_builder_1 = require('./form_builder');
 /**
  * Shorthand set of providers used for building Angular forms.
- *
- * ### Example
- *
- * ```typescript
- * bootstrap(MyApp, [FORM_PROVIDERS]);
- * ```
- *
  * @experimental
  */
-exports.FORM_PROVIDERS = [form_builder_1.FormBuilder, radio_control_value_accessor_1.RadioControlRegistry];
-function flatten(platformDirectives) {
-    var flattenedDirectives = [];
-    platformDirectives.forEach(function (directives) {
-        if (Array.isArray(directives)) {
-            flattenedDirectives = flattenedDirectives.concat(directives);
-        }
-        else {
-            flattenedDirectives.push(directives);
-        }
-    });
-    return flattenedDirectives;
-}
+exports.FORM_PROVIDERS = [radio_control_value_accessor_1.RadioControlRegistry];
 /**
+ * Shorthand set of providers used for building reactive Angular forms.
  * @experimental
+ */
+exports.REACTIVE_FORM_PROVIDERS = [form_builder_1.FormBuilder, radio_control_value_accessor_1.RadioControlRegistry];
+var FormsModule = (function () {
+    function FormsModule() {
+    }
+    /** @nocollapse */
+    FormsModule.decorators = [
+        { type: core_1.NgModule, args: [{
+                    declarations: directives_1.TEMPLATE_DRIVEN_DIRECTIVES,
+                    providers: [exports.FORM_PROVIDERS],
+                    exports: [directives_1.InternalFormsSharedModule, directives_1.TEMPLATE_DRIVEN_DIRECTIVES]
+                },] },
+    ];
+    return FormsModule;
+}());
+exports.FormsModule = FormsModule;
+var ReactiveFormsModule = (function () {
+    function ReactiveFormsModule() {
+    }
+    /** @nocollapse */
+    ReactiveFormsModule.decorators = [
+        { type: core_1.NgModule, args: [{
+                    declarations: [directives_1.REACTIVE_DRIVEN_DIRECTIVES],
+                    providers: [exports.REACTIVE_FORM_PROVIDERS],
+                    exports: [directives_1.InternalFormsSharedModule, directives_1.REACTIVE_DRIVEN_DIRECTIVES]
+                },] },
+    ];
+    return ReactiveFormsModule;
+}());
+exports.ReactiveFormsModule = ReactiveFormsModule;
+/**
+ * @deprecated
  */
 function disableDeprecatedForms() {
-    return [{
-            provide: compiler_1.CompilerConfig,
-            useFactory: function (platformDirectives, platformPipes) {
-                var flattenedDirectives = flatten(platformDirectives);
-                collection_1.ListWrapper.remove(flattenedDirectives, common_1.FORM_DIRECTIVES);
-                return new compiler_1.CompilerConfig({ platformDirectives: flattenedDirectives, platformPipes: platformPipes });
-            },
-            deps: [core_1.PLATFORM_DIRECTIVES, core_1.PLATFORM_PIPES]
-        }];
+    return [];
 }
 exports.disableDeprecatedForms = disableDeprecatedForms;
 /**
- * @experimental
+ * @deprecated
  */
 function provideForms() {
     return [
-        { provide: core_1.PLATFORM_DIRECTIVES, useValue: directives_1.FORM_DIRECTIVES, multi: true }, exports.FORM_PROVIDERS
+        { provide: core_1.PLATFORM_DIRECTIVES, useValue: directives_1.FORM_DIRECTIVES, multi: true }, exports.REACTIVE_FORM_PROVIDERS
     ];
 }
 exports.provideForms = provideForms;
 
-},{"./directives":253,"./directives/radio_control_value_accessor":267,"./facade/collection":279,"./form_builder":284,"@angular/common":16,"@angular/compiler":82,"@angular/core":163}],286:[function(require,module,exports){
+},{"./directives":243,"./directives/radio_control_value_accessor":258,"./form_builder":275,"@angular/core":153}],277:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -40760,6 +40692,8 @@ exports.FORM_DIRECTIVES = directives_1.FORM_DIRECTIVES;
 exports.REACTIVE_FORM_DIRECTIVES = directives_1.REACTIVE_FORM_DIRECTIVES;
 var abstract_control_directive_1 = require('./directives/abstract_control_directive');
 exports.AbstractControlDirective = abstract_control_directive_1.AbstractControlDirective;
+var abstract_form_group_directive_1 = require('./directives/abstract_form_group_directive');
+exports.AbstractFormGroupDirective = abstract_form_group_directive_1.AbstractFormGroupDirective;
 var checkbox_value_accessor_1 = require('./directives/checkbox_value_accessor');
 exports.CheckboxControlValueAccessor = checkbox_value_accessor_1.CheckboxControlValueAccessor;
 var control_container_1 = require('./directives/control_container');
@@ -40778,8 +40712,6 @@ var ng_model_1 = require('./directives/ng_model');
 exports.NgModel = ng_model_1.NgModel;
 var ng_model_group_1 = require('./directives/ng_model_group');
 exports.NgModelGroup = ng_model_group_1.NgModelGroup;
-var form_array_name_1 = require('./directives/reactive_directives/form_array_name');
-exports.FormArrayName = form_array_name_1.FormArrayName;
 var form_control_directive_1 = require('./directives/reactive_directives/form_control_directive');
 exports.FormControlDirective = form_control_directive_1.FormControlDirective;
 var form_control_name_1 = require('./directives/reactive_directives/form_control_name');
@@ -40787,10 +40719,14 @@ exports.FormControlName = form_control_name_1.FormControlName;
 var form_group_directive_1 = require('./directives/reactive_directives/form_group_directive');
 exports.FormGroupDirective = form_group_directive_1.FormGroupDirective;
 var form_group_name_1 = require('./directives/reactive_directives/form_group_name');
-exports.FormGroupName = form_group_name_1.FormGroupName;
+exports.FormArrayName = form_group_name_1.FormArrayName;
+var form_group_name_2 = require('./directives/reactive_directives/form_group_name');
+exports.FormGroupName = form_group_name_2.FormGroupName;
 var select_control_value_accessor_1 = require('./directives/select_control_value_accessor');
 exports.NgSelectOption = select_control_value_accessor_1.NgSelectOption;
 exports.SelectControlValueAccessor = select_control_value_accessor_1.SelectControlValueAccessor;
+var select_multiple_control_value_accessor_1 = require('./directives/select_multiple_control_value_accessor');
+exports.SelectMultipleControlValueAccessor = select_multiple_control_value_accessor_1.SelectMultipleControlValueAccessor;
 var validators_1 = require('./directives/validators');
 exports.MaxLengthValidator = validators_1.MaxLengthValidator;
 exports.MinLengthValidator = validators_1.MinLengthValidator;
@@ -40809,7 +40745,7 @@ exports.NG_VALIDATORS = validators_2.NG_VALIDATORS;
 exports.Validators = validators_2.Validators;
 __export(require('./form_providers'));
 
-},{"./directives":253,"./directives/abstract_control_directive":254,"./directives/checkbox_value_accessor":256,"./directives/control_container":257,"./directives/control_value_accessor":258,"./directives/default_value_accessor":259,"./directives/ng_control":260,"./directives/ng_control_status":261,"./directives/ng_form":262,"./directives/ng_model":263,"./directives/ng_model_group":264,"./directives/reactive_directives/form_array_name":268,"./directives/reactive_directives/form_control_directive":269,"./directives/reactive_directives/form_control_name":270,"./directives/reactive_directives/form_group_directive":271,"./directives/reactive_directives/form_group_name":272,"./directives/select_control_value_accessor":273,"./directives/validators":276,"./form_builder":284,"./form_providers":285,"./model":287,"./validators":288}],287:[function(require,module,exports){
+},{"./directives":243,"./directives/abstract_control_directive":244,"./directives/abstract_form_group_directive":245,"./directives/checkbox_value_accessor":246,"./directives/control_container":247,"./directives/control_value_accessor":248,"./directives/default_value_accessor":249,"./directives/ng_control":251,"./directives/ng_control_status":252,"./directives/ng_form":253,"./directives/ng_model":254,"./directives/ng_model_group":255,"./directives/reactive_directives/form_control_directive":259,"./directives/reactive_directives/form_control_name":260,"./directives/reactive_directives/form_group_directive":261,"./directives/reactive_directives/form_group_name":262,"./directives/select_control_value_accessor":264,"./directives/select_multiple_control_value_accessor":265,"./directives/validators":268,"./form_builder":275,"./form_providers":276,"./model":278,"./validators":279}],278:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -40823,9 +40759,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var PromiseObservable_1 = require('rxjs/observable/PromiseObservable');
 var shared_1 = require('./directives/shared');
 var async_1 = require('./facade/async');
 var collection_1 = require('./facade/collection');
+var exceptions_1 = require('./facade/exceptions');
 var lang_1 = require('./facade/lang');
 /**
  * Indicates that a FormControl is valid, i.e. that no errors exist in the input value.
@@ -40844,11 +40782,11 @@ function isControl(control) {
     return control instanceof AbstractControl;
 }
 exports.isControl = isControl;
-function _find(control, path) {
+function _find(control, path, delimiter) {
     if (lang_1.isBlank(path))
         return null;
     if (!(path instanceof Array)) {
-        path = path.split('/');
+        path = path.split(delimiter);
     }
     if (path instanceof Array && collection_1.ListWrapper.isEmpty(path))
         return null;
@@ -40866,7 +40804,7 @@ function _find(control, path) {
     }, control);
 }
 function toObservable(r) {
-    return lang_1.isPromise(r) ? async_1.ObservableWrapper.fromPromise(r) : r;
+    return lang_1.isPromise(r) ? PromiseObservable_1.PromiseObservable.create(r) : r;
 }
 function coerceToValidator(validator) {
     return Array.isArray(validator) ? shared_1.composeValidators(validator) : validator;
@@ -40896,6 +40834,11 @@ var AbstractControl = (function () {
     });
     Object.defineProperty(AbstractControl.prototype, "valid", {
         get: function () { return this._status === exports.VALID; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AbstractControl.prototype, "invalid", {
+        get: function () { return this._status === exports.INVALID; },
         enumerable: true,
         configurable: true
     });
@@ -40950,13 +40893,36 @@ var AbstractControl = (function () {
         this.validator = coerceToValidator(newValidator);
     };
     AbstractControl.prototype.clearValidators = function () { this.validator = null; };
-    AbstractControl.prototype.markAsTouched = function () { this._touched = true; };
+    AbstractControl.prototype.markAsTouched = function (_a) {
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        onlySelf = lang_1.normalizeBool(onlySelf);
+        this._touched = true;
+        if (lang_1.isPresent(this._parent) && !onlySelf) {
+            this._parent.markAsTouched({ onlySelf: onlySelf });
+        }
+    };
     AbstractControl.prototype.markAsDirty = function (_a) {
         var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
         onlySelf = lang_1.normalizeBool(onlySelf);
         this._pristine = false;
         if (lang_1.isPresent(this._parent) && !onlySelf) {
             this._parent.markAsDirty({ onlySelf: onlySelf });
+        }
+    };
+    AbstractControl.prototype.markAsPristine = function (_a) {
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._pristine = true;
+        this._forEachChild(function (control) { control.markAsPristine({ onlySelf: true }); });
+        if (lang_1.isPresent(this._parent) && !onlySelf) {
+            this._parent._updatePristine({ onlySelf: onlySelf });
+        }
+    };
+    AbstractControl.prototype.markAsUntouched = function (_a) {
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._touched = false;
+        this._forEachChild(function (control) { control.markAsUntouched({ onlySelf: true }); });
+        if (lang_1.isPresent(this._parent) && !onlySelf) {
+            this._parent._updateTouched({ onlySelf: onlySelf });
         }
     };
     AbstractControl.prototype.markAsPending = function (_a) {
@@ -40979,8 +40945,8 @@ var AbstractControl = (function () {
             this._runAsyncValidator(emitEvent);
         }
         if (emitEvent) {
-            async_1.ObservableWrapper.callEmit(this._valueChanges, this._value);
-            async_1.ObservableWrapper.callEmit(this._statusChanges, this._status);
+            this._valueChanges.emit(this._value);
+            this._statusChanges.emit(this._status);
         }
         if (lang_1.isPresent(this._parent) && !onlySelf) {
             this._parent.updateValueAndValidity({ onlySelf: onlySelf, emitEvent: emitEvent });
@@ -40995,12 +40961,12 @@ var AbstractControl = (function () {
             this._status = exports.PENDING;
             this._cancelExistingSubscription();
             var obs = toObservable(this.asyncValidator(this));
-            this._asyncValidationSubscription = async_1.ObservableWrapper.subscribe(obs, function (res) { return _this.setErrors(res, { emitEvent: emitEvent }); });
+            this._asyncValidationSubscription = obs.subscribe({ next: function (res) { return _this.setErrors(res, { emitEvent: emitEvent }); } });
         }
     };
     AbstractControl.prototype._cancelExistingSubscription = function () {
         if (lang_1.isPresent(this._asyncValidationSubscription)) {
-            async_1.ObservableWrapper.dispose(this._asyncValidationSubscription);
+            this._asyncValidationSubscription.unsubscribe();
         }
     };
     /**
@@ -41032,7 +40998,11 @@ var AbstractControl = (function () {
         this._errors = errors;
         this._updateControlsErrors(emitEvent);
     };
-    AbstractControl.prototype.find = function (path) { return _find(this, path); };
+    /**
+     * @deprecated - use get() instead
+     */
+    AbstractControl.prototype.find = function (path) { return _find(this, path, '/'); };
+    AbstractControl.prototype.get = function (path) { return _find(this, path, '.'); };
     AbstractControl.prototype.getError = function (errorCode, path) {
         if (path === void 0) { path = null; }
         var control = lang_1.isPresent(path) && !collection_1.ListWrapper.isEmpty(path) ? this.find(path) : this;
@@ -41062,7 +41032,7 @@ var AbstractControl = (function () {
     AbstractControl.prototype._updateControlsErrors = function (emitEvent) {
         this._status = this._calculateStatus();
         if (emitEvent) {
-            async_1.ObservableWrapper.callEmit(this._statusChanges, this._status);
+            this._statusChanges.emit(this._status);
         }
         if (lang_1.isPresent(this._parent)) {
             this._parent._updateControlsErrors(emitEvent);
@@ -41081,6 +41051,34 @@ var AbstractControl = (function () {
         if (this._anyControlsHaveStatus(exports.INVALID))
             return exports.INVALID;
         return exports.VALID;
+    };
+    /** @internal */
+    AbstractControl.prototype._anyControlsHaveStatus = function (status) {
+        return this._anyControls(function (control) { return control.status == status; });
+    };
+    /** @internal */
+    AbstractControl.prototype._anyControlsDirty = function () {
+        return this._anyControls(function (control) { return control.dirty; });
+    };
+    /** @internal */
+    AbstractControl.prototype._anyControlsTouched = function () {
+        return this._anyControls(function (control) { return control.touched; });
+    };
+    /** @internal */
+    AbstractControl.prototype._updatePristine = function (_a) {
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._pristine = !this._anyControlsDirty();
+        if (lang_1.isPresent(this._parent) && !onlySelf) {
+            this._parent._updatePristine({ onlySelf: onlySelf });
+        }
+    };
+    /** @internal */
+    AbstractControl.prototype._updateTouched = function (_a) {
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._touched = this._anyControlsTouched();
+        if (lang_1.isPresent(this._parent) && !onlySelf) {
+            this._parent._updateTouched({ onlySelf: onlySelf });
+        }
     };
     return AbstractControl;
 }());
@@ -41127,16 +41125,42 @@ var FormControl = (function (_super) {
      * If `emitModelToViewChange` is `true`, the view will be notified about the new value
      * via an `onChange` event. This is the default behavior if `emitModelToViewChange` is not
      * specified.
+     *
+     * If `emitViewToModelChange` is `true`, an ngModelChange event will be fired to update the
+     * model.  This is the default behavior if `emitViewToModelChange` is not specified.
      */
-    FormControl.prototype.updateValue = function (value, _a) {
+    FormControl.prototype.setValue = function (value, _a) {
         var _this = this;
-        var _b = _a === void 0 ? {} : _a, onlySelf = _b.onlySelf, emitEvent = _b.emitEvent, emitModelToViewChange = _b.emitModelToViewChange;
+        var _b = _a === void 0 ? {} : _a, onlySelf = _b.onlySelf, emitEvent = _b.emitEvent, emitModelToViewChange = _b.emitModelToViewChange, emitViewToModelChange = _b.emitViewToModelChange;
         emitModelToViewChange = lang_1.isPresent(emitModelToViewChange) ? emitModelToViewChange : true;
+        emitViewToModelChange = lang_1.isPresent(emitViewToModelChange) ? emitViewToModelChange : true;
         this._value = value;
         if (this._onChange.length && emitModelToViewChange) {
-            this._onChange.forEach(function (changeFn) { return changeFn(_this._value); });
+            this._onChange.forEach(function (changeFn) { return changeFn(_this._value, emitViewToModelChange); });
         }
         this.updateValueAndValidity({ onlySelf: onlySelf, emitEvent: emitEvent });
+    };
+    /**
+     * This function is functionally the same as updateValue() at this level.  It exists for
+     * symmetry with patchValue() on FormGroups and FormArrays, where it does behave differently.
+     */
+    FormControl.prototype.patchValue = function (value, options) {
+        if (options === void 0) { options = {}; }
+        this.setValue(value, options);
+    };
+    /**
+     * @deprecated Please use setValue() instead.
+     */
+    FormControl.prototype.updateValue = function (value, options) {
+        if (options === void 0) { options = {}; }
+        this.setValue(value, options);
+    };
+    FormControl.prototype.reset = function (value, _a) {
+        if (value === void 0) { value = null; }
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this.markAsPristine({ onlySelf: onlySelf });
+        this.markAsUntouched({ onlySelf: onlySelf });
+        this.setValue(value, { onlySelf: onlySelf });
     };
     /**
      * @internal
@@ -41145,11 +41169,15 @@ var FormControl = (function (_super) {
     /**
      * @internal
      */
-    FormControl.prototype._anyControlsHaveStatus = function (status) { return false; };
+    FormControl.prototype._anyControls = function (condition) { return false; };
     /**
      * Register a listener for change events.
      */
     FormControl.prototype.registerOnChange = function (fn) { this._onChange.push(fn); };
+    /**
+     * @internal
+     */
+    FormControl.prototype._forEachChild = function (cb) { };
     return FormControl;
 }(AbstractControl));
 exports.FormControl = FormControl;
@@ -41227,19 +41255,62 @@ var FormGroup = (function (_super) {
         var c = collection_1.StringMapWrapper.contains(this.controls, controlName);
         return c && this._included(controlName);
     };
+    FormGroup.prototype.setValue = function (value, _a) {
+        var _this = this;
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._checkAllValuesPresent(value);
+        collection_1.StringMapWrapper.forEach(value, function (newValue, name) {
+            _this._throwIfControlMissing(name);
+            _this.controls[name].setValue(newValue, { onlySelf: true });
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+    };
+    FormGroup.prototype.patchValue = function (value, _a) {
+        var _this = this;
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        collection_1.StringMapWrapper.forEach(value, function (newValue, name) {
+            if (_this.controls[name]) {
+                _this.controls[name].patchValue(newValue, { onlySelf: true });
+            }
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+    };
+    FormGroup.prototype.reset = function (value, _a) {
+        if (value === void 0) { value = {}; }
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._forEachChild(function (control, name) {
+            control.reset(value[name], { onlySelf: true });
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+        this._updatePristine({ onlySelf: onlySelf });
+        this._updateTouched({ onlySelf: onlySelf });
+    };
+    /** @internal */
+    FormGroup.prototype._throwIfControlMissing = function (name) {
+        if (!Object.keys(this.controls).length) {
+            throw new exceptions_1.BaseException("\n        There are no form controls registered with this group yet.  If you're using ngModel,\n        you may want to check next tick (e.g. use setTimeout).\n      ");
+        }
+        if (!this.controls[name]) {
+            throw new exceptions_1.BaseException("Cannot find form control with name: " + name + ".");
+        }
+    };
+    /** @internal */
+    FormGroup.prototype._forEachChild = function (cb) {
+        collection_1.StringMapWrapper.forEach(this.controls, cb);
+    };
     /** @internal */
     FormGroup.prototype._setParentForControls = function () {
         var _this = this;
-        collection_1.StringMapWrapper.forEach(this.controls, function (control, name) { control.setParent(_this); });
+        this._forEachChild(function (control, name) { control.setParent(_this); });
     };
     /** @internal */
     FormGroup.prototype._updateValue = function () { this._value = this._reduceValue(); };
     /** @internal */
-    FormGroup.prototype._anyControlsHaveStatus = function (status) {
+    FormGroup.prototype._anyControls = function (condition) {
         var _this = this;
         var res = false;
-        collection_1.StringMapWrapper.forEach(this.controls, function (control, name) {
-            res = res || (_this.contains(name) && control.status == status);
+        this._forEachChild(function (control, name) {
+            res = res || (_this.contains(name) && condition(control));
         });
         return res;
     };
@@ -41254,7 +41325,7 @@ var FormGroup = (function (_super) {
     FormGroup.prototype._reduceChildren = function (initValue, fn) {
         var _this = this;
         var res = initValue;
-        collection_1.StringMapWrapper.forEach(this.controls, function (control, name) {
+        this._forEachChild(function (control, name) {
             if (_this._included(name)) {
                 res = fn(res, control, name);
             }
@@ -41265,6 +41336,14 @@ var FormGroup = (function (_super) {
     FormGroup.prototype._included = function (controlName) {
         var isOptional = collection_1.StringMapWrapper.contains(this._optionals, controlName);
         return !isOptional || collection_1.StringMapWrapper.get(this._optionals, controlName);
+    };
+    /** @internal */
+    FormGroup.prototype._checkAllValuesPresent = function (value) {
+        this._forEachChild(function (control, name) {
+            if (value[name] === undefined) {
+                throw new exceptions_1.BaseException("Must supply a value for form control with name: '" + name + "'.");
+            }
+        });
     };
     return FormGroup;
 }(AbstractControl));
@@ -41339,22 +41418,73 @@ var FormArray = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    FormArray.prototype.setValue = function (value, _a) {
+        var _this = this;
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._checkAllValuesPresent(value);
+        value.forEach(function (newValue, index) {
+            _this._throwIfControlMissing(index);
+            _this.at(index).setValue(newValue, { onlySelf: true });
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+    };
+    FormArray.prototype.patchValue = function (value, _a) {
+        var _this = this;
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        value.forEach(function (newValue, index) {
+            if (_this.at(index)) {
+                _this.at(index).patchValue(newValue, { onlySelf: true });
+            }
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+    };
+    FormArray.prototype.reset = function (value, _a) {
+        if (value === void 0) { value = []; }
+        var onlySelf = (_a === void 0 ? {} : _a).onlySelf;
+        this._forEachChild(function (control, index) {
+            control.reset(value[index], { onlySelf: true });
+        });
+        this.updateValueAndValidity({ onlySelf: onlySelf });
+        this._updatePristine({ onlySelf: onlySelf });
+        this._updateTouched({ onlySelf: onlySelf });
+    };
+    /** @internal */
+    FormArray.prototype._throwIfControlMissing = function (index) {
+        if (!this.controls.length) {
+            throw new exceptions_1.BaseException("\n        There are no form controls registered with this array yet.  If you're using ngModel,\n        you may want to check next tick (e.g. use setTimeout).\n      ");
+        }
+        if (!this.at(index)) {
+            throw new exceptions_1.BaseException("Cannot find form control at index " + index);
+        }
+    };
+    /** @internal */
+    FormArray.prototype._forEachChild = function (cb) {
+        this.controls.forEach(function (control, index) { cb(control, index); });
+    };
     /** @internal */
     FormArray.prototype._updateValue = function () { this._value = this.controls.map(function (control) { return control.value; }); };
     /** @internal */
-    FormArray.prototype._anyControlsHaveStatus = function (status) {
-        return this.controls.some(function (c) { return c.status == status; });
+    FormArray.prototype._anyControls = function (condition) {
+        return this.controls.some(function (control) { return condition(control); });
     };
     /** @internal */
     FormArray.prototype._setParentForControls = function () {
         var _this = this;
-        this.controls.forEach(function (control) { control.setParent(_this); });
+        this._forEachChild(function (control) { control.setParent(_this); });
+    };
+    /** @internal */
+    FormArray.prototype._checkAllValuesPresent = function (value) {
+        this._forEachChild(function (control, i) {
+            if (value[i] === undefined) {
+                throw new exceptions_1.BaseException("Must supply a value for form control at index: " + i + ".");
+            }
+        });
     };
     return FormArray;
 }(AbstractControl));
 exports.FormArray = FormArray;
 
-},{"./directives/shared":275,"./facade/async":277,"./facade/collection":279,"./facade/lang":282}],288:[function(require,module,exports){
+},{"./directives/shared":266,"./facade/async":269,"./facade/collection":271,"./facade/exceptions":273,"./facade/lang":274,"rxjs/observable/PromiseObservable":568}],279:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -41364,10 +41494,9 @@ exports.FormArray = FormArray;
  */
 "use strict";
 var core_1 = require('@angular/core');
-var async_1 = require('./facade/async');
+var toPromise_1 = require('rxjs/operator/toPromise');
 var collection_1 = require('./facade/collection');
 var lang_1 = require('./facade/lang');
-var promise_1 = require('./facade/promise');
 /**
  * Providers for validators to be used for {@link FormControl}s in a form.
  *
@@ -41389,8 +41518,7 @@ exports.NG_VALIDATORS = new core_1.OpaqueToken('NgValidators');
  *
  * @experimental
  */
-exports.NG_ASYNC_VALIDATORS =
-/*@ts2dart_const*/ new core_1.OpaqueToken('NgAsyncValidators');
+exports.NG_ASYNC_VALIDATORS = new core_1.OpaqueToken('NgAsyncValidators');
 /**
  * Provides a set of validators used by form controls.
  *
@@ -41481,14 +41609,14 @@ var Validators = (function () {
             return null;
         return function (control) {
             var promises = _executeAsyncValidators(control, presentValidators).map(_convertToPromise);
-            return promise_1.PromiseWrapper.all(promises).then(_mergeErrors);
+            return Promise.all(promises).then(_mergeErrors);
         };
     };
     return Validators;
 }());
 exports.Validators = Validators;
 function _convertToPromise(obj) {
-    return lang_1.isPromise(obj) ? obj : async_1.ObservableWrapper.toPromise(obj);
+    return lang_1.isPromise(obj) ? obj : toPromise_1.toPromise.call(obj);
 }
 function _executeValidators(control, validators) {
     return validators.map(function (v) { return v(control); });
@@ -41503,7 +41631,7 @@ function _mergeErrors(arrayOfErrors) {
     return collection_1.StringMapWrapper.isEmpty(res) ? null : res;
 }
 
-},{"./facade/async":277,"./facade/collection":279,"./facade/lang":282,"./facade/promise":283,"@angular/core":163}],289:[function(require,module,exports){
+},{"./facade/collection":271,"./facade/lang":274,"@angular/core":153,"rxjs/operator/toPromise":569}],280:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -41851,7 +41979,7 @@ function jsonpFactory(jsonpBackend, requestOptions) {
  */
 exports.JSON_BINDINGS = exports.JSONP_PROVIDERS;
 
-},{"./src/backends/browser_jsonp":291,"./src/backends/browser_xhr":292,"./src/backends/jsonp_backend":293,"./src/backends/xhr_backend":294,"./src/base_request_options":295,"./src/base_response_options":296,"./src/enums":297,"./src/headers":303,"./src/http":304,"./src/interfaces":306,"./src/static_request":307,"./src/static_response":308,"./src/url_search_params":309}],290:[function(require,module,exports){
+},{"./src/backends/browser_jsonp":282,"./src/backends/browser_xhr":283,"./src/backends/jsonp_backend":284,"./src/backends/xhr_backend":285,"./src/base_request_options":286,"./src/base_response_options":287,"./src/enums":288,"./src/headers":294,"./src/http":295,"./src/interfaces":297,"./src/static_request":298,"./src/static_response":299,"./src/url_search_params":300}],281:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -41865,7 +41993,7 @@ function __export(m) {
 }
 __export(require('./http'));
 
-},{"./http":289}],291:[function(require,module,exports){
+},{"./http":280}],282:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -41920,7 +42048,7 @@ var BrowserJsonp = (function () {
 }());
 exports.BrowserJsonp = BrowserJsonp;
 
-},{"../facade/lang":302,"@angular/core":163}],292:[function(require,module,exports){
+},{"../facade/lang":293,"@angular/core":153}],283:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -41944,7 +42072,7 @@ var BrowserXhr = (function () {
 }());
 exports.BrowserXhr = BrowserXhr;
 
-},{"@angular/core":163}],293:[function(require,module,exports){
+},{"@angular/core":153}],284:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -42098,7 +42226,7 @@ var JSONPBackend_ = (function (_super) {
 }(JSONPBackend));
 exports.JSONPBackend_ = JSONPBackend_;
 
-},{"../base_response_options":296,"../enums":297,"../facade/exceptions":301,"../facade/lang":302,"../interfaces":306,"../static_response":308,"./browser_jsonp":291,"@angular/core":163,"rxjs/Observable":609}],294:[function(require,module,exports){
+},{"../base_response_options":287,"../enums":288,"../facade/exceptions":292,"../facade/lang":293,"../interfaces":297,"../static_response":299,"./browser_jsonp":282,"@angular/core":153,"rxjs/Observable":562}],285:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -42280,7 +42408,7 @@ var XHRBackend = (function () {
 }());
 exports.XHRBackend = XHRBackend;
 
-},{"../base_response_options":296,"../enums":297,"../facade/lang":302,"../headers":303,"../http_utils":305,"../interfaces":306,"../static_response":308,"./browser_xhr":292,"@angular/core":163,"@angular/platform-browser":322,"rxjs/Observable":609}],295:[function(require,module,exports){
+},{"../base_response_options":287,"../enums":288,"../facade/lang":293,"../headers":294,"../http_utils":296,"../interfaces":297,"../static_response":299,"./browser_xhr":283,"@angular/core":153,"@angular/platform-browser":313,"rxjs/Observable":562}],286:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -42396,7 +42524,7 @@ var BaseRequestOptions = (function (_super) {
 }(RequestOptions));
 exports.BaseRequestOptions = BaseRequestOptions;
 
-},{"../src/facade/lang":302,"./enums":297,"./headers":303,"./http_utils":305,"./url_search_params":309,"@angular/core":163}],296:[function(require,module,exports){
+},{"../src/facade/lang":293,"./enums":288,"./headers":294,"./http_utils":296,"./url_search_params":300,"@angular/core":153}],287:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -42506,7 +42634,7 @@ var BaseResponseOptions = (function (_super) {
 }(ResponseOptions));
 exports.BaseResponseOptions = BaseResponseOptions;
 
-},{"../src/facade/lang":302,"./enums":297,"./headers":303,"@angular/core":163}],297:[function(require,module,exports){
+},{"../src/facade/lang":293,"./enums":288,"./headers":294,"@angular/core":153}],288:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -42572,15 +42700,15 @@ var ResponseType = exports.ResponseType;
 })(exports.ContentType || (exports.ContentType = {}));
 var ContentType = exports.ContentType;
 
-},{}],298:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],299:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":302,"dup":29}],300:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":298,"./collection":299,"./lang":302,"dup":30}],301:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":298,"./exception_handler":300,"dup":31}],302:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],290:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"./lang":293,"dup":19}],291:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./base_wrapped_exception":289,"./collection":290,"./lang":293,"dup":20}],292:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":289,"./exception_handler":291,"dup":21}],293:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -43049,7 +43177,7 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],303:[function(require,module,exports){
+},{}],294:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43194,7 +43322,7 @@ var Headers = (function () {
 }());
 exports.Headers = Headers;
 
-},{"../src/facade/collection":299,"../src/facade/exceptions":301,"../src/facade/lang":302}],304:[function(require,module,exports){
+},{"../src/facade/collection":290,"../src/facade/exceptions":292,"../src/facade/lang":293}],295:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43359,7 +43487,7 @@ var Jsonp = (function (_super) {
 }(Http));
 exports.Jsonp = Jsonp;
 
-},{"../src/facade/exceptions":301,"../src/facade/lang":302,"./base_request_options":295,"./enums":297,"./interfaces":306,"./static_request":307,"@angular/core":163}],305:[function(require,module,exports){
+},{"../src/facade/exceptions":292,"../src/facade/lang":293,"./base_request_options":286,"./enums":288,"./interfaces":297,"./static_request":298,"@angular/core":153}],296:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43397,7 +43525,7 @@ exports.getResponseURL = getResponseURL;
 var lang_2 = require('../src/facade/lang');
 exports.isJsObject = lang_2.isJsObject;
 
-},{"../src/facade/exceptions":301,"../src/facade/lang":302,"./enums":297}],306:[function(require,module,exports){
+},{"../src/facade/exceptions":292,"../src/facade/lang":293,"./enums":288}],297:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43443,7 +43571,7 @@ var XSRFStrategy = (function () {
 }());
 exports.XSRFStrategy = XSRFStrategy;
 
-},{}],307:[function(require,module,exports){
+},{}],298:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43613,7 +43741,7 @@ var FormData = w['FormData'] || noop;
 var Blob = w['Blob'] || noop;
 var ArrayBuffer = w['ArrayBuffer'] || noop;
 
-},{"../src/facade/lang":302,"./enums":297,"./headers":303,"./http_utils":305,"./url_search_params":309}],308:[function(require,module,exports){
+},{"../src/facade/lang":293,"./enums":288,"./headers":294,"./http_utils":296,"./url_search_params":300}],299:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43691,7 +43819,7 @@ var Response = (function () {
 }());
 exports.Response = Response;
 
-},{"../src/facade/exceptions":301,"../src/facade/lang":302,"./http_utils":305}],309:[function(require,module,exports){
+},{"../src/facade/exceptions":292,"../src/facade/lang":293,"./http_utils":296}],300:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43882,7 +44010,7 @@ var URLSearchParams = (function () {
 }());
 exports.URLSearchParams = URLSearchParams;
 
-},{"../src/facade/collection":299,"../src/facade/lang":302}],310:[function(require,module,exports){
+},{"../src/facade/collection":290,"../src/facade/lang":293}],301:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -43895,7 +44023,7 @@ var core_1 = require('@angular/core');
 exports.ReflectionCapabilities = core_1.__core_private__.ReflectionCapabilities;
 exports.reflector = core_1.__core_private__.reflector;
 
-},{"@angular/core":163}],311:[function(require,module,exports){
+},{"@angular/core":153}],302:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44055,17 +44183,17 @@ function bootstrapWorkerApp(appComponentType, customProviders) {
 }
 exports.bootstrapWorkerApp = bootstrapWorkerApp;
 
-},{"./core_private":310,"./src/facade/async":312,"./src/facade/lang":317,"./src/xhr/xhr_cache":319,"./src/xhr/xhr_impl":320,"@angular/common":16,"@angular/compiler":82,"@angular/core":163,"@angular/platform-browser":322}],312:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"./lang":317,"./promise":318,"dup":27,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],313:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],314:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":317,"dup":29}],315:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":313,"./collection":314,"./lang":317,"dup":30}],316:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":313,"./exception_handler":315,"dup":31}],317:[function(require,module,exports){
+},{"./core_private":301,"./src/facade/async":303,"./src/facade/lang":308,"./src/xhr/xhr_cache":310,"./src/xhr/xhr_impl":311,"@angular/common":6,"@angular/compiler":72,"@angular/core":153,"@angular/platform-browser":313}],303:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"./lang":308,"./promise":309,"dup":17,"rxjs/Observable":562,"rxjs/Subject":564,"rxjs/observable/PromiseObservable":568,"rxjs/operator/toPromise":569}],304:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],305:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"./lang":308,"dup":19}],306:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./base_wrapped_exception":304,"./collection":305,"./lang":308,"dup":20}],307:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":304,"./exception_handler":306,"dup":21}],308:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -44534,9 +44662,9 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],318:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],319:[function(require,module,exports){
+},{}],309:[function(require,module,exports){
+arguments[4][24][0].apply(exports,arguments)
+},{"dup":24}],310:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44582,7 +44710,7 @@ var CachedXHR = (function (_super) {
 }(compiler_1.XHR));
 exports.CachedXHR = CachedXHR;
 
-},{"../facade/exceptions":316,"../facade/lang":317,"../facade/promise":318,"@angular/compiler":82}],320:[function(require,module,exports){
+},{"../facade/exceptions":307,"../facade/lang":308,"../facade/promise":309,"@angular/compiler":72}],311:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44636,7 +44764,7 @@ var XHRImpl = (function (_super) {
 }(compiler_1.XHR));
 exports.XHRImpl = XHRImpl;
 
-},{"../facade/lang":317,"../facade/promise":318,"@angular/compiler":82}],321:[function(require,module,exports){
+},{"../facade/lang":308,"../facade/promise":309,"@angular/compiler":72}],312:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44672,7 +44800,7 @@ exports.flattenStyles = core_1.__core_private__.flattenStyles;
 exports.clearStyles = core_1.__core_private__.clearStyles;
 exports.collectAndResolveStyles = core_1.__core_private__.collectAndResolveStyles;
 
-},{"@angular/core":163}],322:[function(require,module,exports){
+},{"@angular/core":153}],313:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44726,7 +44854,7 @@ __export(require('./src/worker_render'));
 __export(require('./src/worker_app'));
 __export(require('./private_export'));
 
-},{"./private_export":323,"./src/browser":324,"./src/browser/location/browser_platform_location":327,"./src/browser/title":330,"./src/browser/tools/tools":332,"./src/dom/debug/by":333,"./src/dom/dom_tokens":337,"./src/dom/events/event_manager":339,"./src/dom/events/hammer_gestures":341,"./src/security/dom_sanitization_service":355,"./src/web_workers/shared/client_message_broker":360,"./src/web_workers/shared/message_bus":361,"./src/web_workers/shared/serializer":366,"./src/web_workers/shared/service_message_broker":367,"./src/web_workers/ui/location_providers":370,"./src/web_workers/worker/location_providers":374,"./src/worker_app":378,"./src/worker_render":379}],323:[function(require,module,exports){
+},{"./private_export":314,"./src/browser":315,"./src/browser/location/browser_platform_location":318,"./src/browser/title":321,"./src/browser/tools/tools":323,"./src/dom/debug/by":324,"./src/dom/dom_tokens":328,"./src/dom/events/event_manager":330,"./src/dom/events/hammer_gestures":332,"./src/security/dom_sanitization_service":346,"./src/web_workers/shared/client_message_broker":351,"./src/web_workers/shared/message_bus":352,"./src/web_workers/shared/serializer":357,"./src/web_workers/shared/service_message_broker":358,"./src/web_workers/ui/location_providers":361,"./src/web_workers/worker/location_providers":365,"./src/worker_app":369,"./src/worker_render":370}],314:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44752,7 +44880,7 @@ exports.__platform_browser_private__ = {
     DomEventsPlugin: dom_events.DomEventsPlugin
 };
 
-},{"./src/dom/debug/ng_probe":334,"./src/dom/dom_adapter":335,"./src/dom/dom_renderer":336,"./src/dom/events/dom_events":338,"./src/dom/shared_styles_host":343}],324:[function(require,module,exports){
+},{"./src/dom/debug/ng_probe":325,"./src/dom/dom_adapter":326,"./src/dom/dom_renderer":327,"./src/dom/events/dom_events":329,"./src/dom/shared_styles_host":334}],315:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -44851,7 +44979,7 @@ function _resolveDefaultAnimationDriver() {
     return new core_private_1.NoOpAnimationDriver();
 }
 
-},{"../core_private":321,"../src/dom/web_animations_driver":345,"./browser/browser_adapter":325,"./browser/location/browser_platform_location":327,"./browser/testability":329,"./dom/debug/ng_probe":334,"./dom/dom_adapter":335,"./dom/dom_renderer":336,"./dom/dom_tokens":337,"./dom/events/dom_events":338,"./dom/events/event_manager":339,"./dom/events/hammer_gestures":341,"./dom/events/key_events":342,"./dom/shared_styles_host":343,"./facade/lang":353,"./security/dom_sanitization_service":355,"@angular/common":16,"@angular/core":163}],325:[function(require,module,exports){
+},{"../core_private":312,"../src/dom/web_animations_driver":336,"./browser/browser_adapter":316,"./browser/location/browser_platform_location":318,"./browser/testability":320,"./dom/debug/ng_probe":325,"./dom/dom_adapter":326,"./dom/dom_renderer":327,"./dom/dom_tokens":328,"./dom/events/dom_events":329,"./dom/events/event_manager":330,"./dom/events/hammer_gestures":332,"./dom/events/key_events":333,"./dom/shared_styles_host":334,"./facade/lang":344,"./security/dom_sanitization_service":346,"@angular/common":6,"@angular/core":153}],316:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45323,7 +45451,7 @@ function parseCookieValue(cookie, name) {
 }
 exports.parseCookieValue = parseCookieValue;
 
-},{"../dom/dom_adapter":335,"../facade/collection":350,"../facade/lang":353,"./generic_browser_adapter":326}],326:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"../facade/collection":341,"../facade/lang":344,"./generic_browser_adapter":317}],317:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45400,7 +45528,7 @@ var GenericBrowserDomAdapter = (function (_super) {
 }(dom_adapter_1.DomAdapter));
 exports.GenericBrowserDomAdapter = GenericBrowserDomAdapter;
 
-},{"../dom/dom_adapter":335,"../facade/collection":350,"../facade/lang":353}],327:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"../facade/collection":341,"../facade/lang":344}],318:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45487,7 +45615,7 @@ var BrowserPlatformLocation = (function (_super) {
 }(common_1.PlatformLocation));
 exports.BrowserPlatformLocation = BrowserPlatformLocation;
 
-},{"../../dom/dom_adapter":335,"./history":328,"@angular/common":16,"@angular/core":163}],328:[function(require,module,exports){
+},{"../../dom/dom_adapter":326,"./history":319,"@angular/common":6,"@angular/core":153}],319:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45501,7 +45629,7 @@ function supportsState() {
 }
 exports.supportsState = supportsState;
 
-},{}],329:[function(require,module,exports){
+},{}],320:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45586,7 +45714,7 @@ var BrowserGetTestability = (function () {
 }());
 exports.BrowserGetTestability = BrowserGetTestability;
 
-},{"../dom/dom_adapter":335,"../facade/collection":350,"../facade/lang":353,"@angular/core":163}],330:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"../facade/collection":341,"../facade/lang":344,"@angular/core":153}],321:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45623,7 +45751,7 @@ var Title = (function () {
 }());
 exports.Title = Title;
 
-},{"../dom/dom_adapter":335}],331:[function(require,module,exports){
+},{"../dom/dom_adapter":326}],322:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45710,7 +45838,7 @@ var AngularProfiler = (function () {
 }());
 exports.AngularProfiler = AngularProfiler;
 
-},{"../../dom/dom_adapter":335,"../../facade/browser":349,"../../facade/lang":353,"@angular/core":163}],332:[function(require,module,exports){
+},{"../../dom/dom_adapter":326,"../../facade/browser":340,"../../facade/lang":344,"@angular/core":153}],323:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45750,7 +45878,7 @@ function disableDebugTools() {
 }
 exports.disableDebugTools = disableDebugTools;
 
-},{"../../facade/lang":353,"./common_tools":331}],333:[function(require,module,exports){
+},{"../../facade/lang":344,"./common_tools":322}],324:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45805,7 +45933,7 @@ var By = (function () {
 }());
 exports.By = By;
 
-},{"../../dom/dom_adapter":335,"../../facade/lang":353}],334:[function(require,module,exports){
+},{"../../dom/dom_adapter":326,"../../facade/lang":344}],325:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45850,7 +45978,7 @@ function _createRootRenderer(rootRenderer /** TODO #9100 */) {
 exports.ELEMENT_PROBE_PROVIDERS = [{ provide: core_1.RootRenderer, useFactory: _createConditionalRootRenderer, deps: [dom_renderer_1.DomRootRenderer] }];
 exports.ELEMENT_PROBE_PROVIDERS_PROD_MODE = [{ provide: core_1.RootRenderer, useFactory: _createRootRenderer, deps: [dom_renderer_1.DomRootRenderer] }];
 
-},{"../../../core_private":321,"../dom_adapter":335,"../dom_renderer":336,"@angular/core":163}],335:[function(require,module,exports){
+},{"../../../core_private":312,"../dom_adapter":326,"../dom_renderer":327,"@angular/core":153}],326:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -45901,7 +46029,7 @@ var DomAdapter = (function () {
 }());
 exports.DomAdapter = DomAdapter;
 
-},{"../facade/lang":353}],336:[function(require,module,exports){
+},{"../facade/lang":344}],327:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46194,7 +46322,7 @@ function splitNamespace(name) {
     return [match[1], match[2]];
 }
 
-},{"../../core_private":321,"../facade/exceptions":352,"../facade/lang":353,"./dom_adapter":335,"./dom_tokens":337,"./events/event_manager":339,"./shared_styles_host":343,"./util":344,"@angular/core":163}],337:[function(require,module,exports){
+},{"../../core_private":312,"../facade/exceptions":343,"../facade/lang":344,"./dom_adapter":326,"./dom_tokens":328,"./events/event_manager":330,"./shared_styles_host":334,"./util":335,"@angular/core":153}],328:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46214,7 +46342,7 @@ var core_1 = require('@angular/core');
  */
 exports.DOCUMENT = new core_1.OpaqueToken('DocumentToken');
 
-},{"@angular/core":163}],338:[function(require,module,exports){
+},{"@angular/core":153}],329:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46258,7 +46386,7 @@ var DomEventsPlugin = (function (_super) {
 }(event_manager_1.EventManagerPlugin));
 exports.DomEventsPlugin = DomEventsPlugin;
 
-},{"../dom_adapter":335,"./event_manager":339,"@angular/core":163}],339:[function(require,module,exports){
+},{"../dom_adapter":326,"./event_manager":330,"@angular/core":153}],330:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46328,7 +46456,7 @@ var EventManagerPlugin = (function () {
 }());
 exports.EventManagerPlugin = EventManagerPlugin;
 
-},{"../../facade/collection":350,"../../facade/exceptions":352,"@angular/core":163}],340:[function(require,module,exports){
+},{"../../facade/collection":341,"../../facade/exceptions":343,"@angular/core":153}],331:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46394,7 +46522,7 @@ var HammerGesturesPluginCommon = (function (_super) {
 }(event_manager_1.EventManagerPlugin));
 exports.HammerGesturesPluginCommon = HammerGesturesPluginCommon;
 
-},{"../../facade/collection":350,"./event_manager":339}],341:[function(require,module,exports){
+},{"../../facade/collection":341,"./event_manager":330}],332:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46481,7 +46609,7 @@ var HammerGesturesPlugin = (function (_super) {
 }(hammer_common_1.HammerGesturesPluginCommon));
 exports.HammerGesturesPlugin = HammerGesturesPlugin;
 
-},{"../../facade/exceptions":352,"../../facade/lang":353,"./hammer_common":340,"@angular/core":163}],342:[function(require,module,exports){
+},{"../../facade/exceptions":343,"../../facade/lang":344,"./hammer_common":331,"@angular/core":153}],333:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46596,7 +46724,7 @@ var KeyEventsPlugin = (function (_super) {
 }(event_manager_1.EventManagerPlugin));
 exports.KeyEventsPlugin = KeyEventsPlugin;
 
-},{"../../facade/collection":350,"../../facade/lang":353,"../dom_adapter":335,"./event_manager":339,"@angular/core":163}],343:[function(require,module,exports){
+},{"../../facade/collection":341,"../../facade/lang":344,"../dom_adapter":326,"./event_manager":330,"@angular/core":153}],334:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46679,7 +46807,7 @@ var DomSharedStylesHost = (function (_super) {
 }(SharedStylesHost));
 exports.DomSharedStylesHost = DomSharedStylesHost;
 
-},{"../facade/collection":350,"./dom_adapter":335,"./dom_tokens":337,"@angular/core":163}],344:[function(require,module,exports){
+},{"../facade/collection":341,"./dom_adapter":326,"./dom_tokens":328,"@angular/core":153}],335:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46700,7 +46828,7 @@ function dashCaseToCamelCase(input) {
 }
 exports.dashCaseToCamelCase = dashCaseToCamelCase;
 
-},{"../facade/lang":353}],345:[function(require,module,exports){
+},{"../facade/lang":344}],336:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46837,7 +46965,7 @@ function _computeStyle(element, prop) {
     return dom_adapter_1.getDOM().getComputedStyle(element)[prop];
 }
 
-},{"../facade/collection":350,"../facade/lang":353,"./dom_adapter":335,"./util":344,"./web_animations_player":346,"@angular/core":163}],346:[function(require,module,exports){
+},{"../facade/collection":341,"../facade/lang":344,"./dom_adapter":326,"./util":335,"./web_animations_player":337,"@angular/core":153}],337:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46891,11 +47019,11 @@ var WebAnimationsPlayer = (function () {
 }());
 exports.WebAnimationsPlayer = WebAnimationsPlayer;
 
-},{"../facade/lang":353}],347:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"./lang":353,"./promise":354,"dup":27,"rxjs/Observable":609,"rxjs/Subject":611,"rxjs/observable/PromiseObservable":615,"rxjs/operator/toPromise":616}],348:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"dup":28}],349:[function(require,module,exports){
+},{"../facade/lang":344}],338:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"./lang":344,"./promise":345,"dup":17,"rxjs/Observable":562,"rxjs/Subject":564,"rxjs/observable/PromiseObservable":568,"rxjs/operator/toPromise":569}],339:[function(require,module,exports){
+arguments[4][18][0].apply(exports,arguments)
+},{"dup":18}],340:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -46921,13 +47049,13 @@ exports.History = win['History'];
 exports.Location = win['Location'];
 exports.EventListener = win['EventListener'];
 
-},{}],350:[function(require,module,exports){
-arguments[4][29][0].apply(exports,arguments)
-},{"./lang":353,"dup":29}],351:[function(require,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"./base_wrapped_exception":348,"./collection":350,"./lang":353,"dup":30}],352:[function(require,module,exports){
-arguments[4][31][0].apply(exports,arguments)
-},{"./base_wrapped_exception":348,"./exception_handler":351,"dup":31}],353:[function(require,module,exports){
+},{}],341:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"./lang":344,"dup":19}],342:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./base_wrapped_exception":339,"./collection":341,"./lang":344,"dup":20}],343:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"./base_wrapped_exception":339,"./exception_handler":342,"dup":21}],344:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -47396,9 +47524,9 @@ exports.escapeRegExp = escapeRegExp;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],354:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"dup":34}],355:[function(require,module,exports){
+},{}],345:[function(require,module,exports){
+arguments[4][24][0].apply(exports,arguments)
+},{"dup":24}],346:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -47568,7 +47696,7 @@ var SafeResourceUrlImpl = (function (_super) {
     return SafeResourceUrlImpl;
 }(SafeValueImpl));
 
-},{"../../core_private":321,"./html_sanitizer":356,"./style_sanitizer":357,"./url_sanitizer":358,"@angular/core":163}],356:[function(require,module,exports){
+},{"../../core_private":312,"./html_sanitizer":347,"./style_sanitizer":348,"./url_sanitizer":349,"@angular/core":153}],347:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -47826,7 +47954,7 @@ function sanitizeHtml(unsafeHtmlInput) {
 }
 exports.sanitizeHtml = sanitizeHtml;
 
-},{"../dom/dom_adapter":335,"./url_sanitizer":358,"@angular/core":163}],357:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"./url_sanitizer":349,"@angular/core":153}],348:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -47920,7 +48048,7 @@ function sanitizeStyle(value) {
 }
 exports.sanitizeStyle = sanitizeStyle;
 
-},{"../dom/dom_adapter":335,"./url_sanitizer":358,"@angular/core":163}],358:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"./url_sanitizer":349,"@angular/core":153}],349:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -47978,7 +48106,7 @@ function sanitizeSrcset(srcset) {
 }
 exports.sanitizeSrcset = sanitizeSrcset;
 
-},{"../dom/dom_adapter":335,"@angular/core":163}],359:[function(require,module,exports){
+},{"../dom/dom_adapter":326,"@angular/core":153}],350:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -47990,7 +48118,7 @@ exports.sanitizeSrcset = sanitizeSrcset;
 var core_1 = require('@angular/core');
 exports.ON_WEB_WORKER = new core_1.OpaqueToken('WebWorker.onWebWorker');
 
-},{"@angular/core":163}],360:[function(require,module,exports){
+},{"@angular/core":153}],351:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48182,7 +48310,7 @@ var UiArguments = (function () {
 }());
 exports.UiArguments = UiArguments;
 
-},{"../../facade/async":347,"../../facade/collection":350,"../../facade/lang":353,"./message_bus":361,"./serializer":366,"@angular/core":163}],361:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/collection":341,"../../facade/lang":344,"./message_bus":352,"./serializer":357,"@angular/core":153}],352:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48206,7 +48334,7 @@ var MessageBus = (function () {
 }());
 exports.MessageBus = MessageBus;
 
-},{}],362:[function(require,module,exports){
+},{}],353:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48223,7 +48351,7 @@ exports.RENDERER_CHANNEL = 'ng-Renderer';
 exports.EVENT_CHANNEL = 'ng-Events';
 exports.ROUTER_CHANNEL = 'ng-Router';
 
-},{}],363:[function(require,module,exports){
+},{}],354:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48378,7 +48506,7 @@ var _Channel = (function () {
     return _Channel;
 }());
 
-},{"../../facade/async":347,"../../facade/collection":350,"../../facade/exceptions":352,"@angular/core":163}],364:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/collection":341,"../../facade/exceptions":343,"@angular/core":153}],355:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48429,7 +48557,7 @@ var RenderStore = (function () {
 }());
 exports.RenderStore = RenderStore;
 
-},{"@angular/core":163}],365:[function(require,module,exports){
+},{"@angular/core":153}],356:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48456,7 +48584,7 @@ var LocationType = (function () {
 }());
 exports.LocationType = LocationType;
 
-},{}],366:[function(require,module,exports){
+},{}],357:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48583,7 +48711,7 @@ var RenderStoreObject = (function () {
 }());
 exports.RenderStoreObject = RenderStoreObject;
 
-},{"../../../core_private":321,"../../facade/exceptions":352,"../../facade/lang":353,"./render_store":364,"./serialized_types":365,"@angular/core":163}],367:[function(require,module,exports){
+},{"../../../core_private":312,"../../facade/exceptions":343,"../../facade/lang":344,"./render_store":355,"./serialized_types":356,"@angular/core":153}],358:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48707,7 +48835,7 @@ var ReceivedMessage = (function () {
 }());
 exports.ReceivedMessage = ReceivedMessage;
 
-},{"../../facade/async":347,"../../facade/collection":350,"../../facade/lang":353,"../shared/message_bus":361,"../shared/serializer":366,"@angular/core":163}],368:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/collection":341,"../../facade/lang":344,"../shared/message_bus":352,"../shared/serializer":357,"@angular/core":153}],359:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48822,7 +48950,7 @@ var EventDispatcher = (function () {
 }());
 exports.EventDispatcher = EventDispatcher;
 
-},{"../../facade/async":347,"../../facade/exceptions":352,"../shared/serializer":366,"./event_serializer":369}],369:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/exceptions":343,"../shared/serializer":357,"./event_serializer":360}],360:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48889,7 +49017,7 @@ function serializeEvent(e, properties) {
     return serialized;
 }
 
-},{"../../facade/collection":350,"../../facade/lang":353}],370:[function(require,module,exports){
+},{"../../facade/collection":341,"../../facade/lang":344}],361:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48917,7 +49045,7 @@ function initUiLocation(injector) {
     };
 }
 
-},{"../../browser/location/browser_platform_location":327,"./platform_location":371,"@angular/core":163}],371:[function(require,module,exports){
+},{"../../browser/location/browser_platform_location":318,"./platform_location":362,"@angular/core":153}],362:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -48977,7 +49105,7 @@ var MessageBasedPlatformLocation = (function () {
 }());
 exports.MessageBasedPlatformLocation = MessageBasedPlatformLocation;
 
-},{"../../browser/location/browser_platform_location":327,"../../facade/async":347,"../../facade/lang":353,"../shared/message_bus":361,"../shared/messaging_api":362,"../shared/serialized_types":365,"../shared/serializer":366,"../shared/service_message_broker":367,"@angular/core":163}],372:[function(require,module,exports){
+},{"../../browser/location/browser_platform_location":318,"../../facade/async":338,"../../facade/lang":344,"../shared/message_bus":352,"../shared/messaging_api":353,"../shared/serialized_types":356,"../shared/serializer":357,"../shared/service_message_broker":358,"@angular/core":153}],363:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49116,7 +49244,7 @@ var MessageBasedRenderer = (function () {
 }());
 exports.MessageBasedRenderer = MessageBasedRenderer;
 
-},{"../../facade/lang":353,"../shared/message_bus":361,"../shared/messaging_api":362,"../shared/render_store":364,"../shared/serializer":366,"../shared/service_message_broker":367,"../ui/event_dispatcher":368,"@angular/core":163}],373:[function(require,module,exports){
+},{"../../facade/lang":344,"../shared/message_bus":352,"../shared/messaging_api":353,"../shared/render_store":355,"../shared/serializer":357,"../shared/service_message_broker":358,"../ui/event_dispatcher":359,"@angular/core":153}],364:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49132,7 +49260,7 @@ function deserializeGenericEvent(serializedEvent) {
 }
 exports.deserializeGenericEvent = deserializeGenericEvent;
 
-},{}],374:[function(require,module,exports){
+},{}],365:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49161,7 +49289,7 @@ function appInitFnFactory(platformLocation, zone) {
     return function () { return zone.runGuarded(function () { return platformLocation.init(); }); };
 }
 
-},{"./platform_location":375,"@angular/common":16,"@angular/core":163}],375:[function(require,module,exports){
+},{"./platform_location":366,"@angular/common":6,"@angular/core":153}],366:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49303,7 +49431,7 @@ var WebWorkerPlatformLocation = (function (_super) {
 }(common_1.PlatformLocation));
 exports.WebWorkerPlatformLocation = WebWorkerPlatformLocation;
 
-},{"../../facade/async":347,"../../facade/collection":350,"../../facade/exceptions":352,"../../facade/lang":353,"../shared/client_message_broker":360,"../shared/message_bus":361,"../shared/messaging_api":362,"../shared/serialized_types":365,"../shared/serializer":366,"./event_deserializer":373,"@angular/common":16,"@angular/core":163}],376:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/collection":341,"../../facade/exceptions":343,"../../facade/lang":344,"../shared/client_message_broker":351,"../shared/message_bus":352,"../shared/messaging_api":353,"../shared/serialized_types":356,"../shared/serializer":357,"./event_deserializer":364,"@angular/common":6,"@angular/core":153}],367:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49552,7 +49680,7 @@ var WebWorkerRenderNode = (function () {
 }());
 exports.WebWorkerRenderNode = WebWorkerRenderNode;
 
-},{"../../facade/async":347,"../../facade/collection":350,"../../facade/lang":353,"../shared/client_message_broker":360,"../shared/message_bus":361,"../shared/messaging_api":362,"../shared/render_store":364,"../shared/serializer":366,"./event_deserializer":373,"@angular/core":163}],377:[function(require,module,exports){
+},{"../../facade/async":338,"../../facade/collection":341,"../../facade/lang":344,"../shared/client_message_broker":351,"../shared/message_bus":352,"../shared/messaging_api":353,"../shared/render_store":355,"../shared/serializer":357,"./event_deserializer":364,"@angular/core":153}],368:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49768,7 +49896,7 @@ var WorkerDomAdapter = (function (_super) {
 }(dom_adapter_1.DomAdapter));
 exports.WorkerDomAdapter = WorkerDomAdapter;
 
-},{"../../dom/dom_adapter":335}],378:[function(require,module,exports){
+},{"../../dom/dom_adapter":326}],369:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -49847,7 +49975,7 @@ function setupWebWorker() {
     worker_adapter_1.WorkerDomAdapter.makeCurrent();
 }
 
-},{"./browser":324,"./facade/lang":353,"./web_workers/shared/api":359,"./web_workers/shared/client_message_broker":360,"./web_workers/shared/message_bus":361,"./web_workers/shared/post_message_bus":363,"./web_workers/shared/render_store":364,"./web_workers/shared/serializer":366,"./web_workers/shared/service_message_broker":367,"./web_workers/worker/renderer":376,"./web_workers/worker/worker_adapter":377,"@angular/common":16,"@angular/core":163}],379:[function(require,module,exports){
+},{"./browser":315,"./facade/lang":344,"./web_workers/shared/api":350,"./web_workers/shared/client_message_broker":351,"./web_workers/shared/message_bus":352,"./web_workers/shared/post_message_bus":354,"./web_workers/shared/render_store":355,"./web_workers/shared/serializer":357,"./web_workers/shared/service_message_broker":358,"./web_workers/worker/renderer":367,"./web_workers/worker/worker_adapter":368,"@angular/common":6,"@angular/core":153}],370:[function(require,module,exports){
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -50008,7 +50136,7 @@ function _resolveDefaultAnimationDriver() {
     return new core_private_1.NoOpAnimationDriver();
 }
 
-},{"../core_private":321,"./browser":324,"./browser/browser_adapter":325,"./browser/testability":329,"./dom/dom_adapter":335,"./dom/dom_renderer":336,"./dom/dom_tokens":337,"./dom/events/dom_events":338,"./dom/events/event_manager":339,"./dom/events/hammer_gestures":341,"./dom/events/key_events":342,"./dom/shared_styles_host":343,"./facade/exceptions":352,"./facade/lang":353,"./web_workers/shared/api":359,"./web_workers/shared/client_message_broker":360,"./web_workers/shared/message_bus":361,"./web_workers/shared/post_message_bus":363,"./web_workers/shared/render_store":364,"./web_workers/shared/serializer":366,"./web_workers/shared/service_message_broker":367,"./web_workers/ui/renderer":372,"@angular/core":163}],380:[function(require,module,exports){
+},{"../core_private":312,"./browser":315,"./browser/browser_adapter":316,"./browser/testability":320,"./dom/dom_adapter":326,"./dom/dom_renderer":327,"./dom/dom_tokens":328,"./dom/events/dom_events":329,"./dom/events/event_manager":330,"./dom/events/hammer_gestures":332,"./dom/events/key_events":333,"./dom/shared_styles_host":334,"./facade/exceptions":343,"./facade/lang":344,"./web_workers/shared/api":350,"./web_workers/shared/client_message_broker":351,"./web_workers/shared/message_bus":352,"./web_workers/shared/post_message_bus":354,"./web_workers/shared/render_store":355,"./web_workers/shared/serializer":357,"./web_workers/shared/service_message_broker":358,"./web_workers/ui/renderer":363,"@angular/core":153}],371:[function(require,module,exports){
 "use strict";
 var dom_1 = require('../util/dom');
 var util_1 = require('../util/util');
@@ -50892,7 +51020,7 @@ var CSS_VALUE_REGEX = /(^-?\d*\.?\d*)(.*)/;
 var SUPPORTS_WILL_CHANGE = (typeof document.documentElement.style['willChange'] !== 'undefined');
 var AnimationRegistry = {};
 
-},{"../util/dom":495,"../util/util":503}],381:[function(require,module,exports){
+},{"../util/dom":486,"../util/util":494}],372:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -50949,7 +51077,7 @@ var FadeOut = (function (_super) {
 }(animation_1.Animation));
 animation_1.Animation.register('fade-out', FadeOut);
 
-},{"./animation":380}],382:[function(require,module,exports){
+},{"./animation":371}],373:[function(require,module,exports){
 "use strict";
 var action_sheet_1 = require('./components/action-sheet/action-sheet');
 exports.ActionSheet = action_sheet_1.ActionSheet;
@@ -51083,7 +51211,7 @@ exports.Footer = toolbar_1.Footer;
 var virtual_scroll_1 = require('./components/virtual-scroll/virtual-scroll');
 exports.VirtualScroll = virtual_scroll_1.VirtualScroll;
 
-},{"./components/action-sheet/action-sheet":384,"./components/alert/alert":386,"./components/app/app":387,"./components/backdrop/backdrop":388,"./components/badge/badge":389,"./components/button/button":390,"./components/checkbox/checkbox":391,"./components/content/content":392,"./components/datetime/datetime":393,"./components/icon/icon":394,"./components/img/img":395,"./components/infinite-scroll/infinite-scroll":397,"./components/infinite-scroll/infinite-scroll-content":396,"./components/input/input":399,"./components/item/item":406,"./components/item/item-reorder":403,"./components/item/item-sliding":405,"./components/label/label":407,"./components/list/list":408,"./components/loading/loading":410,"./components/menu/menu":416,"./components/menu/menu-close":411,"./components/menu/menu-controller":412,"./components/menu/menu-toggle":414,"./components/menu/menu-types":415,"./components/modal/modal":418,"./components/nav/nav":426,"./components/nav/nav-controller":420,"./components/nav/nav-params":422,"./components/nav/nav-pop":423,"./components/nav/nav-push":425,"./components/nav/view-controller":428,"./components/navbar/navbar":429,"./components/option/option":430,"./components/picker/picker":432,"./components/popover/popover":434,"./components/radio/radio-button":435,"./components/radio/radio-group":436,"./components/range/range":437,"./components/refresher/refresher":439,"./components/refresher/refresher-content":438,"./components/scroll/scroll":440,"./components/searchbar/searchbar":441,"./components/segment/segment":442,"./components/select/select":443,"./components/show-hide-when/show-hide-when":444,"./components/slides/slides":445,"./components/spinner/spinner":447,"./components/tabs/tab":450,"./components/tabs/tabs":451,"./components/tap-click/tap-click":454,"./components/toast/toast":456,"./components/toggle/toggle":457,"./components/toolbar/toolbar":460,"./components/virtual-scroll/virtual-scroll":462}],383:[function(require,module,exports){
+},{"./components/action-sheet/action-sheet":375,"./components/alert/alert":377,"./components/app/app":378,"./components/backdrop/backdrop":379,"./components/badge/badge":380,"./components/button/button":381,"./components/checkbox/checkbox":382,"./components/content/content":383,"./components/datetime/datetime":384,"./components/icon/icon":385,"./components/img/img":386,"./components/infinite-scroll/infinite-scroll":388,"./components/infinite-scroll/infinite-scroll-content":387,"./components/input/input":390,"./components/item/item":397,"./components/item/item-reorder":394,"./components/item/item-sliding":396,"./components/label/label":398,"./components/list/list":399,"./components/loading/loading":401,"./components/menu/menu":407,"./components/menu/menu-close":402,"./components/menu/menu-controller":403,"./components/menu/menu-toggle":405,"./components/menu/menu-types":406,"./components/modal/modal":409,"./components/nav/nav":417,"./components/nav/nav-controller":411,"./components/nav/nav-params":413,"./components/nav/nav-pop":414,"./components/nav/nav-push":416,"./components/nav/view-controller":419,"./components/navbar/navbar":420,"./components/option/option":421,"./components/picker/picker":423,"./components/popover/popover":425,"./components/radio/radio-button":426,"./components/radio/radio-group":427,"./components/range/range":428,"./components/refresher/refresher":430,"./components/refresher/refresher-content":429,"./components/scroll/scroll":431,"./components/searchbar/searchbar":432,"./components/segment/segment":433,"./components/select/select":434,"./components/show-hide-when/show-hide-when":435,"./components/slides/slides":436,"./components/spinner/spinner":438,"./components/tabs/tab":441,"./components/tabs/tabs":442,"./components/tap-click/tap-click":445,"./components/toast/toast":447,"./components/toggle/toggle":448,"./components/toolbar/toolbar":451,"./components/virtual-scroll/virtual-scroll":453}],374:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -51314,7 +51442,7 @@ var ActionSheetWpSlideOut = (function (_super) {
 transition_1.Transition.register('action-sheet-wp-slide-out', ActionSheetWpSlideOut);
 var actionSheetIds = -1;
 
-},{"../../animations/animation":380,"../../config/config":465,"../../transitions/transition":488,"../../util/form":498,"../../util/key":499,"../backdrop/backdrop":388,"../icon/icon":394,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/common":16,"@angular/core":163}],384:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/config":456,"../../transitions/transition":479,"../../util/form":489,"../../util/key":490,"../backdrop/backdrop":379,"../icon/icon":385,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/common":6,"@angular/core":153}],375:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -51567,7 +51695,7 @@ var ActionSheetController = (function () {
 }());
 exports.ActionSheetController = ActionSheetController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./action-sheet-component":383,"@angular/core":163}],385:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./action-sheet-component":374,"@angular/core":153}],376:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -51901,7 +52029,7 @@ var AlertWpPopOut = (function (_super) {
 transition_1.Transition.register('alert-wp-pop-out', AlertWpPopOut);
 var alertIds = -1;
 
-},{"../../animations/animation":380,"../../config/config":465,"../../transitions/transition":488,"../../util/key":499,"../../util/util":503,"../backdrop/backdrop":388,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/common":16,"@angular/core":163,"@angular/forms":252}],386:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/config":456,"../../transitions/transition":479,"../../util/key":490,"../../util/util":494,"../backdrop/backdrop":379,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/common":6,"@angular/core":153,"@angular/forms":242}],377:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -52243,7 +52371,7 @@ var AlertController = (function () {
 }());
 exports.AlertController = AlertController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./alert-component":385,"@angular/core":163}],387:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./alert-component":376,"@angular/core":153}],378:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -52543,7 +52671,7 @@ var AppRoot = (function () {
 exports.AppRoot = AppRoot;
 var CLICK_BLOCK_BUFFER_IN_MILLIS = 64;
 
-},{"../../config/config":465,"../../platform/platform":478,"../../util/click-block":492,"../nav/nav-controller-base":419,"../nav/nav-portal":424,"@angular/core":163,"@angular/platform-browser":322}],388:[function(require,module,exports){
+},{"../../config/config":456,"../../platform/platform":469,"../../util/click-block":483,"../nav/nav-controller-base":410,"../nav/nav-portal":415,"@angular/core":153,"@angular/platform-browser":313}],379:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -52600,7 +52728,7 @@ var Backdrop = (function () {
 }());
 exports.Backdrop = Backdrop;
 
-},{"../../gestures/gesture-controller":471,"../../util/util":503,"@angular/core":163}],389:[function(require,module,exports){
+},{"../../gestures/gesture-controller":462,"../../util/util":494,"@angular/core":153}],380:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -52660,7 +52788,7 @@ var Badge = (function () {
 }());
 exports.Badge = Badge;
 
-},{"../../config/config":465,"@angular/core":163}],390:[function(require,module,exports){
+},{"../../config/config":456,"@angular/core":153}],381:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -53078,7 +53206,7 @@ var IGNORE_ATTRS = /_ng|button|left|right/;
 var TEXT = 1;
 var ICON = 2;
 
-},{"../../config/config":465,"../../util/util":503,"@angular/core":163}],391:[function(require,module,exports){
+},{"../../config/config":456,"../../util/util":494,"@angular/core":153}],382:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -53285,7 +53413,7 @@ var Checkbox = (function () {
 }());
 exports.Checkbox = Checkbox;
 
-},{"../../util/form":498,"../../util/util":503,"../item/item":406,"@angular/core":163,"@angular/forms":252}],392:[function(require,module,exports){
+},{"../../util/form":489,"../../util/util":494,"../item/item":397,"@angular/core":153,"@angular/forms":242}],383:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -53846,7 +53974,7 @@ function parsePxUnit(val) {
     return (val.indexOf('px') > 0) ? parseInt(val, 10) : 0;
 }
 
-},{"../../config/config":465,"../../util/dom":495,"../../util/keyboard":500,"../../util/scroll-view":501,"../../util/util":503,"../app/app":387,"../ion":401,"../nav/view-controller":428,"../tabs/tabs":451,"@angular/core":163}],393:[function(require,module,exports){
+},{"../../config/config":456,"../../util/dom":486,"../../util/keyboard":491,"../../util/scroll-view":492,"../../util/util":494,"../app/app":378,"../ion":392,"../nav/view-controller":419,"../tabs/tabs":442,"@angular/core":153}],384:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -54661,7 +54789,7 @@ function convertToArrayOfStrings(input, type) {
     }
 }
 
-},{"../../config/config":465,"../../util/datetime-util":493,"../../util/form":498,"../../util/util":503,"../item/item":406,"../picker/picker":432,"@angular/core":163,"@angular/forms":252}],394:[function(require,module,exports){
+},{"../../config/config":456,"../../util/datetime-util":484,"../../util/form":489,"../../util/util":494,"../item/item":397,"../picker/picker":423,"@angular/core":153,"@angular/forms":242}],385:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -54846,7 +54974,7 @@ var Icon = (function () {
 }());
 exports.Icon = Icon;
 
-},{"../../config/config":465,"@angular/core":163}],395:[function(require,module,exports){
+},{"../../config/config":456,"@angular/core":153}],386:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -55034,7 +55162,7 @@ function getUnitValue(val) {
     return '';
 }
 
-},{"../../platform/platform":478,"../../util/dom":495,"../../util/util":503,"@angular/core":163}],396:[function(require,module,exports){
+},{"../../platform/platform":469,"../../util/dom":486,"../../util/util":494,"@angular/core":153}],387:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -55095,7 +55223,7 @@ var InfiniteScrollContent = (function () {
 }());
 exports.InfiniteScrollContent = InfiniteScrollContent;
 
-},{"../../config/config":465,"../spinner/spinner":447,"./infinite-scroll":397,"@angular/common":16,"@angular/core":163}],397:[function(require,module,exports){
+},{"../../config/config":456,"../spinner/spinner":438,"./infinite-scroll":388,"@angular/common":6,"@angular/core":153}],388:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -55361,7 +55489,7 @@ var STATE_ENABLED = 'enabled';
 var STATE_DISABLED = 'disabled';
 var STATE_LOADING = 'loading';
 
-},{"../content/content":392,"@angular/core":163}],398:[function(require,module,exports){
+},{"../content/content":383,"@angular/core":153}],389:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -55910,7 +56038,7 @@ function getScrollAssistDuration(distanceToScroll) {
     return Math.min(400, Math.max(150, duration));
 }
 
-},{"../../util/dom":495,"../../util/util":503,"./native-input":400,"@angular/core":163}],399:[function(require,module,exports){
+},{"../../util/dom":486,"../../util/util":494,"./native-input":391,"@angular/core":153}],390:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -56129,7 +56257,7 @@ var TextArea = (function (_super) {
 }(input_base_1.InputBase));
 exports.TextArea = TextArea;
 
-},{"../../config/config":465,"../../platform/platform":478,"../../util/form":498,"../app/app":387,"../content/content":392,"../item/item":406,"../nav/nav-controller":420,"./input-base":398,"./native-input":400,"@angular/common":16,"@angular/core":163,"@angular/forms":252}],400:[function(require,module,exports){
+},{"../../config/config":456,"../../platform/platform":469,"../../util/form":489,"../app/app":378,"../content/content":383,"../item/item":397,"../nav/nav-controller":411,"./input-base":389,"./native-input":391,"@angular/common":6,"@angular/core":153,"@angular/forms":242}],391:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -56358,7 +56486,7 @@ var NextInput = (function () {
 }());
 exports.NextInput = NextInput;
 
-},{"../../config/config":465,"../../util/dom":495,"@angular/core":163,"@angular/forms":252}],401:[function(require,module,exports){
+},{"../../config/config":456,"../../util/dom":486,"@angular/core":153,"@angular/forms":242}],392:[function(require,module,exports){
 "use strict";
 var dom_1 = require('../util/dom');
 var ids = 0;
@@ -56394,7 +56522,7 @@ var Ion = (function () {
 }());
 exports.Ion = Ion;
 
-},{"../util/dom":495}],402:[function(require,module,exports){
+},{"../util/dom":486}],393:[function(require,module,exports){
 "use strict";
 var item_reorder_1 = require('../item/item-reorder');
 var ui_event_manager_1 = require('../../util/ui-event-manager');
@@ -56529,7 +56657,7 @@ function itemForPosition(x, y) {
     return item_reorder_1.findReorderItem(element);
 }
 
-},{"../../util/dom":495,"../../util/ui-event-manager":502,"../item/item-reorder":403}],403:[function(require,module,exports){
+},{"../../util/dom":486,"../../util/ui-event-manager":493,"../item/item-reorder":394}],394:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -56869,7 +56997,7 @@ function indexForItem(element) {
 }
 exports.indexForItem = indexForItem;
 
-},{"../../util/dom":495,"../../util/util":503,"../content/content":392,"../item/item-reorder-gesture":402,"./item":406,"@angular/core":163}],404:[function(require,module,exports){
+},{"../../util/dom":486,"../../util/util":494,"../content/content":383,"../item/item-reorder-gesture":393,"./item":397,"@angular/core":153}],395:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -56966,7 +57094,7 @@ function getContainer(ev) {
     return null;
 }
 
-},{"../../gestures/drag-gesture":470,"../../util/dom":495}],405:[function(require,module,exports){
+},{"../../gestures/drag-gesture":461,"../../util/dom":486}],396:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -57454,7 +57582,7 @@ function shouldClose(isCloseDirection, isMovingFast, isOnCloseZone) {
     return shouldClose;
 }
 
-},{"../../util/dom":495,"../../util/util":503,"../list/list":408,"./item":406,"@angular/core":163}],406:[function(require,module,exports){
+},{"../../util/dom":486,"../../util/util":494,"../list/list":399,"./item":397,"@angular/core":153}],397:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -57899,7 +58027,7 @@ var ItemContent = (function () {
 }());
 exports.ItemContent = ItemContent;
 
-},{"../../util/form":498,"../button/button":390,"../icon/icon":394,"../item/item-reorder":403,"../label/label":407,"@angular/common":16,"@angular/core":163}],407:[function(require,module,exports){
+},{"../../util/form":489,"../button/button":381,"../icon/icon":385,"../item/item-reorder":394,"../label/label":398,"@angular/common":6,"@angular/core":153}],398:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -58020,7 +58148,7 @@ var Label = (function () {
 }());
 exports.Label = Label;
 
-},{"@angular/core":163}],408:[function(require,module,exports){
+},{"@angular/core":153}],399:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -58177,7 +58305,7 @@ var ListHeader = (function () {
 }());
 exports.ListHeader = ListHeader;
 
-},{"../../gestures/gesture-controller":471,"../../util/util":503,"../ion":401,"../item/item-sliding-gesture":404,"@angular/core":163}],409:[function(require,module,exports){
+},{"../../gestures/gesture-controller":462,"../../util/util":494,"../ion":392,"../item/item-sliding-gesture":395,"@angular/core":153}],400:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -58369,7 +58497,7 @@ var LoadingWpPopOut = (function (_super) {
 transition_1.Transition.register('loading-wp-pop-out', LoadingWpPopOut);
 var loadingIds = -1;
 
-},{"../../animations/animation":380,"../../config/config":465,"../../transitions/transition":488,"../../util/util":503,"../backdrop/backdrop":388,"../nav/nav-params":422,"../nav/view-controller":428,"../spinner/spinner":447,"@angular/common":16,"@angular/core":163}],410:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/config":456,"../../transitions/transition":479,"../../util/util":494,"../backdrop/backdrop":379,"../nav/nav-params":413,"../nav/view-controller":419,"../spinner/spinner":438,"@angular/common":6,"@angular/core":153}],401:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -58563,7 +58691,7 @@ var LoadingController = (function () {
 }());
 exports.LoadingController = LoadingController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./loading-component":409,"@angular/core":163}],411:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./loading-component":400,"@angular/core":153}],402:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -58631,7 +58759,7 @@ var MenuClose = (function () {
 }());
 exports.MenuClose = MenuClose;
 
-},{"./menu-controller":412,"@angular/core":163}],412:[function(require,module,exports){
+},{"./menu-controller":403,"@angular/core":153}],403:[function(require,module,exports){
 "use strict";
 /**
  * @name MenuController
@@ -58922,7 +59050,7 @@ var MenuController = (function () {
 exports.MenuController = MenuController;
 var menuTypes = {};
 
-},{}],413:[function(require,module,exports){
+},{}],404:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -59013,7 +59141,7 @@ var MenuContentGesture = (function (_super) {
 }(slide_edge_gesture_1.SlideEdgeGesture));
 exports.MenuContentGesture = MenuContentGesture;
 
-},{"../../gestures/slide-edge-gesture":475,"../../util/util":503}],414:[function(require,module,exports){
+},{"../../gestures/slide-edge-gesture":466,"../../util/util":494}],405:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -59172,7 +59300,7 @@ var MenuToggle = (function () {
 }());
 exports.MenuToggle = MenuToggle;
 
-},{"../nav/view-controller":428,"../navbar/navbar":429,"./menu-controller":412,"@angular/core":163}],415:[function(require,module,exports){
+},{"../nav/view-controller":419,"../navbar/navbar":420,"./menu-controller":403,"@angular/core":153}],406:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -59323,7 +59451,7 @@ var MenuOverlayType = (function (_super) {
 }(MenuType));
 menu_controller_1.MenuController.registerType('overlay', MenuOverlayType);
 
-},{"../../animations/animation":380,"./menu-controller":412}],416:[function(require,module,exports){
+},{"../../animations/animation":371,"./menu-controller":403}],407:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -59918,7 +60046,7 @@ var Menu = (function () {
 }());
 exports.Menu = Menu;
 
-},{"../../config/config":465,"../../gestures/gesture-controller":471,"../../platform/platform":478,"../../util/keyboard":500,"../../util/util":503,"../backdrop/backdrop":388,"./menu-controller":412,"./menu-gestures":413,"@angular/core":163}],417:[function(require,module,exports){
+},{"../../config/config":456,"../../gestures/gesture-controller":462,"../../platform/platform":469,"../../util/keyboard":491,"../../util/util":494,"../backdrop/backdrop":379,"./menu-controller":403,"./menu-gestures":404,"@angular/core":153}],408:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -60106,7 +60234,7 @@ var ModalMDSlideOut = (function (_super) {
 }(page_transition_1.PageTransition));
 page_transition_1.PageTransition.register('modal-md-slide-out', ModalMDSlideOut);
 
-},{"../../animations/animation":380,"../../config/bootstrap":464,"../../transitions/page-transition":484,"../../util/dom":495,"../../util/key":499,"../../util/util":503,"../backdrop/backdrop":388,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/core":163}],418:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/bootstrap":455,"../../transitions/page-transition":475,"../../util/dom":486,"../../util/key":490,"../../util/util":494,"../backdrop/backdrop":379,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/core":153}],409:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -60317,7 +60445,7 @@ var ModalController = (function () {
 }());
 exports.ModalController = ModalController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./modal-component":417,"@angular/core":163}],419:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./modal-component":408,"@angular/core":153}],410:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -61446,7 +61574,7 @@ var INIT_ZINDEX = 100;
 var PORTAL_ZINDEX = 9999;
 var ctrlIds = -1;
 
-},{"../../config/bootstrap":464,"../../transitions/transition":488,"../../util/util":503,"../ion":401,"./nav-controller":420,"./nav-interfaces":421,"./nav-params":422,"./swipe-back":427,"./view-controller":428,"@angular/core":163}],420:[function(require,module,exports){
+},{"../../config/bootstrap":455,"../../transitions/transition":479,"../../util/util":494,"../ion":392,"./nav-controller":411,"./nav-interfaces":412,"./nav-params":413,"./swipe-back":418,"./view-controller":419,"@angular/core":153}],411:[function(require,module,exports){
 "use strict";
 /**
  * @name NavController
@@ -61730,12 +61858,12 @@ var NavController = (function () {
 }());
 exports.NavController = NavController;
 
-},{}],421:[function(require,module,exports){
+},{}],412:[function(require,module,exports){
 "use strict";
 exports.DIRECTION_BACK = 'back';
 exports.DIRECTION_FORWARD = 'forward';
 
-},{}],422:[function(require,module,exports){
+},{}],413:[function(require,module,exports){
 "use strict";
 /**
  * @name NavParams
@@ -61790,7 +61918,7 @@ var NavParams = (function () {
 }());
 exports.NavParams = NavParams;
 
-},{}],423:[function(require,module,exports){
+},{}],414:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -61859,7 +61987,7 @@ var NavPop = (function () {
 }());
 exports.NavPop = NavPop;
 
-},{"../../util/util":503,"./nav-controller":420,"@angular/core":163}],424:[function(require,module,exports){
+},{"../../util/util":494,"./nav-controller":411,"@angular/core":153}],415:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -61910,7 +62038,7 @@ var NavPortal = (function (_super) {
 }(nav_controller_base_1.NavControllerBase));
 exports.NavPortal = NavPortal;
 
-},{"../../config/config":465,"../../gestures/gesture-controller":471,"../../util/keyboard":500,"../app/app":387,"../nav/nav-controller-base":419,"@angular/core":163}],425:[function(require,module,exports){
+},{"../../config/config":456,"../../gestures/gesture-controller":462,"../../util/keyboard":491,"../app/app":378,"../nav/nav-controller-base":410,"@angular/core":153}],416:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -62008,7 +62136,7 @@ var NavPush = (function () {
 }());
 exports.NavPush = NavPush;
 
-},{"../../util/util":503,"./nav-controller":420,"@angular/core":163}],426:[function(require,module,exports){
+},{"../../util/util":494,"./nav-controller":411,"@angular/core":153}],417:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -62172,7 +62300,7 @@ var Nav = (function (_super) {
 }(nav_controller_base_1.NavControllerBase));
 exports.Nav = Nav;
 
-},{"../../config/config":465,"../../gestures/gesture-controller":471,"../../util/keyboard":500,"../../util/util":503,"../app/app":387,"./nav-controller-base":419,"./view-controller":428,"@angular/core":163}],427:[function(require,module,exports){
+},{"../../config/config":456,"../../gestures/gesture-controller":462,"../../util/keyboard":491,"../../util/util":494,"../app/app":378,"./nav-controller-base":410,"./view-controller":419,"@angular/core":153}],418:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -62219,7 +62347,7 @@ var SwipeBackGesture = (function (_super) {
 }(slide_edge_gesture_1.SlideEdgeGesture));
 exports.SwipeBackGesture = SwipeBackGesture;
 
-},{"../../gestures/slide-edge-gesture":475,"../../util/util":503}],428:[function(require,module,exports){
+},{"../../gestures/slide-edge-gesture":466,"../../util/util":494}],419:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -62739,7 +62867,7 @@ function ctrlFn(viewCtrl, fnName) {
     }
 }
 
-},{"../../util/util":503,"./nav-params":422,"@angular/core":163}],429:[function(require,module,exports){
+},{"../../util/util":494,"./nav-params":413,"@angular/core":153}],420:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -62979,7 +63107,7 @@ var NavbarTemplate = (function () {
 }());
 exports.NavbarTemplate = NavbarTemplate;
 
-},{"../../config/config":465,"../../util/util":503,"../app/app":387,"../icon/icon":394,"../ion":401,"../nav/nav-controller":420,"../nav/view-controller":428,"../toolbar/toolbar":460,"@angular/core":163}],430:[function(require,module,exports){
+},{"../../config/config":456,"../../util/util":494,"../app/app":378,"../icon/icon":385,"../ion":392,"../nav/nav-controller":411,"../nav/view-controller":419,"../toolbar/toolbar":451,"@angular/core":153}],421:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -63087,7 +63215,7 @@ var Option = (function () {
 }());
 exports.Option = Option;
 
-},{"../../util/util":503,"@angular/core":163}],431:[function(require,module,exports){
+},{"../../util/util":494,"@angular/core":153}],422:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -63580,7 +63708,7 @@ var pickerIds = -1;
 var DECELERATION_FRICTION = 0.97;
 var FRAME_MS = (1000 / 60);
 
-},{"../../animations/animation":380,"../../config/config":465,"../../transitions/transition":488,"../../util/dom":495,"../../util/key":499,"../../util/ui-event-manager":502,"../../util/util":503,"../backdrop/backdrop":388,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/common":16,"@angular/core":163,"@angular/platform-browser":322}],432:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/config":456,"../../transitions/transition":479,"../../util/dom":486,"../../util/key":490,"../../util/ui-event-manager":493,"../../util/util":494,"../backdrop/backdrop":379,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/common":6,"@angular/core":153,"@angular/platform-browser":313}],423:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -63701,7 +63829,7 @@ var PickerController = (function () {
 }());
 exports.PickerController = PickerController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./picker-component":431,"@angular/core":163}],433:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./picker-component":422,"@angular/core":153}],424:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -64015,7 +64143,7 @@ var popoverIds = -1;
 var POPOVER_IOS_BODY_PADDING = 2;
 var POPOVER_MD_BODY_PADDING = 12;
 
-},{"../../animations/animation":380,"../../config/bootstrap":464,"../../config/config":465,"../../transitions/page-transition":484,"../../util/dom":495,"../../util/key":499,"../backdrop/backdrop":388,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/core":163}],434:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/bootstrap":455,"../../config/config":456,"../../transitions/page-transition":475,"../../util/dom":486,"../../util/key":490,"../backdrop/backdrop":379,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/core":153}],425:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -64208,7 +64336,7 @@ var PopoverController = (function () {
 }());
 exports.PopoverController = PopoverController;
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./popover-component":433,"@angular/core":163}],435:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./popover-component":424,"@angular/core":153}],426:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -64395,7 +64523,7 @@ var RadioButton = (function () {
 }());
 exports.RadioButton = RadioButton;
 
-},{"../../util/form":498,"../../util/util":503,"../item/item":406,"./radio-group":436,"@angular/core":163}],436:[function(require,module,exports){
+},{"../../util/form":489,"../../util/util":494,"../item/item":397,"./radio-group":427,"@angular/core":153}],427:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -64619,7 +64747,7 @@ var RadioGroup = (function () {
 exports.RadioGroup = RadioGroup;
 var radioGroupIds = -1;
 
-},{"../../util/util":503,"../list/list":408,"@angular/core":163,"@angular/forms":252}],437:[function(require,module,exports){
+},{"../../util/util":494,"../list/list":399,"@angular/core":153,"@angular/forms":242}],428:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -65306,7 +65434,7 @@ var Range = (function () {
 }());
 exports.Range = Range;
 
-},{"../../util/debouncer":494,"../../util/dom":495,"../../util/form":498,"../../util/ui-event-manager":502,"../../util/util":503,"../item/item":406,"@angular/common":16,"@angular/core":163,"@angular/forms":252}],438:[function(require,module,exports){
+},{"../../util/debouncer":485,"../../util/dom":486,"../../util/form":489,"../../util/ui-event-manager":493,"../../util/util":494,"../item/item":397,"@angular/common":6,"@angular/core":153,"@angular/forms":242}],429:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -65374,7 +65502,7 @@ var RefresherContent = (function () {
 }());
 exports.RefresherContent = RefresherContent;
 
-},{"../../config/config":465,"../icon/icon":394,"../spinner/spinner":447,"./refresher":439,"@angular/common":16,"@angular/core":163}],439:[function(require,module,exports){
+},{"../../config/config":456,"../icon/icon":385,"../spinner/spinner":438,"./refresher":430,"@angular/common":6,"@angular/core":153}],430:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -65867,7 +65995,7 @@ var STATE_REFRESHING = 'refreshing';
 var STATE_CANCELLING = 'cancelling';
 var STATE_COMPLETING = 'completing';
 
-},{"../../gestures/gesture-controller":471,"../../util/dom":495,"../../util/ui-event-manager":502,"../../util/util":503,"../content/content":392,"@angular/core":163}],440:[function(require,module,exports){
+},{"../../gestures/gesture-controller":462,"../../util/dom":486,"../../util/ui-event-manager":493,"../../util/util":494,"../content/content":383,"@angular/core":153}],431:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -65966,7 +66094,7 @@ var Scroll = (function (_super) {
 }(ion_1.Ion));
 exports.Scroll = Scroll;
 
-},{"../ion":401,"@angular/core":163}],441:[function(require,module,exports){
+},{"../ion":392,"@angular/core":153}],432:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -66379,7 +66507,7 @@ var Searchbar = (function () {
 }());
 exports.Searchbar = Searchbar;
 
-},{"../../config/config":465,"../../util/debouncer":494,"../../util/util":503,"../icon/icon":394,"@angular/core":163,"@angular/forms":252}],442:[function(require,module,exports){
+},{"../../config/config":456,"../../util/debouncer":485,"../../util/util":494,"../icon/icon":385,"@angular/core":153,"@angular/forms":242}],433:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -66686,7 +66814,7 @@ var Segment = (function () {
 }());
 exports.Segment = Segment;
 
-},{"../../util/util":503,"@angular/core":163,"@angular/forms":252}],443:[function(require,module,exports){
+},{"../../util/util":494,"@angular/core":153,"@angular/forms":242}],434:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -67166,7 +67294,7 @@ var Select = (function () {
 }());
 exports.Select = Select;
 
-},{"../../util/form":498,"../../util/util":503,"../action-sheet/action-sheet":384,"../alert/alert":386,"../app/app":387,"../item/item":406,"../nav/nav-controller":420,"../option/option":430,"@angular/common":16,"@angular/core":163,"@angular/forms":252}],444:[function(require,module,exports){
+},{"../../util/form":489,"../../util/util":494,"../action-sheet/action-sheet":375,"../alert/alert":377,"../app/app":378,"../item/item":397,"../nav/nav-controller":411,"../option/option":421,"@angular/common":6,"@angular/core":153,"@angular/forms":242}],435:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -67350,7 +67478,7 @@ var HideWhen = (function (_super) {
 }(DisplayWhen));
 exports.HideWhen = HideWhen;
 
-},{"../../platform/platform":478,"@angular/core":163}],445:[function(require,module,exports){
+},{"../../platform/platform":469,"@angular/core":153}],436:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -68101,7 +68229,7 @@ var SlideLazy = (function () {
 exports.SlideLazy = SlideLazy;
 var slidesId = -1;
 
-},{"../../animations/animation":380,"../../gestures/gesture":472,"../../util":491,"../../util/dom":495,"../../util/util":503,"../ion":401,"./swiper-widget":446,"@angular/core":163}],446:[function(require,module,exports){
+},{"../../animations/animation":371,"../../gestures/gesture":463,"../../util":482,"../../util/dom":486,"../../util/util":494,"../ion":392,"./swiper-widget":437,"@angular/core":153}],437:[function(require,module,exports){
 /**
  * Swiper 3.1.2
  * Most modern mobile touch slider and framework with hardware accelerated transitions
@@ -72057,7 +72185,7 @@ function Swiper(container, params) {
       }
   }
 
-},{}],447:[function(require,module,exports){
+},{}],438:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -72349,7 +72477,7 @@ var SPINNERS = {
     }
 };
 
-},{"../../config/config":465,"@angular/common":16,"@angular/core":163}],448:[function(require,module,exports){
+},{"../../config/config":456,"@angular/common":6,"@angular/core":153}],439:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -72432,7 +72560,7 @@ var TabButton = (function (_super) {
 }(ion_1.Ion));
 exports.TabButton = TabButton;
 
-},{"../../config/config":465,"../ion":401,"./tab":450,"@angular/core":163}],449:[function(require,module,exports){
+},{"../../config/config":456,"../ion":392,"./tab":441,"@angular/core":153}],440:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -72476,7 +72604,7 @@ var TabHighlight = (function () {
 }());
 exports.TabHighlight = TabHighlight;
 
-},{"../../util/dom":495,"@angular/core":163}],450:[function(require,module,exports){
+},{"../../util/dom":486,"@angular/core":153}],441:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -72829,7 +72957,7 @@ var Tab = (function (_super) {
 }(nav_controller_base_1.NavControllerBase));
 exports.Tab = Tab;
 
-},{"../../config/config":465,"../../gestures/gesture-controller":471,"../../util/keyboard":500,"../../util/util":503,"../app/app":387,"../nav/nav-controller-base":419,"./tabs":451,"@angular/core":163}],451:[function(require,module,exports){
+},{"../../config/config":456,"../../gestures/gesture-controller":462,"../../util/keyboard":491,"../../util/util":494,"../app/app":378,"../nav/nav-controller-base":410,"./tabs":442,"@angular/core":153}],442:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -73365,7 +73493,7 @@ var Tabs = (function (_super) {
 exports.Tabs = Tabs;
 var tabIds = -1;
 
-},{"../../config/config":465,"../../platform/platform":478,"../../util/dom":495,"../../util/util":503,"../app/app":387,"../badge/badge":389,"../content/content":392,"../icon/icon":394,"../ion":401,"../nav/nav-controller":420,"../nav/view-controller":428,"./tab-button":448,"./tab-highlight":449,"@angular/common":16,"@angular/core":163}],452:[function(require,module,exports){
+},{"../../config/config":456,"../../platform/platform":469,"../../util/dom":486,"../../util/util":494,"../app/app":378,"../badge/badge":380,"../content/content":383,"../icon/icon":385,"../ion":392,"../nav/nav-controller":411,"../nav/view-controller":419,"./tab-button":439,"./tab-highlight":440,"@angular/common":6,"@angular/core":153}],443:[function(require,module,exports){
 "use strict";
 var dom_1 = require('../../util/dom');
 var Activator = (function () {
@@ -73447,7 +73575,7 @@ var Activator = (function () {
 exports.Activator = Activator;
 var CLEAR_STATE_DEFERS = 5;
 
-},{"../../util/dom":495}],453:[function(require,module,exports){
+},{"../../util/dom":486}],444:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -73554,7 +73682,7 @@ var RippleActivator = (function (_super) {
 exports.RippleActivator = RippleActivator;
 var TOUCH_DOWN_ACCEL = 300;
 
-},{"../../util/dom":495,"./activator":452}],454:[function(require,module,exports){
+},{"../../util/dom":486,"./activator":443}],445:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -73750,7 +73878,7 @@ var POINTER_TOLERANCE = 4;
 var POINTER_MOVE_UNTIL_CANCEL = 10;
 var DISABLE_NATIVE_CLICK_AMOUNT = 2500;
 
-},{"../../config/config":465,"../../util/dom":495,"../app/app":387,"./activator":452,"./ripple":453,"@angular/core":163}],455:[function(require,module,exports){
+},{"../../config/config":456,"../../util/dom":486,"../app/app":378,"./activator":443,"./ripple":444,"@angular/core":153}],446:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -74028,7 +74156,7 @@ var TOAST_POSITION_TOP = 'top';
 var TOAST_POSITION_MIDDLE = 'middle';
 var TOAST_POSITION_BOTTOM = 'bottom';
 
-},{"../../animations/animation":380,"../../config/config":465,"../../transitions/transition":488,"../nav/nav-params":422,"../nav/view-controller":428,"@angular/common":16,"@angular/core":163}],456:[function(require,module,exports){
+},{"../../animations/animation":371,"../../config/config":456,"../../transitions/transition":479,"../nav/nav-params":413,"../nav/view-controller":419,"@angular/common":6,"@angular/core":153}],447:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -74195,7 +74323,7 @@ var TOAST_POSITION_TOP = 'top';
 var TOAST_POSITION_MIDDLE = 'middle';
 var TOAST_POSITION_BOTTOM = 'bottom';
 
-},{"../../util/util":503,"../app/app":387,"../nav/view-controller":428,"./toast-component":455,"@angular/core":163}],457:[function(require,module,exports){
+},{"../../util/util":494,"../app/app":378,"../nav/view-controller":419,"./toast-component":446,"@angular/core":153}],448:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -74444,7 +74572,7 @@ var Toggle = (function () {
 }());
 exports.Toggle = Toggle;
 
-},{"../../util/dom":495,"../../util/form":498,"../../util/ui-event-manager":502,"../../util/util":503,"../item/item":406,"@angular/core":163,"@angular/forms":252}],458:[function(require,module,exports){
+},{"../../util/dom":486,"../../util/form":489,"../../util/ui-event-manager":493,"../../util/util":494,"../item/item":397,"@angular/core":153,"@angular/forms":242}],449:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -74500,7 +74628,7 @@ var ToolbarItem = (function () {
 }());
 exports.ToolbarItem = ToolbarItem;
 
-},{"../button/button":390,"../navbar/navbar":429,"./toolbar":460,"@angular/core":163}],459:[function(require,module,exports){
+},{"../button/button":381,"../navbar/navbar":420,"./toolbar":451,"@angular/core":153}],450:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -74590,7 +74718,7 @@ var ToolbarTitle = (function (_super) {
 }(ion_1.Ion));
 exports.ToolbarTitle = ToolbarTitle;
 
-},{"../ion":401,"../navbar/navbar":429,"./toolbar":460,"@angular/core":163}],460:[function(require,module,exports){
+},{"../ion":392,"../navbar/navbar":420,"./toolbar":451,"@angular/core":153}],451:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -74902,7 +75030,7 @@ var Toolbar = (function (_super) {
 }(ToolbarBase));
 exports.Toolbar = Toolbar;
 
-},{"../../config/config":465,"../ion":401,"../nav/view-controller":428,"@angular/core":163}],461:[function(require,module,exports){
+},{"../../config/config":456,"../ion":392,"../nav/view-controller":419,"@angular/core":153}],452:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -74958,7 +75086,7 @@ var VirtualItem = (function () {
 }());
 exports.VirtualItem = VirtualItem;
 
-},{"@angular/core":163}],462:[function(require,module,exports){
+},{"@angular/core":153}],453:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -75566,7 +75694,7 @@ var SCROLL_END_TIMEOUT_MS = 140;
 var SCROLL_DIFFERENCE_MINIMUM = 20;
 var QUEUE_CHANGE_DETECTION = 0;
 
-},{"../../config/config":465,"../../platform/platform":478,"../../util/dom":495,"../../util/util":503,"../content/content":392,"../img/img":395,"../nav/view-controller":428,"./virtual-item":461,"./virtual-util":463,"@angular/core":163}],463:[function(require,module,exports){
+},{"../../config/config":456,"../../platform/platform":469,"../../util/dom":486,"../../util/util":494,"../content/content":383,"../img/img":386,"../nav/view-controller":419,"./virtual-item":452,"./virtual-util":454,"@angular/core":153}],454:[function(require,module,exports){
 "use strict";
 var dom_1 = require('../../util/dom');
 /**
@@ -76099,7 +76227,7 @@ var TEMPLATE_FOOTER = 2;
 var VIEWABLE_RENDERED_PADDING = 3;
 var REQUIRED_DOM_READS = 2;
 
-},{"../../util/dom":495}],464:[function(require,module,exports){
+},{"../../util/dom":486}],455:[function(require,module,exports){
 "use strict";
 var platform_browser_dynamic_1 = require('@angular/platform-browser-dynamic');
 var core_1 = require('@angular/core');
@@ -76185,7 +76313,7 @@ function addSelector(type, selector) {
 }
 exports.addSelector = addSelector;
 
-},{"../components/app/app":387,"../components/tap-click/tap-click":454,"../platform/platform":478,"../util/dom":495,"./providers":468,"@angular/core":163,"@angular/platform-browser-dynamic":311}],465:[function(require,module,exports){
+},{"../components/app/app":378,"../components/tap-click/tap-click":445,"../platform/platform":469,"../util/dom":486,"./providers":459,"@angular/core":153,"@angular/platform-browser-dynamic":302}],456:[function(require,module,exports){
 /**
 * @ngdoc service
 * @name Config
@@ -76517,7 +76645,7 @@ var Config = (function () {
 exports.Config = Config;
 var modeConfigs = {};
 
-},{"../platform/platform":478,"../util/util":503}],466:[function(require,module,exports){
+},{"../platform/platform":469,"../util/util":494}],457:[function(require,module,exports){
 "use strict";
 var common_1 = require('@angular/common');
 var forms_1 = require('@angular/forms');
@@ -76706,7 +76834,7 @@ exports.IONIC_DIRECTIVES = [
     show_hide_when_1.HideWhen
 ];
 
-},{"../components/backdrop/backdrop":388,"../components/badge/badge":389,"../components/button/button":390,"../components/checkbox/checkbox":391,"../components/content/content":392,"../components/datetime/datetime":393,"../components/icon/icon":394,"../components/img/img":395,"../components/infinite-scroll/infinite-scroll":397,"../components/infinite-scroll/infinite-scroll-content":396,"../components/input/input":399,"../components/item/item":406,"../components/item/item-reorder":403,"../components/item/item-sliding":405,"../components/label/label":407,"../components/list/list":408,"../components/menu/menu":416,"../components/menu/menu-close":411,"../components/menu/menu-toggle":414,"../components/nav/nav":426,"../components/nav/nav-pop":423,"../components/nav/nav-push":425,"../components/navbar/navbar":429,"../components/option/option":430,"../components/radio/radio-button":435,"../components/radio/radio-group":436,"../components/range/range":437,"../components/refresher/refresher":439,"../components/refresher/refresher-content":438,"../components/scroll/scroll":440,"../components/searchbar/searchbar":441,"../components/segment/segment":442,"../components/select/select":443,"../components/show-hide-when/show-hide-when":444,"../components/slides/slides":445,"../components/spinner/spinner":447,"../components/tabs/tab":450,"../components/tabs/tabs":451,"../components/toggle/toggle":457,"../components/toolbar/toolbar":460,"../components/toolbar/toolbar-item":458,"../components/toolbar/toolbar-title":459,"../components/virtual-scroll/virtual-item":461,"../components/virtual-scroll/virtual-scroll":462,"@angular/common":16,"@angular/forms":252}],467:[function(require,module,exports){
+},{"../components/backdrop/backdrop":379,"../components/badge/badge":380,"../components/button/button":381,"../components/checkbox/checkbox":382,"../components/content/content":383,"../components/datetime/datetime":384,"../components/icon/icon":385,"../components/img/img":386,"../components/infinite-scroll/infinite-scroll":388,"../components/infinite-scroll/infinite-scroll-content":387,"../components/input/input":390,"../components/item/item":397,"../components/item/item-reorder":394,"../components/item/item-sliding":396,"../components/label/label":398,"../components/list/list":399,"../components/menu/menu":407,"../components/menu/menu-close":402,"../components/menu/menu-toggle":405,"../components/nav/nav":417,"../components/nav/nav-pop":414,"../components/nav/nav-push":416,"../components/navbar/navbar":420,"../components/option/option":421,"../components/radio/radio-button":426,"../components/radio/radio-group":427,"../components/range/range":428,"../components/refresher/refresher":430,"../components/refresher/refresher-content":429,"../components/scroll/scroll":431,"../components/searchbar/searchbar":432,"../components/segment/segment":433,"../components/select/select":434,"../components/show-hide-when/show-hide-when":435,"../components/slides/slides":436,"../components/spinner/spinner":438,"../components/tabs/tab":441,"../components/tabs/tabs":442,"../components/toggle/toggle":448,"../components/toolbar/toolbar":451,"../components/toolbar/toolbar-item":449,"../components/toolbar/toolbar-title":450,"../components/virtual-scroll/virtual-item":452,"../components/virtual-scroll/virtual-scroll":453,"@angular/common":6,"@angular/forms":242}],458:[function(require,module,exports){
 "use strict";
 var config_1 = require('./config');
 // iOS Mode Settings
@@ -76797,7 +76925,7 @@ config_1.Config.setModeConfig('wp', {
     toastLeave: 'toast-wp-slide-out',
 });
 
-},{"./config":465}],468:[function(require,module,exports){
+},{"./config":456}],459:[function(require,module,exports){
 "use strict";
 var core_1 = require('@angular/core');
 var forms_1 = require('@angular/forms');
@@ -76951,7 +77079,7 @@ function bindEvents(window, document, platform, events) {
     }, 2000);
 }
 
-},{"../components/action-sheet/action-sheet":384,"../components/alert/alert":386,"../components/app/app":387,"../components/loading/loading":410,"../components/menu/menu-controller":412,"../components/modal/modal":418,"../components/picker/picker":432,"../components/popover/popover":434,"../components/tap-click/tap-click":454,"../components/toast/toast":456,"../gestures/gesture-controller":471,"../platform/platform":478,"../translation/translate":489,"../util/dom":495,"../util/events":496,"../util/feature-detect":497,"../util/form":498,"../util/keyboard":500,"../util/scroll-view":501,"../util/util":503,"./config":465,"./directives":466,"@angular/core":163,"@angular/forms":252,"@angular/http":290}],469:[function(require,module,exports){
+},{"../components/action-sheet/action-sheet":375,"../components/alert/alert":377,"../components/app/app":378,"../components/loading/loading":401,"../components/menu/menu-controller":403,"../components/modal/modal":409,"../components/picker/picker":423,"../components/popover/popover":425,"../components/tap-click/tap-click":445,"../components/toast/toast":447,"../gestures/gesture-controller":462,"../platform/platform":469,"../translation/translate":480,"../util/dom":486,"../util/events":487,"../util/feature-detect":488,"../util/form":489,"../util/keyboard":491,"../util/scroll-view":492,"../util/util":494,"./config":456,"./directives":457,"@angular/core":153,"@angular/forms":242,"@angular/http":281}],460:[function(require,module,exports){
 "use strict";
 var core_1 = require('@angular/core');
 var _reflect = Reflect;
@@ -76974,7 +77102,7 @@ function Page(config) {
 }
 exports.Page = Page;
 
-},{"@angular/core":163}],470:[function(require,module,exports){
+},{"@angular/core":153}],461:[function(require,module,exports){
 "use strict";
 var util_1 = require('../util');
 var ui_event_manager_1 = require('../util/ui-event-manager');
@@ -77093,7 +77221,7 @@ var PanGesture = (function () {
 }());
 exports.PanGesture = PanGesture;
 
-},{"../util":491,"../util/dom":495,"../util/ui-event-manager":502,"./recognizers":474}],471:[function(require,module,exports){
+},{"../util":482,"../util/dom":486,"../util/ui-event-manager":493,"./recognizers":465}],462:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -77288,7 +77416,7 @@ var GestureDelegate = (function () {
 }());
 exports.GestureDelegate = GestureDelegate;
 
-},{"../components/app/app":387,"@angular/core":163}],472:[function(require,module,exports){
+},{"../components/app/app":378,"@angular/core":153}],463:[function(require,module,exports){
 "use strict";
 var util_1 = require('../util');
 var hammer_1 = require('./hammer');
@@ -77356,7 +77484,7 @@ var Gesture = (function () {
 }());
 exports.Gesture = Gesture;
 
-},{"../util":491,"./hammer":473}],473:[function(require,module,exports){
+},{"../util":482,"./hammer":464}],464:[function(require,module,exports){
 "use strict";
 /* tslint:disable */
 var util_1 = require('../util/util');
@@ -79510,7 +79638,7 @@ util_1.assign(Hammer, {
 });
 win.Hammer = Hammer;
 
-},{"../util/util":503}],474:[function(require,module,exports){
+},{"../util/util":494}],465:[function(require,module,exports){
 "use strict";
 var PanRecognizer = (function () {
     function PanRecognizer(direction, threshold, maxAngle) {
@@ -79565,7 +79693,7 @@ var PanRecognizer = (function () {
 }());
 exports.PanRecognizer = PanRecognizer;
 
-},{}],475:[function(require,module,exports){
+},{}],466:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -79617,7 +79745,7 @@ var SlideEdgeGesture = (function (_super) {
 }(slide_gesture_1.SlideGesture));
 exports.SlideEdgeGesture = SlideEdgeGesture;
 
-},{"../util/dom":495,"../util/util":503,"./slide-gesture":476}],476:[function(require,module,exports){
+},{"../util/dom":486,"../util/util":494,"./slide-gesture":467}],467:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -79695,7 +79823,7 @@ var SlideGesture = (function (_super) {
 }(drag_gesture_1.PanGesture));
 exports.SlideGesture = SlideGesture;
 
-},{"../util":491,"../util/dom":495,"./drag-gesture":470}],477:[function(require,module,exports){
+},{"../util":482,"../util/dom":486,"./drag-gesture":461}],468:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -79737,7 +79865,7 @@ require('./transitions/transition-ios');
 require('./transitions/transition-md');
 require('./transitions/transition-wp');
 
-},{"./animations/animation":380,"./animations/builtins":381,"./components":382,"./config/bootstrap":464,"./config/config":465,"./config/directives":466,"./config/modes":467,"./config/providers":468,"./decorators/page":469,"./gestures/drag-gesture":470,"./gestures/gesture":472,"./gestures/gesture-controller":471,"./gestures/slide-edge-gesture":475,"./gestures/slide-gesture":476,"./platform/platform":478,"./platform/registry":479,"./platform/storage":480,"./transitions/page-transition":484,"./transitions/transition":488,"./transitions/transition-ios":485,"./transitions/transition-md":486,"./transitions/transition-wp":487,"./translation/translate":489,"./translation/translate_pipe":490,"./util/click-block":492,"./util/events":496,"./util/form":498,"./util/keyboard":500,"./util/util":503}],478:[function(require,module,exports){
+},{"./animations/animation":371,"./animations/builtins":372,"./components":373,"./config/bootstrap":455,"./config/config":456,"./config/directives":457,"./config/modes":458,"./config/providers":459,"./decorators/page":460,"./gestures/drag-gesture":461,"./gestures/gesture":463,"./gestures/gesture-controller":462,"./gestures/slide-edge-gesture":466,"./gestures/slide-gesture":467,"./platform/platform":469,"./platform/registry":470,"./platform/storage":471,"./transitions/page-transition":475,"./transitions/transition":479,"./transitions/transition-ios":476,"./transitions/transition-md":477,"./transitions/transition-wp":478,"./translation/translate":480,"./translation/translate_pipe":481,"./util/click-block":483,"./util/events":487,"./util/form":489,"./util/keyboard":491,"./util/util":494}],469:[function(require,module,exports){
 "use strict";
 var core_1 = require('@angular/core');
 var util_1 = require('../util/util');
@@ -80448,7 +80576,7 @@ var PlatformNode = (function () {
 var platformRegistry = {};
 var platformDefault = null;
 
-},{"../util/dom":495,"../util/util":503,"@angular/core":163}],479:[function(require,module,exports){
+},{"../util/dom":486,"../util/util":494,"@angular/core":153}],470:[function(require,module,exports){
 "use strict";
 var platform_1 = require('./platform');
 var dom_1 = require('../util/dom');
@@ -80638,7 +80766,7 @@ function isIOSDevice(p) {
     return p.testNavigatorPlatform('iphone|ipad|ipod');
 }
 
-},{"../util/dom":495,"./platform":478}],480:[function(require,module,exports){
+},{"../util/dom":486,"./platform":469}],471:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -80647,7 +80775,7 @@ __export(require('./storage/storage'));
 __export(require('./storage/local-storage'));
 __export(require('./storage/sql'));
 
-},{"./storage/local-storage":481,"./storage/sql":482,"./storage/storage":483}],481:[function(require,module,exports){
+},{"./storage/local-storage":472,"./storage/sql":473,"./storage/storage":474}],472:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -80758,7 +80886,7 @@ var LocalStorage = (function (_super) {
 }(storage_1.StorageEngine));
 exports.LocalStorage = LocalStorage;
 
-},{"./storage":483}],482:[function(require,module,exports){
+},{"./storage":474}],473:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -80908,7 +81036,7 @@ var SqlStorage = (function (_super) {
 }(storage_1.StorageEngine));
 exports.SqlStorage = SqlStorage;
 
-},{"../../util/util":503,"./storage":483}],483:[function(require,module,exports){
+},{"../../util/util":494,"./storage":474}],474:[function(require,module,exports){
 "use strict";
 /**
  * Storage is an easy way to store key/value pairs and other complicated
@@ -80989,7 +81117,7 @@ var StorageEngine = (function () {
 }());
 exports.StorageEngine = StorageEngine;
 
-},{}],484:[function(require,module,exports){
+},{}],475:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -81041,7 +81169,7 @@ function parsePxUnit(val) {
     return (val.indexOf('px') > 0) ? parseInt(val, 10) : 0;
 }
 
-},{"../animations/animation":380,"../components/content/content":392,"./transition":488}],485:[function(require,module,exports){
+},{"../animations/animation":371,"../components/content/content":383,"./transition":479}],476:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -81211,7 +81339,7 @@ var IOSTransition = (function (_super) {
 }(page_transition_1.PageTransition));
 page_transition_1.PageTransition.register('ios-transition', IOSTransition);
 
-},{"../animations/animation":380,"./page-transition":484}],486:[function(require,module,exports){
+},{"../animations/animation":371,"./page-transition":475}],477:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -81268,7 +81396,7 @@ var MDTransition = (function (_super) {
 }(page_transition_1.PageTransition));
 page_transition_1.PageTransition.register('md-transition', MDTransition);
 
-},{"../animations/animation":380,"./page-transition":484}],487:[function(require,module,exports){
+},{"../animations/animation":371,"./page-transition":475}],478:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -81323,7 +81451,7 @@ var WPTransition = (function (_super) {
 }(page_transition_1.PageTransition));
 page_transition_1.PageTransition.register('wp-transition', WPTransition);
 
-},{"../animations/animation":380,"./page-transition":484}],488:[function(require,module,exports){
+},{"../animations/animation":371,"./page-transition":475}],479:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -81370,7 +81498,7 @@ var Transition = (function (_super) {
 exports.Transition = Transition;
 var TransitionRegistry = {};
 
-},{"../animations/animation":380}],489:[function(require,module,exports){
+},{"../animations/animation":371}],480:[function(require,module,exports){
 "use strict";
 /**
  * @private
@@ -81435,7 +81563,7 @@ var Translate = (function () {
 }());
 exports.Translate = Translate;
 
-},{}],490:[function(require,module,exports){
+},{}],481:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -81481,7 +81609,7 @@ var TranslatePipe = (function () {
 }());
 exports.TranslatePipe = TranslatePipe;
 
-},{"./translate":489,"@angular/core":163}],491:[function(require,module,exports){
+},{"./translate":480,"@angular/core":153}],482:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -81491,7 +81619,7 @@ exports.dom = domUtil;
 __export(require('./util/util'));
 __export(require('./util/datetime-util'));
 
-},{"./util/datetime-util":493,"./util/dom":495,"./util/util":503}],492:[function(require,module,exports){
+},{"./util/datetime-util":484,"./util/dom":486,"./util/util":494}],483:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -81544,7 +81672,7 @@ var ClickBlock = (function () {
 }());
 exports.ClickBlock = ClickBlock;
 
-},{"../components/app/app":387,"../config/config":465,"./dom":495,"@angular/core":163}],493:[function(require,module,exports){
+},{"../components/app/app":378,"../config/config":456,"./dom":486,"@angular/core":153}],484:[function(require,module,exports){
 "use strict";
 var util_1 = require('./util');
 function renderDateTime(template, value, locale) {
@@ -81980,7 +82108,7 @@ var MONTH_SHORT_NAMES = [
     'Dec',
 ];
 
-},{"./util":503}],494:[function(require,module,exports){
+},{"./util":494}],485:[function(require,module,exports){
 "use strict";
 var Debouncer = (function () {
     function Debouncer(wait) {
@@ -82007,7 +82135,7 @@ var Debouncer = (function () {
 }());
 exports.Debouncer = Debouncer;
 
-},{}],495:[function(require,module,exports){
+},{}],486:[function(require,module,exports){
 "use strict";
 // RequestAnimationFrame Polyfill (Android 4.3 and below)
 /*! @author Paul Irish */
@@ -82276,7 +82404,7 @@ function flushDimensionCache() {
 exports.flushDimensionCache = flushDimensionCache;
 var dimensionCache = {};
 
-},{}],496:[function(require,module,exports){
+},{}],487:[function(require,module,exports){
 "use strict";
 /**
  * @name Events
@@ -82385,7 +82513,7 @@ var Events = (function () {
 }());
 exports.Events = Events;
 
-},{}],497:[function(require,module,exports){
+},{}],488:[function(require,module,exports){
 "use strict";
 var FeatureDetect = (function () {
     function FeatureDetect() {
@@ -82439,7 +82567,7 @@ FeatureDetect.add('backdrop-filter', function (window, document, body) {
     return backdrop;
 });
 
-},{}],498:[function(require,module,exports){
+},{}],489:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -82511,7 +82639,7 @@ var Form = (function () {
 }());
 exports.Form = Form;
 
-},{"@angular/core":163}],499:[function(require,module,exports){
+},{"@angular/core":153}],490:[function(require,module,exports){
 "use strict";
 (function (Key) {
     Key[Key["ENTER"] = 13] = "ENTER";
@@ -82521,7 +82649,7 @@ exports.Form = Form;
 var Key = exports.Key;
 ;
 
-},{}],500:[function(require,module,exports){
+},{}],491:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -82706,7 +82834,7 @@ exports.Keyboard = Keyboard;
 var KEYBOARD_CLOSE_POLLING = 150;
 var KEYBOARD_POLLING_CHECKS_MAX = 100;
 
-},{"../config/config":465,"./dom":495,"./form":498,"./key":499,"@angular/core":163}],501:[function(require,module,exports){
+},{"../config/config":456,"./dom":486,"./form":489,"./key":490,"@angular/core":153}],492:[function(require,module,exports){
 "use strict";
 var dom_1 = require('../util/dom');
 var ScrollView = (function () {
@@ -82933,7 +83061,7 @@ var MIN_VELOCITY_CONTINUE_DECELERATION = 0.12;
 var DECELERATION_FRICTION = 0.97;
 var FRAME_MS = (1000 / 60);
 
-},{"../util/dom":495}],502:[function(require,module,exports){
+},{"../util/dom":486}],493:[function(require,module,exports){
 "use strict";
 /**
  * @private
@@ -83089,7 +83217,7 @@ function listenEvent(ele, eventName, zoneWrapped, option, callback) {
     }
 }
 
-},{}],503:[function(require,module,exports){
+},{}],494:[function(require,module,exports){
 "use strict";
 function noop() { }
 exports.noop = noop;
@@ -83295,7 +83423,7 @@ function reorderArray(array, indexes) {
 }
 exports.reorderArray = reorderArray;
 
-},{}],504:[function(require,module,exports){
+},{}],495:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -83306,8 +83434,6 @@ var actionsheet_1 = require('./plugins/actionsheet');
 exports.ActionSheet = actionsheet_1.ActionSheet;
 var admob_1 = require('./plugins/admob');
 exports.AdMob = admob_1.AdMob;
-var android_fingerprint_auth_1 = require('./plugins/android-fingerprint-auth');
-exports.AndroidFingerprintAuth = android_fingerprint_auth_1.AndroidFingerprintAuth;
 var appavailability_1 = require('./plugins/appavailability');
 exports.AppAvailability = appavailability_1.AppAvailability;
 var apprate_1 = require('./plugins/apprate');
@@ -83317,7 +83443,6 @@ exports.AppVersion = appversion_1.AppVersion;
 var badge_1 = require('./plugins/badge');
 exports.Badge = badge_1.Badge;
 var background_geolocation_1 = require('./plugins/background-geolocation');
-var backgroundmode_1 = require('./plugins/backgroundmode');
 var barcodescanner_1 = require('./plugins/barcodescanner');
 exports.BarcodeScanner = barcodescanner_1.BarcodeScanner;
 var base64togallery_1 = require('./plugins/base64togallery');
@@ -83331,19 +83456,11 @@ exports.BLE = ble_1.BLE;
 var bluetoothserial_1 = require('./plugins/bluetoothserial');
 exports.BluetoothSerial = bluetoothserial_1.BluetoothSerial;
 var calendar_1 = require('./plugins/calendar');
-var call_number_1 = require('./plugins/call-number');
-exports.CallNumber = call_number_1.CallNumber;
 var camera_1 = require('./plugins/camera');
-var camera_preview_1 = require('./plugins/camera-preview');
-exports.CameraPreview = camera_preview_1.CameraPreview;
 var card_io_1 = require('./plugins/card-io');
 var clipboard_1 = require('./plugins/clipboard');
 exports.Clipboard = clipboard_1.Clipboard;
-var code_push_1 = require('./plugins/code-push');
-exports.CodePush = code_push_1.CodePush;
 var contacts_1 = require('./plugins/contacts');
-var crop_1 = require('./plugins/crop');
-exports.Crop = crop_1.Crop;
 var datepicker_1 = require('./plugins/datepicker');
 var dbmeter_1 = require('./plugins/dbmeter');
 exports.DBMeter = dbmeter_1.DBMeter;
@@ -83360,22 +83477,16 @@ var dialogs_1 = require('./plugins/dialogs');
 exports.Dialogs = dialogs_1.Dialogs;
 var emailcomposer_1 = require('./plugins/emailcomposer');
 exports.EmailComposer = emailcomposer_1.EmailComposer;
-var estimote_beacons_1 = require('./plugins/estimote-beacons');
-exports.EstimoteBeacons = estimote_beacons_1.EstimoteBeacons;
 var facebook_1 = require('./plugins/facebook');
+exports.Facebook = facebook_1.Facebook;
 var file_1 = require('./plugins/file');
 exports.File = file_1.File;
-var file_chooser_1 = require('./plugins/file-chooser');
-exports.FileChooser = file_chooser_1.FileChooser;
-var file_opener_1 = require('./plugins/file-opener');
-exports.FileOpener = file_opener_1.FileOpener;
 var filetransfer_1 = require('./plugins/filetransfer');
 exports.Transfer = filetransfer_1.Transfer;
 var flashlight_1 = require('./plugins/flashlight');
 exports.Flashlight = flashlight_1.Flashlight;
-var geofence_1 = require('./plugins/geofence');
-exports.Geofence = geofence_1.Geofence;
 var geolocation_1 = require('./plugins/geolocation');
+exports.Geolocation = geolocation_1.Geolocation;
 var globalization_1 = require('./plugins/globalization');
 exports.Globalization = globalization_1.Globalization;
 var google_plus_1 = require('./plugins/google-plus');
@@ -83386,58 +83497,23 @@ exports.GoogleAnalytics = googleanalytics_1.GoogleAnalytics;
 var hotspot_1 = require('./plugins/hotspot');
 exports.Hotspot = hotspot_1.Hotspot;
 var httpd_1 = require('./plugins/httpd');
-var ibeacon_1 = require('./plugins/ibeacon');
 var imagepicker_1 = require('./plugins/imagepicker');
-var imageresizer_1 = require('./plugins/imageresizer');
 var inappbrowser_1 = require('./plugins/inappbrowser');
-var inapppurchase_1 = require('./plugins/inapppurchase');
-exports.InAppPurchase = inapppurchase_1.InAppPurchase;
 var insomnia_1 = require('./plugins/insomnia');
 exports.Insomnia = insomnia_1.Insomnia;
-var instagram_1 = require('./plugins/instagram');
-exports.Instagram = instagram_1.Instagram;
-var is_debug_1 = require('./plugins/is-debug');
 var keyboard_1 = require('./plugins/keyboard');
 exports.Keyboard = keyboard_1.Keyboard;
 var launchnavigator_1 = require('./plugins/launchnavigator');
 var localnotifications_1 = require('./plugins/localnotifications');
-var media_capture_1 = require('./plugins/media-capture');
-var native_audio_1 = require('./plugins/native-audio');
-exports.NativeAudio = native_audio_1.NativeAudio;
-var native_page_transitions_1 = require('./plugins/native-page-transitions');
-var nativestorage_1 = require('./plugins/nativestorage');
-exports.NativeStorage = nativestorage_1.NativeStorage;
-var market_1 = require('./plugins/market');
-exports.Market = market_1.Market;
 var media_1 = require('./plugins/media');
-var mixpanel_1 = require('./plugins/mixpanel');
-var music_controls_1 = require('./plugins/music-controls');
-exports.MusicControls = music_controls_1.MusicControls;
 var network_1 = require('./plugins/network');
 exports.Network = network_1.Network;
-var nfc_1 = require('./plugins/nfc');
-var onesignal_1 = require('./plugins/onesignal');
-exports.OneSignal = onesignal_1.OneSignal;
-var photo_viewer_1 = require('./plugins/photo-viewer');
-exports.PhotoViewer = photo_viewer_1.PhotoViewer;
-var screen_orientation_1 = require('./plugins/screen-orientation');
-exports.ScreenOrientation = screen_orientation_1.ScreenOrientation;
-var pay_pal_1 = require('./plugins/pay-pal');
-var pin_dialog_1 = require('./plugins/pin-dialog');
-exports.PinDialog = pin_dialog_1.PinDialog;
-var power_management_1 = require('./plugins/power-management');
-exports.PowerManagement = power_management_1.PowerManagement;
+exports.Connection = network_1.Connection;
 var printer_1 = require('./plugins/printer');
 var push_1 = require('./plugins/push');
 var safari_view_controller_1 = require('./plugins/safari-view-controller');
 var screenshot_1 = require('./plugins/screenshot');
 exports.Screenshot = screenshot_1.Screenshot;
-var securestorage_1 = require('./plugins/securestorage');
-exports.SecureStorage = securestorage_1.SecureStorage;
-var shake_1 = require('./plugins/shake');
-exports.Shake = shake_1.Shake;
-var sim_1 = require('./plugins/sim');
-exports.Sim = sim_1.Sim;
 var sms_1 = require('./plugins/sms');
 var socialsharing_1 = require('./plugins/socialsharing');
 exports.SocialSharing = socialsharing_1.SocialSharing;
@@ -83448,24 +83524,14 @@ var sqlite_1 = require('./plugins/sqlite');
 exports.SQLite = sqlite_1.SQLite;
 var statusbar_1 = require('./plugins/statusbar');
 exports.StatusBar = statusbar_1.StatusBar;
-var streaming_media_1 = require('./plugins/streaming-media');
 var _3dtouch_1 = require('./plugins/3dtouch');
 var toast_1 = require('./plugins/toast');
 var touchid_1 = require('./plugins/touchid');
 exports.TouchID = touchid_1.TouchID;
-var text_to_speech_1 = require('./plugins/text-to-speech');
-exports.TextToSpeech = text_to_speech_1.TextToSpeech;
-var twitter_connect_1 = require('./plugins/twitter-connect');
 var vibration_1 = require('./plugins/vibration');
 exports.Vibration = vibration_1.Vibration;
-var video_editor_1 = require('./plugins/video-editor');
-var video_player_1 = require('./plugins/video-player');
 var webintent_1 = require('./plugins/webintent');
 exports.WebIntent = webintent_1.WebIntent;
-var youtube_video_player_1 = require('./plugins/youtube-video-player');
-exports.YoutubeVideoPlayer = youtube_video_player_1.YoutubeVideoPlayer;
-var zip_1 = require('./plugins/zip');
-exports.Zip = zip_1.Zip;
 __export(require('./plugins/3dtouch'));
 __export(require('./plugins/background-geolocation'));
 __export(require('./plugins/backgroundmode'));
@@ -83473,52 +83539,34 @@ __export(require('./plugins/batterystatus'));
 __export(require('./plugins/calendar'));
 __export(require('./plugins/camera'));
 __export(require('./plugins/card-io'));
-__export(require('./plugins/code-push'));
 __export(require('./plugins/contacts'));
 __export(require('./plugins/datepicker'));
 __export(require('./plugins/device'));
 __export(require('./plugins/devicemotion'));
 __export(require('./plugins/deviceorientation'));
-__export(require('./plugins/facebook'));
-__export(require('./plugins/file'));
-__export(require('./plugins/filetransfer'));
-__export(require('./plugins/geolocation'));
 __export(require('./plugins/googlemaps'));
 __export(require('./plugins/httpd'));
-__export(require('./plugins/ibeacon'));
 __export(require('./plugins/imagepicker'));
-__export(require('./plugins/imageresizer'));
 __export(require('./plugins/inappbrowser'));
 __export(require('./plugins/launchnavigator'));
 __export(require('./plugins/localnotifications'));
-__export(require('./plugins/nfc'));
 __export(require('./plugins/media'));
-__export(require('./plugins/media-capture'));
-__export(require('./plugins/mixpanel'));
-__export(require('./plugins/pay-pal'));
-__export(require('./plugins/native-page-transitions'));
 __export(require('./plugins/printer'));
 __export(require('./plugins/push'));
 __export(require('./plugins/safari-view-controller'));
 __export(require('./plugins/sms'));
 __export(require('./plugins/spinnerdialog'));
-__export(require('./plugins/streaming-media'));
 __export(require('./plugins/toast'));
-__export(require('./plugins/twitter-connect'));
-__export(require('./plugins/video-editor'));
-__export(require('./plugins/video-player'));
 __export(require('./plugins/plugin'));
 // Window export to use outside of a module loading system
 window['IonicNative'] = {
     ActionSheet: actionsheet_1.ActionSheet,
     AdMob: admob_1.AdMob,
-    AndroidFingerprintAuth: android_fingerprint_auth_1.AndroidFingerprintAuth,
     AppAvailability: appavailability_1.AppAvailability,
     AppRate: apprate_1.AppRate,
     AppVersion: appversion_1.AppVersion,
     Badge: badge_1.Badge,
     BackgroundGeolocation: background_geolocation_1.BackgroundGeolocation,
-    BackgroundMode: backgroundmode_1.BackgroundMode,
     BarcodeScanner: barcodescanner_1.BarcodeScanner,
     Base64ToGallery: base64togallery_1.Base64ToGallery,
     BatteryStatus: batterystatus_1.BatteryStatus,
@@ -83526,14 +83574,11 @@ window['IonicNative'] = {
     BLE: ble_1.BLE,
     BluetoothSerial: bluetoothserial_1.BluetoothSerial,
     Calendar: calendar_1.Calendar,
-    CallNumber: call_number_1.CallNumber,
     Camera: camera_1.Camera,
-    CameraPreview: camera_preview_1.CameraPreview,
     CardIO: card_io_1.CardIO,
     Clipboard: clipboard_1.Clipboard,
-    CodePush: code_push_1.CodePush,
+    Connection: network_1.Connection,
     Contacts: contacts_1.Contacts,
-    Crop: crop_1.Crop,
     DatePicker: datepicker_1.DatePicker,
     DBMeter: dbmeter_1.DBMeter,
     Deeplinks: deeplinks_1.Deeplinks,
@@ -83544,13 +83589,9 @@ window['IonicNative'] = {
     Dialogs: dialogs_1.Dialogs,
     Diagnostic: diagnostic_1.Diagnostic,
     EmailComposer: emailcomposer_1.EmailComposer,
-    EstimoteBeacons: estimote_beacons_1.EstimoteBeacons,
     Facebook: facebook_1.Facebook,
     File: file_1.File,
-    FileChooser: file_chooser_1.FileChooser,
-    FileOpener: file_opener_1.FileOpener,
     Flashlight: flashlight_1.Flashlight,
-    Geofence: geofence_1.Geofence,
     Geolocation: geolocation_1.Geolocation,
     Globalization: globalization_1.Globalization,
     GooglePlus: google_plus_1.GooglePlus,
@@ -83558,93 +83599,67 @@ window['IonicNative'] = {
     GoogleAnalytics: googleanalytics_1.GoogleAnalytics,
     Hotspot: hotspot_1.Hotspot,
     Httpd: httpd_1.Httpd,
-    IBeacon: ibeacon_1.IBeacon,
     ImagePicker: imagepicker_1.ImagePicker,
-    ImageResizer: imageresizer_1.ImageResizer,
     InAppBrowser: inappbrowser_1.InAppBrowser,
-    InAppPurchase: inapppurchase_1.InAppPurchase,
-    Instagram: instagram_1.Instagram,
-    IsDebug: is_debug_1.IsDebug,
     Keyboard: keyboard_1.Keyboard,
     LaunchNavigator: launchnavigator_1.LaunchNavigator,
     LocalNotifications: localnotifications_1.LocalNotifications,
-    Market: market_1.Market,
-    MediaCapture: media_capture_1.MediaCapture,
     MediaPlugin: media_1.MediaPlugin,
-    Mixpanel: mixpanel_1.Mixpanel,
-    MusicControls: music_controls_1.MusicControls,
-    NativeAudio: native_audio_1.NativeAudio,
-    NativePageTransitions: native_page_transitions_1.NativePageTransitions,
-    NativeStorage: nativestorage_1.NativeStorage,
     Network: network_1.Network,
-    PayPal: pay_pal_1.PayPal,
-    NFC: nfc_1.NFC,
     Printer: printer_1.Printer,
     Push: push_1.Push,
-    OneSignal: onesignal_1.OneSignal,
-    PhotoViewer: photo_viewer_1.PhotoViewer,
-    ScreenOrientation: screen_orientation_1.ScreenOrientation,
-    PinDialog: pin_dialog_1.PinDialog,
-    PowerManagement: power_management_1.PowerManagement,
     SafariViewController: safari_view_controller_1.SafariViewController,
     Screenshot: screenshot_1.Screenshot,
-    SecureStorage: securestorage_1.SecureStorage,
-    Shake: shake_1.Shake,
-    Sim: sim_1.Sim,
     SMS: sms_1.SMS,
     SocialSharing: socialsharing_1.SocialSharing,
     SpinnerDialog: spinnerdialog_1.SpinnerDialog,
     Splashscreen: splashscreen_1.Splashscreen,
     SQLite: sqlite_1.SQLite,
     StatusBar: statusbar_1.StatusBar,
-    StreamingMedia: streaming_media_1.StreamingMedia,
     ThreeDeeTouch: _3dtouch_1.ThreeDeeTouch,
     Toast: toast_1.Toast,
     TouchID: touchid_1.TouchID,
     Transfer: filetransfer_1.Transfer,
-    TextToSpeech: text_to_speech_1.TextToSpeech,
-    TwitterConnect: twitter_connect_1.TwitterConnect,
-    VideoEditor: video_editor_1.VideoEditor,
-    VideoPlayer: video_player_1.VideoPlayer,
     Vibration: vibration_1.Vibration,
-    WebIntent: webintent_1.WebIntent,
-    YoutubeVideoPlayer: youtube_video_player_1.YoutubeVideoPlayer,
-    Zip: zip_1.Zip
+    WebIntent: webintent_1.WebIntent
 };
 ng1_1.initAngular1(window['IonicNative']);
 // To help developers using cordova, we listen for the device ready event and
 // log an error if it didn't fire in a reasonable amount of time. Generally,
 // when this happens, developers should remove and reinstall plugins, since
 // an inconsistent plugin is often the culprit.
-var before = Date.now();
+var before = +new Date;
 var didFireReady = false;
 document.addEventListener('deviceready', function () {
-    console.log('DEVICE READY FIRED AFTER', (Date.now() - before), 'ms');
+    console.log('DEVICE READY FIRED AFTER', (+new Date - before), 'ms');
     didFireReady = true;
 });
 setTimeout(function () {
     if (!didFireReady && window.cordova) {
-        console.warn("Native: deviceready did not fire within " + DEVICE_READY_TIMEOUT + "ms. This can happen when plugins are in an inconsistent state. Try removing plugins from plugins/ and reinstalling them.");
+        console.warn('Native: deviceready did not fire within ' + DEVICE_READY_TIMEOUT + 'ms. This can happen when plugins are in an inconsistent state. Try removing plugins from plugins/ and reinstalling them.');
     }
 }, DEVICE_READY_TIMEOUT);
 
-},{"./ng1":505,"./plugins/3dtouch":506,"./plugins/actionsheet":507,"./plugins/admob":508,"./plugins/android-fingerprint-auth":509,"./plugins/appavailability":510,"./plugins/apprate":511,"./plugins/appversion":512,"./plugins/background-geolocation":513,"./plugins/backgroundmode":514,"./plugins/badge":515,"./plugins/barcodescanner":516,"./plugins/base64togallery":517,"./plugins/batterystatus":518,"./plugins/ble":519,"./plugins/bluetoothserial":520,"./plugins/brightness":521,"./plugins/calendar":522,"./plugins/call-number":523,"./plugins/camera":525,"./plugins/camera-preview":524,"./plugins/card-io":526,"./plugins/clipboard":527,"./plugins/code-push":528,"./plugins/contacts":529,"./plugins/crop":530,"./plugins/datepicker":531,"./plugins/dbmeter":532,"./plugins/deeplinks":533,"./plugins/device":534,"./plugins/deviceaccounts":535,"./plugins/devicemotion":536,"./plugins/deviceorientation":537,"./plugins/diagnostic":538,"./plugins/dialogs":539,"./plugins/emailcomposer":540,"./plugins/estimote-beacons":541,"./plugins/facebook":542,"./plugins/file":545,"./plugins/file-chooser":543,"./plugins/file-opener":544,"./plugins/filetransfer":546,"./plugins/flashlight":547,"./plugins/geofence":548,"./plugins/geolocation":549,"./plugins/globalization":550,"./plugins/google-plus":551,"./plugins/googleanalytics":552,"./plugins/googlemaps":553,"./plugins/hotspot":554,"./plugins/httpd":555,"./plugins/ibeacon":556,"./plugins/imagepicker":557,"./plugins/imageresizer":558,"./plugins/inappbrowser":559,"./plugins/inapppurchase":560,"./plugins/insomnia":561,"./plugins/instagram":562,"./plugins/is-debug":563,"./plugins/keyboard":564,"./plugins/launchnavigator":565,"./plugins/localnotifications":566,"./plugins/market":567,"./plugins/media":569,"./plugins/media-capture":568,"./plugins/mixpanel":570,"./plugins/music-controls":571,"./plugins/native-audio":572,"./plugins/native-page-transitions":573,"./plugins/nativestorage":574,"./plugins/network":575,"./plugins/nfc":576,"./plugins/onesignal":577,"./plugins/pay-pal":578,"./plugins/photo-viewer":579,"./plugins/pin-dialog":580,"./plugins/plugin":581,"./plugins/power-management":582,"./plugins/printer":583,"./plugins/push":584,"./plugins/safari-view-controller":585,"./plugins/screen-orientation":586,"./plugins/screenshot":587,"./plugins/securestorage":588,"./plugins/shake":589,"./plugins/sim":590,"./plugins/sms":591,"./plugins/socialsharing":592,"./plugins/spinnerdialog":593,"./plugins/splashscreen":594,"./plugins/sqlite":595,"./plugins/statusbar":596,"./plugins/streaming-media":597,"./plugins/text-to-speech":598,"./plugins/toast":599,"./plugins/touchid":600,"./plugins/twitter-connect":601,"./plugins/vibration":602,"./plugins/video-editor":603,"./plugins/video-player":604,"./plugins/webintent":605,"./plugins/youtube-video-player":606,"./plugins/zip":607}],505:[function(require,module,exports){
+},{"./ng1":496,"./plugins/3dtouch":497,"./plugins/actionsheet":498,"./plugins/admob":499,"./plugins/appavailability":500,"./plugins/apprate":501,"./plugins/appversion":502,"./plugins/background-geolocation":503,"./plugins/backgroundmode":504,"./plugins/badge":505,"./plugins/barcodescanner":506,"./plugins/base64togallery":507,"./plugins/batterystatus":508,"./plugins/ble":509,"./plugins/bluetoothserial":510,"./plugins/brightness":511,"./plugins/calendar":512,"./plugins/camera":513,"./plugins/card-io":514,"./plugins/clipboard":515,"./plugins/contacts":516,"./plugins/datepicker":517,"./plugins/dbmeter":518,"./plugins/deeplinks":519,"./plugins/device":520,"./plugins/deviceaccounts":521,"./plugins/devicemotion":522,"./plugins/deviceorientation":523,"./plugins/diagnostic":524,"./plugins/dialogs":525,"./plugins/emailcomposer":526,"./plugins/facebook":527,"./plugins/file":528,"./plugins/filetransfer":529,"./plugins/flashlight":530,"./plugins/geolocation":531,"./plugins/globalization":532,"./plugins/google-plus":533,"./plugins/googleanalytics":534,"./plugins/googlemaps":535,"./plugins/hotspot":536,"./plugins/httpd":537,"./plugins/imagepicker":538,"./plugins/inappbrowser":539,"./plugins/insomnia":540,"./plugins/keyboard":541,"./plugins/launchnavigator":542,"./plugins/localnotifications":543,"./plugins/media":544,"./plugins/network":545,"./plugins/plugin":546,"./plugins/printer":547,"./plugins/push":548,"./plugins/safari-view-controller":549,"./plugins/screenshot":550,"./plugins/sms":551,"./plugins/socialsharing":552,"./plugins/spinnerdialog":553,"./plugins/splashscreen":554,"./plugins/sqlite":555,"./plugins/statusbar":556,"./plugins/toast":557,"./plugins/touchid":558,"./plugins/vibration":559,"./plugins/webintent":560}],496:[function(require,module,exports){
 "use strict";
 /**
  * Initialize the ionic.native Angular module if we're running in ng1.
  * This iterates through the list of registered plugins and dynamically
- * creates Angular 1 services of the form $cordovaSERVICE, ex: $cordovaStatusBar.
+ * creates Angular 1 services of the form $cordovaSERVICE, ex: $cordovStatusBar.
  */
 function initAngular1(plugins) {
     if (window.angular) {
-        var ngModule_1 = window.angular.module('ionic.native', []);
+        window.angular.module('ionic.native', []);
         for (var name in plugins) {
             var serviceName = '$cordova' + name;
             var cls = plugins[name];
             (function (serviceName, cls, name) {
-                ngModule_1.service(serviceName, [function () {
-                        var funcs = window.angular.copy(cls);
-                        funcs.prototype['name'] = name;
+                window.angular.module('ionic.native').service(serviceName, [function () {
+                        var funcs = {};
+                        for (var k in cls) {
+                            funcs[k] = cls[k];
+                        }
+                        funcs['name'] = name;
                         return funcs;
                     }]);
             })(serviceName, cls, name);
@@ -83653,7 +83668,7 @@ function initAngular1(plugins) {
 }
 exports.initAngular1 = initAngular1;
 
-},{}],506:[function(require,module,exports){
+},{}],497:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -83669,13 +83684,11 @@ var Observable_1 = require('rxjs/Observable');
  * @usage
  * Please do refer to the original plugin's repo for detailed usage. The usage example here might not be sufficient.
  * ```
- * import { ThreeDeeTouch } from 'ionic-native';
+ * import {ThreeDeeTouch, ThreeDeeTouchQuickAction, ThreeDeeTouchForceTouch} from 'ionic-native';
  *
- * // import for type completion on variables
- * import { ThreeDeeTouchQuickAction, ThreeDeeTouchForceTouch } from 'ionic-native';
  * ...
  *
- * ThreeDeeTouch.isAvailable().then(isAvailable => console.log("3D Touch available? " + isAvailable));
+ * ThreeDeeTouch.isAvailable().then(isAvailable => console.log("3D Touch available? " + isAvailable)):
  *
  * ThreeDeeTouch.watchForceTouches()
  *   .subscribe(
@@ -83712,15 +83725,6 @@ var Observable_1 = require('rxjs/Observable');
  *   }
  * ];
  * ThreeDeeTouch.configureQuickActions(actions);
- *
- * ThreeDeeTouchForceTouch.onHomeIconPressed().subscribe(
- *  (payload) => {
- *    // returns an object that is the button you presed
- *    console.log('Pressed the ${payload.title} button')
- *    console.log(payload.type)
- *
- *  }
- * )
  * ```
  */
 var ThreeDeeTouch = (function () {
@@ -83736,13 +83740,6 @@ var ThreeDeeTouch = (function () {
      * @returns {Observable<ThreeDeeTouchForceTouch>} Returns an observable that sends a `ThreeDeeTouchForceTouch` object
      */
     ThreeDeeTouch.watchForceTouches = function () { return; };
-    /**
-     * setup the 3D-touch actions, takes an array of objects with the following
-     * @param {string} type (optional) A type that can be used `onHomeIconPressed` callback
-     * @param {string} title Title for your action
-     * @param {string} subtitle (optional) A short description for your action
-     * @param {string} iconType (optional) Choose between Prohibit, Contact, Home, MarkLocation, Favorite, Love, Cloud, Invitation, Confirmation, Mail, Message, Date, Time, CapturePhoto, CaptureVideo, Task, TaskCompleted, Alarm, Bookmark, Shuffle, Audio, Update
-     */
     ThreeDeeTouch.configureQuickActions = function (quickActions) { };
     /**
      * When a home icon is pressed, your app launches and this JS callback is invoked.
@@ -83750,9 +83747,8 @@ var ThreeDeeTouch = (function () {
      */
     ThreeDeeTouch.onHomeIconPressed = function () {
         return new Observable_1.Observable(function (observer) {
-            if (window.ThreeDeeTouch && window.ThreeDeeTouch.onHomeIconPressed) {
+            if (window.ThreeDeeTouch && window.ThreeDeeTouch.onHomeIconPressed)
                 window.ThreeDeeTouch.onHomeIconPressed = observer.next.bind(observer);
-            }
             else {
                 observer.error('3dTouch plugin is not available.');
                 observer.complete();
@@ -83760,7 +83756,6 @@ var ThreeDeeTouch = (function () {
         });
     };
     /**
-     * Enable Link Preview.
      * UIWebView and WKWebView (the webviews powering Cordova apps) don't allow the fancy new link preview feature of iOS9.
      */
     ThreeDeeTouch.enableLinkPreview = function () { };
@@ -83783,6 +83778,11 @@ var ThreeDeeTouch = (function () {
     ], ThreeDeeTouch, "configureQuickActions", null);
     __decorate([
         plugin_1.Cordova({
+            observable: true
+        })
+    ], ThreeDeeTouch, "onHomeIconPressed", null);
+    __decorate([
+        plugin_1.Cordova({
             sync: true
         })
     ], ThreeDeeTouch, "enableLinkPreview", null);
@@ -83803,7 +83803,7 @@ var ThreeDeeTouch = (function () {
 }());
 exports.ThreeDeeTouch = ThreeDeeTouch;
 
-},{"./plugin":581,"rxjs/Observable":609}],507:[function(require,module,exports){
+},{"./plugin":546,"rxjs/Observable":562}],498:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -83820,9 +83820,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-actionsheet`. For more info, please see the [ActionSheet plugin docs](https://github.com/EddyVerbruggen/cordova-plugin-actionsheet).
  *
  * @usage
- * ```typescript
- * import { ActionSheet } from 'ionic-native';
- *
+ * ```ts
+ * import {ActionSheet} from 'ionic-native';
  *
  * let buttonLabels = ['Share via Facebook', 'Share via Twitter'];
  * ActionSheet.show({
@@ -83830,42 +83829,38 @@ var plugin_1 = require('./plugin');
  *   'buttonLabels': buttonLabels,
  *   'addCancelButtonWithLabel': 'Cancel',
  *   'addDestructiveButtonWithLabel' : 'Delete'
- * }).then((buttonIndex: number) => {
- *   console.log('Button pressed: ' + buttonIndex);
+ * }).then(buttonIndex => {
+ *   console.log('Button pressed: ' + buttonLabels[buttonIndex - 1]);
  * });
  * ```
- *
- * @advanced
- * ActionSheet options
- *
- * | Option                        | Type      | Description                                  |
- * |-------------------------------|-----------|----------------------------------------------|
- * | title                         |`string`   | The title for the actionsheet                |
- * | buttonLabels                  |`string[]` | the labels for the buttons. Uses the index x |
- * | androidTheme                  |`number`   | Theme to be used on Android                  |
- * | androidEnableCancelButton     |`boolean`  | Enable a cancel on Android                   |
- * | winphoneEnableCancelButton    |`boolean`  | Enable a cancel on Windows Phone             |
- * | addCancelButtonWithLabel      |`string`   | Add a cancel button with text                |
- * | addDestructiveButtonWithLabel |`string`   | Add a destructive button with text           |
- * | position                      |`number[]` | On an iPad, set the X,Y position             |
- *
  *
  */
 var ActionSheet = (function () {
     function ActionSheet() {
     }
     /**
-     * Show a native ActionSheet component. See below for options.
-     * @param {options} Options See table below
+     * Show the ActionSheet. The ActionSheet's options is an object with the following propterties.
+     *
+     * | Option                        | Type      | Description                                  |
+     * |-------------------------------|-----------|----------------------------------------------|
+     * | title                         |`string`   | The title for the actionsheet                |
+     * | buttonLabels                  |`string[]` | the labels for the buttons. Uses the index x |
+     * | androidTheme                  |`number`   | Theme to be used on Android                  |
+     * | androidEnableCancelButton     |`boolean`  | Enable a cancel on Android                   |
+     * | winphoneEnableCancelButton    |`boolean`  | Enable a cancel on Windows Phone             |
+     * | addCancelButtonWithLabel      |`string`   | Add a cancel button with text                |
+     * | addDestructiveButtonWithLabel |`string`   | Add a destructive button with text           |
+     * | position                      |`number[]` | On an iPad, set the X,Y position             |
+     *
+     * @param {options} Options See table above
      * @returns {Promise} Returns a Promise that resolves with the index of the
      *   button pressed (1 based, so 1, 2, 3, etc.)
      */
     ActionSheet.show = function (options) { return; };
     /**
-     * Progamtically hide the native ActionSheet
-     * @returns {Promise} Returns a Promise that resolves when the actionsheet is closed
+     * Hide the ActionSheet.
      */
-    ActionSheet.hide = function (options) { return; };
+    ActionSheet.hide = function () { return; };
     __decorate([
         plugin_1.Cordova()
     ], ActionSheet, "show", null);
@@ -83884,7 +83879,7 @@ var ActionSheet = (function () {
 }());
 exports.ActionSheet = ActionSheet;
 
-},{"./plugin":581}],508:[function(require,module,exports){
+},{"./plugin":546}],499:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84090,75 +84085,7 @@ var AdMob = (function () {
 }());
 exports.AdMob = AdMob;
 
-},{"./plugin":581}],509:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Android Fingerprint Auth
- * @description
- * This plugin will open a native dialog fragment prompting the user to authenticate using their fingerprint. If the device has a secure lockscreen (pattern, PIN, or password), the user may opt to authenticate using that method as a backup.
- * @usage
- * ```typescript
- * import { AndroidFingerprintAuth } from 'ionic-native';
- *
- * AndroidFingerprintAuth.isAvailable()
- *   .then((result)=> {
- *     if(result.isAvailable){
- *       // it is available
- *
- *       AndroidFingerprintAuth.show({ clientId: "myAppName", clientSecret: "so_encrypted_much_secure_very_secret" })
- *         .then(result => {
- *            if(result.withFingerprint) {
- *              console.log('Successfully authenticated with fingerprint!');
- *            } else if(result.withPassword) {
- *              console.log('Successfully authenticated with backup password!');
- *            } else console.log('Didn\'t authenticate!');
- *         })
- *         .catch(error => console.error(error));
- *
- *     } else {
- *       // fingerprint auth isn't available
- *     }
- *   })
- *   .catch(error => console.error(error));
- * ```
- */
-var AndroidFingerprintAuth = (function () {
-    function AndroidFingerprintAuth() {
-    }
-    /**
-     * Opens a native dialog fragment to use the device hardware fingerprint scanner to authenticate against fingerprints registered for the device.
-     * @param params {any}
-     */
-    AndroidFingerprintAuth.show = function (params) { return; };
-    /**
-     * Check if service is available
-     */
-    AndroidFingerprintAuth.isAvailable = function () { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], AndroidFingerprintAuth, "show", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], AndroidFingerprintAuth, "isAvailable", null);
-    AndroidFingerprintAuth = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-android-fingerprint-auth',
-            pluginRef: 'FingerprintAuth',
-            repo: 'https://github.com/mjwheatley/cordova-plugin-android-fingerprint-auth'
-        })
-    ], AndroidFingerprintAuth);
-    return AndroidFingerprintAuth;
-}());
-exports.AndroidFingerprintAuth = AndroidFingerprintAuth;
-
-},{"./plugin":581}],510:[function(require,module,exports){
+},{"./plugin":546}],500:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84175,22 +84102,22 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-appavailability. For more info, please see the [AppAvailability plugin docs](https://github.com/ohh2ahh/AppAvailability).
  *
  * @usage
- * ```typescript
- * import { AppAvailability } from 'ionic-native';
+ * ```js
+ * import {AppAvailability} from 'ionic-native';
  *
  *
- * let app;
+ * var app;
  *
- * if (device.platform === 'iOS') {
+ * if(device.platform === 'iOS') {
  *   app = 'twitter://';
- * } else if (device.platform === 'Android') {
+ * }else if(device.platform === 'Android'){
  *   app = 'com.twitter.android';
  * }
  *
  * AppAvailability.check(app)
  *   .then(
- *     (yes: string) => console.log(app + ' is available'),
- *     (no: string) => console.log(app + ' is NOT available')
+ *     yes => console.log(app + " is available"),
+ *     no => console.log(app + " is NOT available")
  *   );
  * ```
  */
@@ -84199,7 +84126,7 @@ var AppAvailability = (function () {
     }
     /**
      * Checks if an app is available on device
-     * @param {string} app Package name on android, or URI scheme on iOS
+     * @param app Package name on android, or URI scheme on iOS
      * @returns {Promise<boolean>}
      */
     AppAvailability.check = function (app) { return; };
@@ -84218,7 +84145,7 @@ var AppAvailability = (function () {
 }());
 exports.AppAvailability = AppAvailability;
 
-},{"./plugin":581}],511:[function(require,module,exports){
+},{"./plugin":546}],501:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84235,45 +84162,40 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-apprate. For more info, please see the [AppRate plugin docs](https://github.com/pushandplay/cordova-plugin-apprate).
  *
  * @usage
- * ```typescript
- * import { AppRate } from 'ionic-native';
+ * ```js
+ * import {AppRate} from 'ionic-native';
  *
- *  AppRate.preferences.storeAppURL = {
- *    ios: '<my_app_id>',
- *    android: 'market://details?id=<package_name>',
- *  };
  *
+ * AppRate.preferences.storeAppURL.ios = '<my_app_id>';
+ * AppRate.preferences.storeAppURL.android = 'market://details?id=<package_name>';
+ * AppRate.preferences.storeAppURL.blackberry = 'appworld://content/[App Id]/';
+ * AppRate.preferences.storeAppURL.windows8 = 'ms-windows-store:Review?name=<the Package Family Name of the application>';
  * AppRate.promptForRating();
  * ```
- *
- * @advanced
- *
- * Rating dialog preferences
- *
- * | Option                       | Type       | Default | Description                                                                            |
- * |------------------------------|------------|---------|----------------------------------------------------------------------------------------|
- * | useLanguage                  | `String`   | null    | custom BCP 47 language tag                                                             |
- * | displayAppName               | `String`   | ''      | custom application title                                                               |
- * | promptAgainForEachNewVersion | `Boolean`  | true    | show dialog again when application version will be updated                             |
- * | usesUntilPrompt              | `Integer`  | 3       | count of runs of application before dialog will be displayed                           |
- * | openStoreInApp               | `Boolean`  | false   | leave app or no when application page opened in app store (now supported only for iOS) |
- * | useCustomRateDialog          | `Boolean`  | false   | use custom view for rate dialog                                                        |
- * | callbacks.onButtonClicked    | `Function` | null    | call back function. called when user clicked on rate-dialog buttons                    |
- * | callbacks.onRateDialogShow   | `Function` | null    | call back function. called when rate-dialog showing                                    |
- * | storeAppURL.ios              | `String`   | null    | application id in AppStore                                                             |
- * | storeAppURL.android          | `String`   | null    | application URL in GooglePlay                                                          |
- * | storeAppURL.blackberry       | `String`   | null    | application URL in AppWorld                                                            |
- * | storeAppURL.windows8         | `String`   | null    | application URL in WindowsStore                                                        |
- * | customLocale                 | `Object`   | null    | custom locale object                                                                   |
-
  */
 var AppRate = (function () {
     function AppRate() {
     }
     Object.defineProperty(AppRate, "preferences", {
         /**
-         * Configure various settings for the Rating View.
-         * See table below for options
+         * Rating dialog preferences
+         *
+         * | Option                       | Type       | Default | Description                                                                            |
+         * |------------------------------|------------|---------|----------------------------------------------------------------------------------------|
+         * | useLanguage                  | `String`   | null    | custom BCP 47 language tag                                                             |
+         * | displayAppName               | `String`   | ''      | custom application title                                                               |
+         * | promptAgainForEachNewVersion | `Boolean`  | true    | show dialog again when application version will be updated                             |
+         * | usesUntilPrompt              | `Integer`  | 3       | count of runs of application before dialog will be displayed                           |
+         * | openStoreInApp               | `Boolean`  | false   | leave app or no when application page opened in app store (now supported only for iOS) |
+         * | useCustomRateDialog          | `Boolean`  | false   | use custom view for rate dialog                                                        |
+         * | callbacks.onButtonClicked    | `Function` | null    | call back function. called when user clicked on rate-dialog buttons                    |
+         * | callbacks.onRateDialogShow   | `Function` | null    | call back function. called when rate-dialog showing                                    |
+         * | storeAppURL.ios              | `String`   | null    | application id in AppStore                                                             |
+         * | storeAppURL.android          | `String`   | null    | application URL in GooglePlay                                                          |
+         * | storeAppURL.blackberry       | `String`   | null    | application URL in AppWorld                                                            |
+         * | storeAppURL.windows8         | `String`   | null    | application URL in WindowsStore                                                        |
+         * | customLocale                 | `Object`   | null    | custom locale object                                                                   |
+         * @type {{}}
          */
         get: function () { return window.AppRate.preferences; },
         enumerable: true,
@@ -84281,6 +84203,7 @@ var AppRate = (function () {
     });
     /**
      * Prompts the user for rating
+     *
      * @param {boolean} immediately  Show the rating prompt immediately.
      */
     AppRate.promptForRating = function (immediately) { };
@@ -84303,7 +84226,7 @@ var AppRate = (function () {
 }());
 exports.AppRate = AppRate;
 
-},{"./plugin":581}],512:[function(require,module,exports){
+},{"./plugin":546}],502:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84320,8 +84243,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-app-version`. For more info, please see the [Cordova App Version docs](https://github.com/whiteoctober/cordova-plugin-app-version).
  *
  * @usage
- * ```typescript
- * import { AppVersion } from 'ionic-native';
+ * ```js
+ * import {AppVersion} from 'ionic-native';
  *
  *
  *  AppVersion.getAppName();
@@ -84377,7 +84300,7 @@ var AppVersion = (function () {
 }());
 exports.AppVersion = AppVersion;
 
-},{"./plugin":581}],513:[function(require,module,exports){
+},{"./plugin":546}],503:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84394,8 +84317,9 @@ var plugin_1 = require('./plugin');
  *
  * @usage
  *
- * ```typescript
- * import { BackgroundGeolocation } from 'ionic-native';
+ * ```ts
+ * import {BackgroundGeolocation} from 'ionic-native';
+ *
  *
  *
  * // When device is ready :
@@ -84410,21 +84334,22 @@ var plugin_1 = require('./plugin');
  *             stopOnTerminate: false, // enable this to clear background location settings when the app terminates
  *     };
  *
- *     BackgroundGeolocation.configure((location) => {
-         console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
-
-          // IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
-          // and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-          // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-          BackgroundGeolocation.finish(); // FOR IOS ONLY
-
- *      }, (error) => {
- *        console.log('BackgroundGeolocation error');
- *      }, config);
+ *     BackgroundGeolocation.configure(config)
+ *        .then((location) => {
+ *             console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+ *
+ *             // IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
+ *             // and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+ *             // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+ *             BackgroundGeolocation.finish(); // FOR IOS ONLY
+ *         })
+ *        .catch((error) => {
+ *             console.log('BackgroundGeolocation error');
+ *         });
  *
  *     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
  *     BackgroundGeolocation.start();
- * })
+ * }
  *
  * // If you wish to turn OFF background-tracking, call the #stop method.
  * BackgroundGeolocation.stop();
@@ -84436,16 +84361,15 @@ var BackgroundGeolocation = (function () {
     }
     /**
      * Configure the plugin.
-     *
-     * @param {Function} Success callback will be called when background location is determined.
-     * @param {Function} Fail callback to be executed every time a geolocation error occurs.
-     * @param {Object} An object of type Config
-     *
-     * @return Location object, which tries to mimic w3c Coordinates interface.
+     * Success callback will be called with one argument - Location object, which tries to mimic w3c Coordinates interface.
      * See http://dev.w3.org/geo/api/spec-source.html#coordinates_interface
      * Callback to be executed every time a geolocation is recorded in the background.
+     *
+     * Fail callback to be executed every time a geolocation error occurs.
+     *
+     * Options a json object of type Config
      */
-    BackgroundGeolocation.configure = function (callback, errorCallback, options) { return; };
+    BackgroundGeolocation.configure = function (options) { return; };
     /**
      * Turn ON the background-geolocation system.
      * The user will be tracked whenever they suspend the app.
@@ -84524,7 +84448,7 @@ var BackgroundGeolocation = (function () {
     BackgroundGeolocation.deleteAllLocations = function () { return; };
     __decorate([
         plugin_1.Cordova({
-            sync: true
+            callbackOrder: 'reverse'
         })
     ], BackgroundGeolocation, "configure", null);
     __decorate([
@@ -84574,7 +84498,7 @@ var BackgroundGeolocation = (function () {
     BackgroundGeolocation = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova-plugin-mauron85-background-geolocation',
-            pluginRef: 'backgroundGeolocation',
+            pluginRef: 'plugins.backgroundGeoLocation',
             repo: 'https://github.com/mauron85/cordova-plugin-background-geolocation',
             platforms: ['iOS', 'Android', 'Windows Phone 8']
         })
@@ -84583,7 +84507,7 @@ var BackgroundGeolocation = (function () {
 }());
 exports.BackgroundGeolocation = BackgroundGeolocation;
 
-},{"./plugin":581}],514:[function(require,module,exports){
+},{"./plugin":546}],504:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84598,24 +84522,11 @@ var plugin_1 = require('./plugin');
 * Cordova plugin to prevent the app from going to sleep while in background.
 *  Requires Cordova plugin: cordova-plugin-background-mode. For more info about plugin, vist: https://github.com/katzer/cordova-plugin-background-mode#android-customization
 *@usage
-* ```typescript
-* import { BackgroundMode } from 'ionic-native';
+* ```js
+* import {BackgroundMode} from 'ionic-native';
 *
 * BackgroundMode.enable();
 * ```
-*
-* @advanced
-*
-* Configuration options
-*
-* | Property | Type      | Description                                                                  |
-* |----------|-----------|------------------------------------------------------------------------------|
-* | title    | `string`  | Title of the background task. Optional                                       |
-* | ticker   | `string`  | The text that scrolls itself on the statusbar. Optional                      |
-* | text     | `string`  | Description of the background task. Optional                                 |
-* | silent   | `boolean` | If the plugin will display a notification or not. Default is false. Optional |
-* | resume   | `boolean` | Bring the app into the foreground if the notification is tapped. Optional    |
-*
 */
 var BackgroundMode = (function () {
     function BackgroundMode() {
@@ -84632,30 +84543,26 @@ var BackgroundMode = (function () {
     BackgroundMode.disable = function () { };
     /**
     * Checks if background mode is enabled or not.
-    * @returns {boolean} returns a true of false if the background mode is enabled.
     */
     BackgroundMode.isEnabled = function () { return; };
     /**
     * Can be used to get the information if the background mode is active.
-    * @returns {boolean} returns tru or flase if the background mode is active.
     */
     BackgroundMode.isActive = function () { return; };
     /**
     * Override the default title, ticker and text.
     * Available only for Android platform.
-    * @param {Configure} options List of option to configure. See table below
     */
     BackgroundMode.setDefaults = function (options) { };
     /**
     * Modify the displayed information.
     * Available only for Android platform.
-    * @param {Configure} options Any options you want to update. See table below.
     */
     BackgroundMode.update = function (options) { };
     /**
     * Sets a callback for a specific event
     * Can be used to get notified or run function when the background mode has been activated, deactivated or failed.
-    * @param {string} eventName The name of the event. Available events: activate, deactivate, failure
+    * @param eventName The name of the event. Available events: activate, deactivate, failure
     */
     BackgroundMode.on = function (eventName, callback) { };
     __decorate([
@@ -84689,7 +84596,7 @@ var BackgroundMode = (function () {
     ], BackgroundMode, "on", null);
     BackgroundMode = __decorate([
         plugin_1.Plugin({
-            plugin: 'cordova-plugin-background-mode',
+            plugin: 'de.appplant.cordova.plugin.background-mode',
             pluginRef: 'cordova.plugins.backgroundMode',
             repo: 'https://github.com/katzer/cordova-plugin-background-mode',
             platforms: ['Android', 'iOS', 'Windows Phone 8']
@@ -84699,7 +84606,7 @@ var BackgroundMode = (function () {
 }());
 exports.BackgroundMode = BackgroundMode;
 
-},{"./plugin":581}],515:[function(require,module,exports){
+},{"./plugin":546}],505:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84716,8 +84623,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-badge. For more info, please see the [Badge plugin docs](https://github.com/katzer/cordova-plugin-badge).
  *
  * @usage
- * ```typescript
- * import { Badge } from 'ionic-native';
+ * ```js
+ * import {Badge} from 'ionic-native';
  *
  *
  * Badge.set(10);
@@ -84797,7 +84704,7 @@ var Badge = (function () {
 }());
 exports.Badge = Badge;
 
-},{"./plugin":581}],516:[function(require,module,exports){
+},{"./plugin":546}],506:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84814,8 +84721,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `phonegap-plugin-barcodescanner`. For more info, please see the [BarcodeScanner plugin docs](https://github.com/phonegap/phonegap-plugin-barcodescanner).
  *
  * @usage
- * ```typescript
- * import { BarcodeScanner } from 'ionic-native';
+ * ```js
+ * import {BarcodeScanner} from 'ionic-native';
  *
  *
  * BarcodeScanner.scan().then((barcodeData) => {
@@ -84830,20 +84737,16 @@ var BarcodeScanner = (function () {
     }
     /**
      * Open the barcode scanner.
-     * @param options {Object} Optional options to pass to the scanner
      * @return Returns a Promise that resolves with scanner data, or rejects with an error.
      */
     BarcodeScanner.scan = function (options) { return; };
     /**
      * Encodes data into a barcode.
      * NOTE: not well supported on Android
-     * @param type {string} Type of encoding
-     * @param data {any} Data to encode
+     * @param type
+     * @param data
      */
     BarcodeScanner.encode = function (type, data) { return; };
-    /**
-     * @private
-     */
     BarcodeScanner.Encode = {
         TEXT_TYPE: 'TEXT_TYPE',
         EMAIL_TYPE: 'EMAIL_TYPE',
@@ -84870,7 +84773,7 @@ var BarcodeScanner = (function () {
 }());
 exports.BarcodeScanner = BarcodeScanner;
 
-},{"./plugin":581}],517:[function(require,module,exports){
+},{"./plugin":546}],507:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84883,13 +84786,13 @@ var plugin_1 = require('./plugin');
  * @name Base64 To Gallery
  * @description This plugin allows you to save base64 data as a png image into the device
  * @usage
- * ```typescript
- * import { Base64ToGallery } from 'ionic-native';
+ * ```ts
+ * import {Base64ToGallery} from 'ionic-native';
  *
  *
  * Base64ToGallery.base64ToGallery(base64Data, 'img_').then(
- *   res => console.log('Saved image to gallery ', res),
- *   err => console.log('Error saving image to gallery ', err)
+ *   res => console.log("Saved image to gallery ", res),
+ *   err => console.log("Error saving image to gallery ", err)
  * );
  * ```
  */
@@ -84898,18 +84801,14 @@ var Base64ToGallery = (function () {
     }
     /**
      * Converts a base64 string to an image file in the device gallery
-     * @param {string} data The actual base64 string that you want to save
-     * @param {any} options (optional) An object with properties: prefix: string, mediaScanner: boolean. Prefix will be prepended to the filename. If true, mediaScanner runs Media Scanner on Android and saves to Camera Roll on iOS; if false, saves to Library folder on iOS.
-     * @returns {Promise} returns a promise that resolves when the image is saved.
+     * @param data
+     * @param prefix
      */
-    Base64ToGallery.base64ToGallery = function (data, options) {
+    Base64ToGallery.base64ToGallery = function (data, prefix) {
         return;
     };
     __decorate([
-        plugin_1.Cordova({
-            successIndex: 2,
-            errorIndex: 3
-        })
+        plugin_1.Cordova()
     ], Base64ToGallery, "base64ToGallery", null);
     Base64ToGallery = __decorate([
         plugin_1.Plugin({
@@ -84923,7 +84822,7 @@ var Base64ToGallery = (function () {
 }());
 exports.Base64ToGallery = Base64ToGallery;
 
-},{"./plugin":581}],518:[function(require,module,exports){
+},{"./plugin":546}],508:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -84938,13 +84837,14 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-batterystatus. For more info, please see the [BatteryStatus plugin docs](https://github.com/apache/cordova-plugin-battery-status).
  *
  * @usage
- * ```typescript
- * import { BatteryStatus } from 'ionic-native';
+ * ```js
+ * import {BatteryStatus} from 'ionic-native';
+ *
  *
  *
  * // watch change in battery status
  * let subscription = BatteryStatus.onChange().subscribe(
- *  (status: StatusObject) => {
+ *  status => {
  *    console.log(status.level, status.isPlugged);
  *  }
  * );
@@ -85001,7 +84901,7 @@ var BatteryStatus = (function () {
 }());
 exports.BatteryStatus = BatteryStatus;
 
-},{"./plugin":581}],519:[function(require,module,exports){
+},{"./plugin":546}],509:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -85033,7 +84933,7 @@ var plugin_1 = require('./plugin');
  *
  * Peripheral Data is passed to the success callback when scanning and connecting. Limited data is passed when scanning.
  *
- * ```typescript
+ * ```ts
  *   {
  *       "name": "Battery Demo",
  *       "id": "20:FF:D0:FF:D1:C0",
@@ -85043,7 +84943,7 @@ var plugin_1 = require('./plugin');
  * ```
  * After connecting, the peripheral object also includes service, characteristic and descriptor information.
  *
- * ```typescript
+ * ```ts
  *   {
  *       "name": "Battery Demo",
  *       "id": "20:FF:D0:FF:D1:C0",
@@ -85102,7 +85002,7 @@ var plugin_1 = require('./plugin');
  *
  * ### Android
  *
- * ```typescript
+ * ```ts
  *   {
  *       "name": "demo",
  *       "id": "00:1A:7D:DA:71:13",
@@ -85117,7 +85017,7 @@ var plugin_1 = require('./plugin');
  *
  * Note that iOS uses the string value of the constants for the [Advertisement Data Retrieval Keys](https://developer.apple.com/library/ios/documentation/CoreBluetooth/Reference/CBCentralManagerDelegate_Protocol/index.html#//apple_ref/doc/constant_group/Advertisement_Data_Retrieval_Keys). This will likely change in the future.
  *
- * ```typescript
+ * ```ts
  *   {
  *       "name": "demo",
  *       "id": "D8479A4F-7517-BCD3-91B5-3302B2F81802",
@@ -85146,7 +85046,7 @@ var plugin_1 = require('./plugin');
  *
  * This means that you need convert your data to ArrayBuffers before sending and from ArrayBuffers when receiving.
  *
- * ```typescript
+ * ```ts
  *   // ASCII only
  *   function stringToBytes(string) {
  *      var array = new Uint8Array(string.length);
@@ -85425,7 +85325,7 @@ var BLE = (function () {
 }());
 exports.BLE = BLE;
 
-},{"./plugin":581}],520:[function(require,module,exports){
+},{"./plugin":546}],510:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -85438,129 +85338,126 @@ var plugin_1 = require('./plugin');
  * @name Bluetooth Serial
  * @description This plugin enables serial communication over Bluetooth. It was written for communicating between Android or iOS and an Arduino.
  * @usage
- * ```typescript
- * import { BluetoothSerial } from 'ionic-native';
- *
- *
- * // Write a string
- * BluetoothSerial.write("hello world").then(success, failure);
- *
- * // Array of int or bytes
- * BluetoothSerial.write([186, 220, 222]).then(success, failure);
- *
- * // Typed Array
- * var data = new Uint8Array(4);
- * data[0] = 0x41;
- * data[1] = 0x42;
- * data[2] = 0x43;
- * data[3] = 0x44;
- * BluetoothSerial.write(data).then(success, failure);
- *
- * // Array Buffer
- * BluetoothSerial.write(data.buffer).then(success, failure);
- * ```
  */
 var BluetoothSerial = (function () {
     function BluetoothSerial() {
     }
     /**
      * Connect to a Bluetooth device
-     * @param {string} macAddress_or_uuid Identifier of the remote device
-     * @returns {Observable} Subscribe to connect, unsubscribe to disconnect.
+     * Returns an Observable. Subscribe to connect, unsubscribe to disconnect.
+     * @param macAddress_or_uuid Identifier of the remote device
      */
     BluetoothSerial.connect = function (macAddress_or_uuid) { return; };
     /**
      * Connect insecurely to a Bluetooth device
-     * @param {string} macAddress Identifier of the remote device
-     * @returns {Observable} Subscribe to connect, unsubscribe to disconnect.
+     * Returns an Observable. Subscribe to connect, unsubscribe to disconnect.
+     * @param macAddress Identifier of the remote device
      */
     BluetoothSerial.connectInsecure = function (macAddress) { return; };
     /**
      * Writes data to the serial port
-     * @param {any} data ArrayBuffer of data
-     * @returns {Promise} returns a promise when data has been written
+     * @param data ArrayBuffer of data
+     * @usage
+     * ```ts
+     * // Write a string
+     * Bluetooth.write("hello world").then(success, failure);
+     *
+     * // Array of int or bytes
+     * Bluetooth.write([186, 220, 222]).then(success, failure);
+     *
+     * // Typed Array
+     * var data = new Uint8Array(4);
+     * data[0] = 0x41;
+     * data[1] = 0x42;
+     * data[2] = 0x43;
+     * data[3] = 0x44;
+     * Bluetooth.write(data).then(success, failure);
+     *
+     * // Array Buffer
+     * Bluetooth.write(data.buffer).then(success, failure);
+     * ```
      */
     BluetoothSerial.write = function (data) { return; };
     /**
      * Gets the number of bytes of data available
-     * @returns {Promise} returns a promise that contains the available bytes
      */
     BluetoothSerial.available = function () { return; };
     /**
      * Reads data from the buffer
-     * @returns {Promise} returns a promise with data from the buffer
      */
     BluetoothSerial.read = function () { return; };
     /**
      * Reads data from the buffer until it reaches a delimiter
-     * @param {string} delimiter string that you want to search until
-     * @returns {Promise} returns a promise
+     * @param delimiter
      */
     BluetoothSerial.readUntil = function (delimiter) { return; };
     /**
      * Subscribe to be notified when data is received
-     * @param {string} delimiter the string you want to watch for
-     * @returns {Observable} returns an observable.
+     * @param delimiter
      */
     BluetoothSerial.subscribe = function (delimiter) { return; };
     /**
      * Subscribe to be notified when data is received
-     * @returns {Observable} returns an observable
      */
     BluetoothSerial.subscribeRawData = function () { return; };
     /**
      * Clears data in buffer
-     * @returns {Promise} returns a promise when completed
      */
     BluetoothSerial.clear = function () { return; };
     /**
      * Lists bonded devices
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.list = function () { return; };
     /**
      * Reports if bluetooth is enabled
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.isEnabled = function () { return; };
     /**
      * Reports the connection status
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.isConnected = function () { return; };
     /**
      * Reads the RSSI from the connected peripheral
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.readRSSI = function () { return; };
     /**
      * Show the Bluetooth settings on the device
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.showBluetoothSettings = function () { return; };
     /**
      * Enable Bluetooth on the device
-     * @returns {Promise} returns a promise
      */
     BluetoothSerial.enable = function () { return; };
     /**
      * Discover unpaired devices
-     * @returns {Promise} returns a promise
+     * @usage
+     * ```ts
+     * [{
+     *    "class": 276,
+     *    "id": "10:BF:48:CB:00:00",
+     *    "address": "10:BF:48:CB:00:00",
+     *    "name": "Nexus 7"
+     * }, {
+     *    "class": 7936,
+     *    "id": "00:06:66:4D:00:00",
+     *    "address": "00:06:66:4D:00:00",
+     *    "name": "RN42"
+     * }]
+     * ```
      */
     BluetoothSerial.discoverUnpaired = function () { return; };
     /**
      * Subscribe to be notified on Bluetooth device discovery. Discovery process must be initiated with the `discoverUnpaired` function.
-     * @returns {Observable} Returns an observable
      */
     BluetoothSerial.setDeviceDiscoveredListener = function () { return; };
     /**
      * Sets the human readable device name that is broadcasted to other devices
-     * @param {string} newName Desired name of device
+     * @param newName Desired name of device
      */
     BluetoothSerial.setName = function (newName) { };
     /**
      * Makes the device discoverable by other devices
-     * @param {number} discoverableDuration Desired number of seconds device should be discoverable for
+     * @param discoverableDuration Desired number of seconds device should be discoverable for
      */
     BluetoothSerial.setDiscoverable = function (discoverableDuration) { };
     __decorate([
@@ -85682,7 +85579,7 @@ var BluetoothSerial = (function () {
 }());
 exports.BluetoothSerial = BluetoothSerial;
 
-},{"./plugin":581}],521:[function(require,module,exports){
+},{"./plugin":546}],511:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -85699,9 +85596,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-brightness`. For more info, please see the [Brightness plugin docs](https://github.com/mgcrea/cordova-plugin-brightness).
  *
  * @usage
- * ```typescript
- * import { Brightness } from 'ionic-native';
- *
+ * ```ts
+ * import {Brightness} from 'ionic-native';
  *
  * let brightnessValue: number = 0.8;
  * Brightness.setBrightness(brightnessValue);
@@ -85741,7 +85637,7 @@ var Brightness = (function () {
     Brightness = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova-plugin-brightness',
-            pluginRef: 'cordova.plugins.brightness',
+            pluginRef: 'plugins.brightness',
             repo: 'https://github.com/mgcrea/cordova-plugin-brightness',
             platforms: ['Android', 'iOS']
         })
@@ -85750,7 +85646,7 @@ var Brightness = (function () {
 }());
 exports.Brightness = Brightness;
 
-},{"./plugin":581}],522:[function(require,module,exports){
+},{"./plugin":546}],512:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -85766,18 +85662,7 @@ var plugin_1 = require('./plugin');
  *
  * Requires Cordova plugin: `cordova-plugin-calendar`. For more info, please see the [Calendar plugin docs](https://github.com/EddyVerbruggen/Calendar-PhoneGap-Plugin).
  *
- *
  * @usage
- * ```
- * import {Calendar} from 'ionic-native';
- *
- *
- *
- * Calendar.createCalendar('MyCalendar').then(
- *   (msg) => { console.log(msg); },
- *   (err) => { console.log(err); }
- * );
- * ```
  *
  */
 var Calendar = (function () {
@@ -85823,12 +85708,36 @@ var Calendar = (function () {
     /**
      * Create a calendar. (iOS only)
      *
-     * @param {string | Object} nameOrOptions  either a string name or a options object. If string, provide the calendar name. IF an object, provide a calendar name as a string and a calendar color in hex format as a string
-     * @return {Promise} Returns a Promise
+     * @usage
+     * ```
+     * import {Calendar} from 'ionic-native';
+     *
+     *
+     *
+     * Calendar.createCalendar('MyCalendar').then(
+     *   (msg) => { console.log(msg); },
+     *   (err) => { console.log(err); }
+     * );
+     * ```
+     *
+     * @param {string | Object} nameOrOptions  either a string name or a options object.
+     * options:
+     *   calendarName: string  the name of the calendar
+     *   calendarColor: string  the hex color of the calendar
+     * @return Returns a Promise
      */
     Calendar.createCalendar = function (nameOrOptions) { return; };
     /**
      * Delete a calendar. (iOS only)
+     *
+     * @usage
+     * ```
+     * Calendar.deleteCalendar('MyCalendar').then(
+     *   (msg) => { console.log(msg); },
+     *   (err) => { console.log(err); }
+     * );
+     * ```
+     *
      * @param {string} name  Name of the calendar to delete.
      * @return Returns a Promise
      */
@@ -85860,6 +85769,7 @@ var Calendar = (function () {
     };
     /**
      * Silently create an event.
+     *
      * @param {string} [title]  The event title
      * @param {string} [location]  The event location
      * @param {string} [notes]  The event notes
@@ -85926,6 +85836,7 @@ var Calendar = (function () {
     Calendar.findEvent = function (title, location, notes, startDate, endDate) { return; };
     /**
      * Find an event with additional options.
+     *
      * @param {string} [title]  The event title
      * @param {string} [location]  The event location
      * @param {string} [notes]  The event notes
@@ -86011,8 +85922,7 @@ var Calendar = (function () {
     Calendar.deleteEventFromNamedCalendar = function (title, location, notes, startDate, endDate, calendarName) { return; };
     /**
      * Open the calendar at the specified date.
-     * @param {Date} date The date you want to open the calendar on
-     * @return {Promise<any>} Promise returns a promise
+     * @return {Date} date
      */
     Calendar.openCalendar = function (date) { return; };
     __decorate([
@@ -86098,240 +86008,7 @@ var Calendar = (function () {
 }());
 exports.Calendar = Calendar;
 
-},{"./plugin":581}],523:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name CallNumber
- * @description
- * Call a number directly from your Cordova/Ionic application.
- *
- * @usage
- * ```
- * import {CallNumber} from 'ionic-native';
- *
- * CallNumber.callNumber(18001010101, true)
- *   .then(() => console.log('Launched dialer!'))
- *   .catch(() => console.log('Error launching dialer'));
- *
- * ```
- */
-var CallNumber = (function () {
-    function CallNumber() {
-    }
-    /**
-     * Calls a phone number
-     * @param numberToCall {number} The phone number to call
-     * @param bypassAppChooser {boolean} Set to true to bypass the app chooser and go directly to dialer
-     */
-    CallNumber.callNumber = function (numberToCall, bypassAppChooser) {
-        return;
-    };
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], CallNumber, "callNumber", null);
-    CallNumber = __decorate([
-        plugin_1.Plugin({
-            plugin: 'call-number',
-            pluginRef: 'plugins.CallNumber',
-            repo: 'https://github.com/Rohfosho/CordovaCallNumberPlugin',
-            platforms: ['iOS', 'Android']
-        })
-    ], CallNumber);
-    return CallNumber;
-}());
-exports.CallNumber = CallNumber;
-
-},{"./plugin":581}],524:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name CameraPreview
- * @description
- * Showing camera preview in HTML
- *
- * For more info, please see the [Cordova Camera Preview Plugin Docs](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview).
- *
- * @usage
- * ```
- * import { CameraPreview } from 'ionic-native';
- *
- * // camera options (Size and location)
- * let cameraRect: CameraPreviewRect = {
- *   x: 100,
- *   y: 100,
- *   width: 200,
- *   height: 200
- * };
- *
- *
- * // start camera
- * CameraPreview.startCamera(
- *   cameraRect, // position and size of preview
- *   'front', // default camera
- *   true, // tape to take picture
- *   false, // disable drag
- *   true // send the preview to the back of the screen so we can add overlaying elements
- * );
- *
- * // Set the handler to run every time we take a picture
- * CameraPreview.setOnPictureTakenHandler().subscribe((result) => {
- *   console.log(result);
- *   // do something with the result
- * });
- *
- *
- * // take a picture
- * CameraPreview.takePicture({
- *   maxWidth: 640,
- *   maxHeight: 640
- * });
- *
- * // Switch camera
- * CameraPreview.switchCamera();
- *
- * // set color effect to negative
- * CameraPreview.setColorEffect('negative');
- *
- * // Stop the camera preview
- * CameraPreview.stopCamera();
- *
- * ```
- *
- */
-var CameraPreview = (function () {
-    function CameraPreview() {
-    }
-    /**
-     * Starts the camera preview instance.
-     * @param {CameraPreviewRect} position and size of the preview window - {x: number, y: number, width: number, height: number}
-     * @param {string} which camera to use - 'front' | 'back'
-     * @param {boolean} enable tap to take picture
-     * @param {boolean} enable preview box drag across the screen
-     * @param {boolean} send preview box to the back of the webview
-     * @param {number} alpha of the preview box
-     */
-    CameraPreview.startCamera = function (rect, defaultCamera, tapEnabled, dragEnabled, toBack, alpha) { };
-    ;
-    /**
-     * Stops the camera preview instance.
-     */
-    CameraPreview.stopCamera = function () { };
-    ;
-    /**
-     * Take the picture, the parameter size is optional
-     * @param {CameraPreviewSize} optional - size of the picture to take
-     */
-    CameraPreview.takePicture = function (size) { };
-    ;
-    /**
-     * Register a callback function that receives the original picture and the image captured from the preview box.
-     */
-    CameraPreview.setOnPictureTakenHandler = function () { return; };
-    ;
-    /**
-     * Switch from the rear camera and front camera, if available.
-     */
-    CameraPreview.switchCamera = function () { };
-    ;
-    /**
-     * Show the camera preview box.
-     */
-    CameraPreview.show = function () { };
-    ;
-    /**
-     * Hide the camera preview box.
-     */
-    CameraPreview.hide = function () { };
-    ;
-    /**
-     * Set the default mode for the Flash.
-     */
-    // @Cordova({
-    //   sync: true
-    // })
-    // static setFlashMode(mode: number): void { };
-    /**
-     * Set camera color effect.
-     */
-    CameraPreview.setColorEffect = function (effect) { };
-    ;
-    /**
-     * @private
-     * @enum {number}
-     */
-    CameraPreview.FlashMode = {
-        OFF: 0,
-        ON: 1,
-        AUTO: 2
-    };
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "startCamera", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "stopCamera", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "takePicture", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true
-        })
-    ], CameraPreview, "setOnPictureTakenHandler", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "switchCamera", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "show", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "hide", null);
-    __decorate([
-        plugin_1.Cordova({
-            sync: true
-        })
-    ], CameraPreview, "setColorEffect", null);
-    CameraPreview = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-camera-preview',
-            pluginRef: 'cordova.plugins.camerapreview',
-            repo: 'https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview',
-            platforms: ['Android', 'iOS']
-        })
-    ], CameraPreview);
-    return CameraPreview;
-}());
-exports.CameraPreview = CameraPreview;
-
-},{"./plugin":581}],525:[function(require,module,exports){
+},{"./plugin":546}],513:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -86348,16 +86025,14 @@ var plugin_1 = require('./plugin');
  * Requires {@link module:driftyco/ionic-native} and the Cordova plugin: `cordova-plugin-camera`. For more info, please see the [Cordova Camera Plugin Docs](https://github.com/apache/cordova-plugin-camera).
  *
  * @usage
- * ```typescript
- * import { Camera } from 'ionic-native';
- *
+ * ```js
+ * import {Camera} from 'ionic-native';
  *
  * Camera.getPicture(options).then((imageData) => {
  *  // imageData is either a base64 encoded string or a file URI
  *  // If it's base64:
- *  let base64Image = 'data:image/jpeg;base64,' + imageData;
+ *  let base64Image = "data:image/jpeg;base64," + imageData;
  * }, (err) => {
- *  // Handle error
  * });
  * ```
  */
@@ -86366,8 +86041,8 @@ var Camera = (function () {
     }
     /**
      * Take a picture or video, or load one from the library.
-     * @param {CameraOptions?} options Options that you want to pass to the camera. Encoding type, quality, etc. Optional
-     * @return {Promise} Returns a Promise that resolves with Base64 encoding of the image data, or the image file URI, depending on cameraOptions, otherwise rejects with an error.
+     * @param {CameraOptions} options
+     * @return Returns a Promise that resolves with Base64 encoding of the image data, or the image file URI, depending on cameraOptions, otherwise rejects with an error.
      */
     Camera.getPicture = function (options) { return; };
     /**
@@ -86378,7 +86053,6 @@ var Camera = (function () {
     Camera.cleanup = function () { };
     ;
     /**
-     * @private
      * @enum {number}
      */
     Camera.DestinationType = {
@@ -86390,7 +86064,6 @@ var Camera = (function () {
         NATIVE_URI: 2
     };
     /**
-     * @private
      * @enum {number}
      */
     Camera.EncodingType = {
@@ -86400,7 +86073,6 @@ var Camera = (function () {
         PNG: 1
     };
     /**
-     * @private
      * @enum {number}
      */
     Camera.MediaType = {
@@ -86412,7 +86084,6 @@ var Camera = (function () {
         ALLMEDIA: 2
     };
     /**
-     * @private
      * @enum {number}
      */
     Camera.PictureSourceType = {
@@ -86424,7 +86095,6 @@ var Camera = (function () {
         SAVEDPHOTOALBUM: 2
     };
     /**
-     * @private
      * Matches iOS UIPopoverArrowDirection constants to specify arrow location on popover.
      * @enum {number}
      */
@@ -86436,7 +86106,6 @@ var Camera = (function () {
         ARROW_ANY: 15
     };
     /**
-     * @private
      * @enum {number}
      */
     Camera.Direction = {
@@ -86467,7 +86136,7 @@ var Camera = (function () {
 }());
 exports.Camera = Camera;
 
-},{"./plugin":581}],526:[function(require,module,exports){
+},{"./plugin":546}],514:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -86481,8 +86150,9 @@ var plugin_1 = require('./plugin');
  * @description
  * @usage
  * ```
- * import { CardIO } from 'ionic-native';
+ * import {CardIO} from 'ionic-native';
  *
+ * ...
  *
  * CardIO.canScan()
  *   .then(
@@ -86510,7 +86180,7 @@ var CardIO = (function () {
     CardIO.canScan = function () { return; };
     /**
      * Scan a credit card with card.io.
-     * @param {CardIOOptions} options Options for configuring the plugin
+     * @param options
      */
     CardIO.scan = function (options) { return; };
     /**
@@ -86538,7 +86208,7 @@ var CardIO = (function () {
 }());
 exports.CardIO = CardIO;
 
-},{"./plugin":581}],527:[function(require,module,exports){
+},{"./plugin":546}],515:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -86556,20 +86226,21 @@ var plugin_1 = require('./plugin');
  * For more info, please see the [Clipboard plugin docs](https://github.com/VersoSolutions/CordovaClipboard.git).
  *
  * @usage
- * ```typescript
- * import { Clipboard } from 'ionic-native';
+ * ```js
+ * import {Clipboard} from 'ionic-native';
  *
  *
- * Clipboard.copy('Hello world');
+ *
+ * Clipboard.copy("Hello world");
  *
  * Clipboard.paste().then(
- *    (resolve: string) => {
- *     alert(resolve);
- *     },
- *     (reject: string) => {
- *     alert('Error: ' + reject);
+ *    (resolve : string) => {
+  *     alert(resolve);
+*     },
+ *     (reject : string) => {
+ *     alert("Error: " + reject);
  *     }
- *     );
+*     );
  * );
  * ```
  */
@@ -86578,13 +86249,13 @@ var Clipboard = (function () {
     }
     /**
      * Copies the given text
-     * @param {string} text Text that gets copied on the system clipboard
-     * @returns {Promise<T>} Returns a promise after the text has been copied
+     * @param text
+     * @returns {Promise<T>}
      */
     Clipboard.copy = function (text) { return; };
     /**
      * Pastes the text stored in clipboard
-     * @returns {Promise<T>} Returns a promise after the text has been pasted
+     * @returns {Promise<T>}
      */
     Clipboard.paste = function () { return; };
     __decorate([
@@ -86605,7 +86276,7 @@ var Clipboard = (function () {
 }());
 exports.Clipboard = Clipboard;
 
-},{"./plugin":581}],528:[function(require,module,exports){
+},{"./plugin":546}],516:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -86614,208 +86285,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var plugin_1 = require('./plugin');
-/**
- * Defines the possible result statuses of the window.codePush.sync operation.
- */
-(function (SyncStatus) {
-    /**
-     * The application is up to date.
-     */
-    SyncStatus[SyncStatus["UP_TO_DATE"] = 0] = "UP_TO_DATE";
-    /**
-     * An update is available, it has been downloaded, unzipped and copied to the deployment folder.
-     * After the completion of the callback invoked with SyncStatus.UPDATE_INSTALLED, the application will be reloaded with the updated code and resources.
-     */
-    SyncStatus[SyncStatus["UPDATE_INSTALLED"] = 1] = "UPDATE_INSTALLED";
-    /**
-     * An optional update is available, but the user declined to install it. The update was not downloaded.
-     */
-    SyncStatus[SyncStatus["UPDATE_IGNORED"] = 2] = "UPDATE_IGNORED";
-    /**
-     * An error happened during the sync operation. This might be an error while communicating with the server, downloading or unziping the update.
-     * The console logs should contain more information about what happened. No update has been applied in this case.
-     */
-    SyncStatus[SyncStatus["ERROR"] = 3] = "ERROR";
-    /**
-     * There is an ongoing sync in progress, so this attempt to sync has been aborted.
-     */
-    SyncStatus[SyncStatus["IN_PROGRESS"] = 4] = "IN_PROGRESS";
-    /**
-     * Intermediate status - the plugin is about to check for updates.
-     */
-    SyncStatus[SyncStatus["CHECKING_FOR_UPDATE"] = 5] = "CHECKING_FOR_UPDATE";
-    /**
-     * Intermediate status - a user dialog is about to be displayed. This status will be reported only if user interaction is enabled.
-     */
-    SyncStatus[SyncStatus["AWAITING_USER_ACTION"] = 6] = "AWAITING_USER_ACTION";
-    /**
-     * Intermediate status - the update package is about to be downloaded.
-     */
-    SyncStatus[SyncStatus["DOWNLOADING_PACKAGE"] = 7] = "DOWNLOADING_PACKAGE";
-    /**
-     * Intermediate status - the update package is about to be installed.
-     */
-    SyncStatus[SyncStatus["INSTALLING_UPDATE"] = 8] = "INSTALLING_UPDATE";
-})(exports.SyncStatus || (exports.SyncStatus = {}));
-var SyncStatus = exports.SyncStatus;
-/**
- * Defines the available install modes for updates.
- */
-(function (InstallMode) {
-    /**
-     * The update will be applied to the running application immediately. The application will be reloaded with the new content immediately.
-     */
-    InstallMode[InstallMode["IMMEDIATE"] = 0] = "IMMEDIATE";
-    /**
-     * The update is downloaded but not installed immediately. The new content will be available the next time the application is started.
-     */
-    InstallMode[InstallMode["ON_NEXT_RESTART"] = 1] = "ON_NEXT_RESTART";
-    /**
-     * The udpate is downloaded but not installed immediately. The new content will be available the next time the application is resumed or restarted, whichever event happends first.
-     */
-    InstallMode[InstallMode["ON_NEXT_RESUME"] = 2] = "ON_NEXT_RESUME";
-})(exports.InstallMode || (exports.InstallMode = {}));
-var InstallMode = exports.InstallMode;
-/**
- * @name CodePush
- * @description
- * CodePush plugin for Cordova by Microsoft that supports iOS and Android.
- *
- * For more info, please see https://github.com/ksachdeva/ionic2-code-push-example
- *
- * @usage
- * ```typescript
- * import { CodePush } from 'ionic-native';
- *
- * // note - mostly error & completed methods of observable will not fire
- * // as syncStatus will contain the current state of the update
- * CodePush.sync().subscribe((syncStatus) => console.log(syncStatus));
- *
- * const downloadProgress = (progress) => { console.log(`Downloaded ${progress.receivedBytes} of ${progress.totalBytes}`); }
- * CodePush.sync({}, downloadProgress).subscribe((syncStatus) => console.log(syncStatus));
- *
- * ```
- */
-var CodePush = (function () {
-    function CodePush() {
-    }
-    /**
-     * Get the current package information.
-     *
-     * @param packageSuccess Callback invoked with the currently deployed package information.
-     * @param packageError Optional callback invoked in case of an error.
-     */
-    CodePush.getCurrentPackage = function () {
-        return;
-    };
-    /**
-     * Gets the pending package information, if any. A pending package is one that has been installed but the application still runs the old code.
-     * This happends only after a package has been installed using ON_NEXT_RESTART or ON_NEXT_RESUME mode, but the application was not restarted/resumed yet.
-     */
-    CodePush.getPendingPackage = function () {
-        return;
-    };
-    /**
-     * Checks with the CodePush server if an update package is available for download.
-     *
-     * @param querySuccess Callback invoked in case of a successful response from the server.
-     *                     The callback takes one RemotePackage parameter. A non-null package is a valid update.
-     *                     A null package means the application is up to date for the current native application version.
-     * @param queryError Optional callback invoked in case of an error.
-     * @param deploymentKey Optional deployment key that overrides the config.xml setting.
-     */
-    CodePush.checkForUpdate = function (deploymentKey) {
-        return;
-    };
-    /**
-     * Notifies the plugin that the update operation succeeded and that the application is ready.
-     * Calling this function is required on the first run after an update. On every subsequent application run, calling this function is a noop.
-     * If using sync API, calling this function is not required since sync calls it internally.
-     *
-     * @param notifySucceeded Optional callback invoked if the plugin was successfully notified.
-     * @param notifyFailed Optional callback invoked in case of an error during notifying the plugin.
-     */
-    CodePush.notifyApplicationReady = function () {
-        return;
-    };
-    /**
-     * Reloads the application. If there is a pending update package installed using ON_NEXT_RESTART or ON_NEXT_RESUME modes, the update
-     * will be immediately visible to the user. Otherwise, calling this function will simply reload the current version of the application.
-     */
-    CodePush.restartApplication = function () {
-        return;
-    };
-    /**
-     * Convenience method for installing updates in one method call.
-     * This method is provided for simplicity, and its behavior can be replicated by using window.codePush.checkForUpdate(), RemotePackage's download() and LocalPackage's install() methods.
-     *
-     * The algorithm of this method is the following:
-     * - Checks for an update on the CodePush server.
-     * - If an update is available
-     *         - If the update is mandatory and the alertMessage is set in options, the user will be informed that the application will be updated to the latest version.
-     *           The update package will then be downloaded and applied.
-     *         - If the update is not mandatory and the confirmMessage is set in options, the user will be asked if they want to update to the latest version.
-     *           If they decline, the syncCallback will be invoked with SyncStatus.UPDATE_IGNORED.
-     *         - Otherwise, the update package will be downloaded and applied with no user interaction.
-     * - If no update is available on the server, or if a previously rolled back update is available and the ignoreFailedUpdates is set to true, the syncCallback will be invoked with the SyncStatus.UP_TO_DATE.
-     * - If an error occurs during checking for update, downloading or installing it, the syncCallback will be invoked with the SyncStatus.ERROR.
-     *
-     * @param syncCallback Optional callback to be called with the status of the sync operation.
-     * @param syncOptions Optional SyncOptions parameter configuring the behavior of the sync operation.
-     * @param downloadProgress Optional callback invoked during the download process. It is called several times with one DownloadProgress parameter.
-     *
-     */
-    CodePush.sync = function (syncOptions, downloadProgress) {
-        return;
-    };
-    __decorate([
-        plugin_1.Cordova()
-    ], CodePush, "getCurrentPackage", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], CodePush, "getPendingPackage", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], CodePush, "checkForUpdate", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], CodePush, "notifyApplicationReady", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], CodePush, "restartApplication", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3 // we don't need this, so we set it to a value higher than # of args
-        })
-    ], CodePush, "sync", null);
-    CodePush = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-code-push',
-            pluginRef: 'codePush',
-            repo: 'https://github.com/Microsoft/cordova-plugin-code-push',
-            platforms: ['Android', 'iOS']
-        })
-    ], CodePush);
-    return CodePush;
-}());
-exports.CodePush = CodePush;
-
-},{"./plugin":581}],529:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @private
- */
 var Contact = (function () {
     function Contact() {
         this._objectInstance = navigator.contacts.create();
@@ -86826,11 +86295,6 @@ var Contact = (function () {
         configurable: true
     });
     Object.defineProperty(Contact.prototype, "displayName", {
-        get: function () { return; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Contact.prototype, "name", {
         get: function () { return; },
         enumerable: true,
         configurable: true
@@ -86909,9 +86373,6 @@ var Contact = (function () {
     ], Contact.prototype, "displayName", null);
     __decorate([
         plugin_1.InstanceProperty
-    ], Contact.prototype, "name", null);
-    __decorate([
-        plugin_1.InstanceProperty
     ], Contact.prototype, "nickname", null);
     __decorate([
         plugin_1.InstanceProperty
@@ -86952,9 +86413,6 @@ var Contact = (function () {
     return Contact;
 }());
 exports.Contact = Contact;
-/**
- * @private
- */
 var ContactName = (function () {
     function ContactName(formatted, familyName, givenName, middleName, honorificPrefix, honorificSuffix) {
         this._objectInstance = new window.ContactName(formatted, familyName, givenName, middleName, honorificPrefix, honorificSuffix);
@@ -87010,9 +86468,6 @@ var ContactName = (function () {
     return ContactName;
 }());
 exports.ContactName = ContactName;
-/**
- * @private
- */
 var ContactField = (function () {
     function ContactField(type, value, pref) {
         this._objectInstance = new window.ContactField(type, value, pref);
@@ -87044,9 +86499,6 @@ var ContactField = (function () {
     return ContactField;
 }());
 exports.ContactField = ContactField;
-/**
- * @private
- */
 var ContactAddress = (function () {
     function ContactAddress(pref, type, formatted, streetAddress, locality, region, postalCode, country) {
         this._objectInstance = new window.ContactAddress(pref, type, formatted, streetAddress, locality, region, postalCode, country);
@@ -87118,9 +86570,6 @@ var ContactAddress = (function () {
     return ContactAddress;
 }());
 exports.ContactAddress = ContactAddress;
-/**
- * @private
- */
 var ContactOrganization = (function () {
     function ContactOrganization() {
         this._objectInstance = new window.ContactOrganization();
@@ -87168,9 +86617,6 @@ var ContactOrganization = (function () {
     return ContactOrganization;
 }());
 exports.ContactOrganization = ContactOrganization;
-/**
- * @private
- */
 var ContactFindOptions = (function () {
     function ContactFindOptions() {
         this._objectInstance = new window.ContactFindOptions();
@@ -87217,15 +86663,16 @@ exports.ContactFindOptions = ContactFindOptions;
  *
  * @usage
  *
- * ```typescript
- * import { Contact } from 'ionic-native';
+ * ```js
+ * import {Contact} from 'ionic-native';
+ *
  *
  *
  * let contact = new Contact();
- * contact.displayName = 'Mr. Ionitron';
+ * contact.displayName = "Mr. Ionitron";
  * contact.save().then(
- *   () => console.log('Contact saved!', contact),
- *   (error: any) => console.error('Error saving contact.', error)
+ *   () => console.log("Contact saved!", contact),
+ *   (error: any) => console.error("Error saving contact.", error)
  * );
  * ```
  *
@@ -87234,15 +86681,14 @@ exports.ContactFindOptions = ContactFindOptions;
 var Contacts = (function () {
     function Contacts() {
     }
-    /**
-     * Create a single contact.
-     * @return Returns a object Contact
-     */
     Contacts.create = function () {
         return new Contact();
     };
     /**
      * Search for contacts in the Contacts list.
+     *
+     * Example: Contacts.find(['*'], { filter: 'Max' }) // will search for a displayName of 'Max'
+     *
      * @param fields {string[]}  Contact fields to be used as a search qualifier.
      *  A zero-length contactFields parameter is invalid and results in ContactError.INVALID_ARGUMENT_ERROR.
      *  A contactFields value of "*" searches all contact fields.
@@ -87281,58 +86727,7 @@ var Contacts = (function () {
 }());
 exports.Contacts = Contacts;
 
-},{"./plugin":581}],530:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Crop
- * @description Crops images
- * @usage
- * ```
- * import {Crop} from 'ionic-native';
- *
- * ...
- *
- * Crop.crop('path/to/image.jpg', {quality: 75})
- *   .then(
- *     newImage => console.log("new image path is: " + newImage),
- *     error => console.error("Error cropping image", error)
- *   );
- * ```
- */
-var Crop = (function () {
-    function Crop() {
-    }
-    /**
-     * Crops an image
-     * @param pathToImage
-     * @param options
-     * @return {Promise<string>} Returns a promise that resolves with the new image path, or rejects if failed to crop.
-     */
-    Crop.crop = function (pathToImage, options) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Crop, "crop", null);
-    Crop = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-crop',
-            pluginRef: 'plugins',
-            repo: 'https://github.com/jeduan/cordova-plugin-crop'
-        })
-    ], Crop);
-    return Crop;
-}());
-exports.Crop = Crop;
-
-},{"./plugin":581}],531:[function(require,module,exports){
+},{"./plugin":546}],517:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87351,16 +86746,17 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-datepicker`. For more info, please see the [DatePicker plugin docs](https://github.com/VitaliiBlagodir/cordova-plugin-datepicker).
  *
  * @usage
- * ```typescript
- * import { DatePicker } from 'ionic-native';
+ * ```js
+ * import {DatePicker} from 'ionic-native';
+ *
  *
  *
  * DatePicker.show({
  *   date: new Date(),
  *   mode: 'date'
  * }).then(
- *   date => console.log('Got date: ', date),
- *   err => console.log('Error occurred while getting date: ', err)
+ *   date => console.log("Got date: ", date),
+ *   err => console.log("Error occurred while getting date:", err)
  * );
  * ```
  *
@@ -87370,7 +86766,7 @@ var DatePicker = (function () {
     }
     /**
      * Shows the date and/or time picker dialog(s)
-     * @param {DatePickerOptions} options Options for the date picker.
+     * @param options
      * @returns {Promise<Date>} Returns a promise that resolves with the picked date and/or time, or rejects with an error.
      */
     DatePicker.show = function (options) { return; };
@@ -87388,7 +86784,7 @@ var DatePicker = (function () {
 }());
 exports.DatePicker = DatePicker;
 
-},{"./plugin":581}],532:[function(require,module,exports){
+},{"./plugin":546}],518:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87401,8 +86797,9 @@ var plugin_1 = require('./plugin');
  * @name DB Meter
  * @description This plugin defines a global DBMeter object, which permits to get the decibel values from the microphone.
  * @usage
- * ```typescript
- * import { DBMeter } from 'ionic-native';
+ * ```ts
+ * import {DBMeter} from 'ionic-native';
+ *
  *
  *
  * // Start listening
@@ -87412,7 +86809,7 @@ var plugin_1 = require('./plugin');
  *
  * // Check if we are listening
  * DBMeter.isListening().then(
- *   (isListening: boolean) => console.log(isListening)
+ *   (isListening : boolean) => console.log(isListening)
  * );
  *
  * // Stop listening
@@ -87420,8 +86817,8 @@ var plugin_1 = require('./plugin');
  *
  * // Delete DBMeter instance from memory
  * DBMeter.delete().then(
- *   () => console.log('Deleted DB Meter instance'),
- *   error => console.log('Error occurred while deleting DB Meter instance')
+ *   () => console.log("Deleted DB Meter instance"),
+ *   error => console.log("Error occurred while deleting DB Meter instance")
  * );
  * ```
  */
@@ -87475,7 +86872,7 @@ var DBMeter = (function () {
 }());
 exports.DBMeter = DBMeter;
 
-},{"./plugin":581}],533:[function(require,module,exports){
+},{"./plugin":546}],519:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87490,8 +86887,8 @@ var plugin_1 = require('./plugin');
  * and Universal App Links.
  *
  * @usage
- * ```typescript
- * import { IonicDeeplinks } from 'ionic-native';
+ * ```ts
+ * import {IonicDeeplinks} from 'ionic-native';
  *
  * ```
  */
@@ -87543,15 +86940,14 @@ var Deeplinks = (function () {
             plugin: 'ionic-plugin-deeplinks',
             pluginRef: 'IonicDeeplink',
             repo: 'https://github.com/driftyco/ionic-plugin-deeplinks',
-            platforms: ['iOS', 'Android'],
-            install: 'ionic plugin add ionic-plugin-deeplinks --variable URL_SCHEME=myapp --variable DEEPLINK_SCHEME=https --variable DEEPLINK_HOST=example.com --variable ANDROID_PATH_PREFIX=/'
+            platforms: ['iOS', 'Android']
         })
     ], Deeplinks);
     return Deeplinks;
 }());
 exports.Deeplinks = Deeplinks;
 
-},{"./plugin":581}],534:[function(require,module,exports){
+},{"./plugin":546}],520:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87566,8 +86962,9 @@ var plugin_1 = require('./plugin');
  * Access information about the underlying device and platform.
  *
  * @usage
- * ```typescript
- * import { Device } from 'ionic-native';
+ * ```js
+ * import {Device} from 'ionic-native';
+ *
  *
  *
  * console.log('Device UUID is: ' + Device.device.uuid);
@@ -87600,7 +86997,7 @@ var Device = (function () {
 }());
 exports.Device = Device;
 
-},{"./plugin":581}],535:[function(require,module,exports){
+},{"./plugin":546}],521:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87652,7 +87049,7 @@ var DeviceAccounts = (function () {
 }());
 exports.DeviceAccounts = DeviceAccounts;
 
-},{"./plugin":581}],536:[function(require,module,exports){
+},{"./plugin":546}],522:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87667,18 +87064,19 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-device-motion`. For more info, please see the [Device Motion docs](https://github.com/apache/cordova-plugin-device-motion).
  *
  * @usage
- * ```typescript
- * import { DeviceMotion } from 'ionic-native';
+ * ```ts
+ * import {DeviceMotion} from 'ionic-native';
+ *
  *
  *
  * // Get the device current acceleration
  * DeviceMotion.getCurrentAcceleration().then(
- *   (acceleration: AccelerationData) => console.log(acceleration),
- *   (error: any) => console.log(error)
+ *   acceleration => console.log(acceleration),
+ *   error => console.log(error)
  * );
  *
  * // Watch device acceleration
- * var subscription = DeviceMotion.watchAcceleration().subscribe((acceleration: AccelerationData) => {
+ * var subscription = DeviceMotion.watchAcceleration().subscribe(acceleration => {
  *   console.log(acceleration);
  * });
  *
@@ -87692,15 +87090,30 @@ var DeviceMotion = (function () {
     }
     /**
      * Get the current acceleration along the x, y, and z axes.
+     *
      * @returns {Promise<any>} Returns object with x, y, z, and timestamp properties
      */
-    DeviceMotion.getCurrentAcceleration = function () { return; };
+    DeviceMotion.getCurrentAcceleration = function () {
+        return;
+    };
     /**
      * Watch the device acceleration. Clear the watch by unsubscribing from the observable.
-     * @param {AccelerometerOptions} options list of options for the accelerometer.
-     * @returns {Observable<AccelerationData>} Observable returns an observable that you can subscribe to
+     *
+     * ```ts
+     * // Watch device acceleration
+     * var subscription = DeviceMotion.watchPosition().subscribe(acceleration => {
+     *   console.log(acceleration);
+     * });
+     *
+     * // Stop watch
+     * subscription.unsubscribe();
+     * ```
+     * @param options
+     * @returns {Observable<AccelerationData>}
      */
-    DeviceMotion.watchAcceleration = function (options) { return; };
+    DeviceMotion.watchAcceleration = function (options) {
+        return;
+    };
     __decorate([
         plugin_1.Cordova()
     ], DeviceMotion, "getCurrentAcceleration", null);
@@ -87722,7 +87135,7 @@ var DeviceMotion = (function () {
 }());
 exports.DeviceMotion = DeviceMotion;
 
-},{"./plugin":581}],537:[function(require,module,exports){
+},{"./plugin":546}],523:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87737,20 +87150,20 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-device-orientation`. For more info, please see the [Device Orientation docs](https://github.com/apache/cordova-plugin-device-orientation).
  *
  * @usage
- * ```typescript
- * // CompassHeading is an interface for compass
- * import { DeviceOrientation, CompassHeading } from 'ionic-native';
+ * ```ts
+ * import {DeviceOrientation} from 'ionic-native';
+ *
  *
  *
  * // Get the device current compass heading
  * DeviceOrientation.getCurrentHeading().then(
- *   (data: CompassHeading) => console.log(data),
- *   (error: any) => console.log(error)
+ *   data => console.log(data),
+ *   error => console.log(error)
  * );
  *
  * // Watch the device compass heading change
  * var subscription = DeviceOrientation.watchHeading().subscribe(
- *   (data: CompassHeading) => console.log(data)
+ *   data => console.log(data)
  * );
  *
  * // Stop watching heading change
@@ -87769,8 +87182,8 @@ var DeviceOrientation = (function () {
      * Get the device current heading at a regular interval
      *
      * Stop the watch by unsubscribing from the observable
-     * @param {CompassOptions} options Options for compass. Frequency and Filter. Optional
-     * @returns {Observable<CompassHeading>} Returns an observable that contains the compass heading
+     * @param options
+     * @returns {Observable<CompassHeading>}
      */
     DeviceOrientation.watchHeading = function (options) { return; };
     __decorate([
@@ -87794,7 +87207,7 @@ var DeviceOrientation = (function () {
 }());
 exports.DeviceOrientation = DeviceOrientation;
 
-},{"./plugin":581}],538:[function(require,module,exports){
+},{"./plugin":546}],524:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87803,234 +87216,49 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var plugin_1 = require('./plugin');
-/**
- * @name Diagnostic
- * @description
- * Checks whether device hardware features are enabled or available to the app, e.g. camera, GPS, wifi
- *
- * @usage
- * ```typescript
- * import { Diagnostic } from 'ionic-native';
- *
- * let successCallback = (isAvailable) => { console.log('Is available? ' + isAvailable); };
- * let errorCallback = (e) => console.error(e);
- *
- * Diagnostic.isCameraAvailable().then(successCallback).catch(errorCallback);
- *
- * Diagnostic.isBluetoothAvailable().then(successCallback, errorCallback);
- *
- *
- * Diagnostic.getBluetoothState()
- *   .then((state) => {
- *     if (state == Diagnostic.bluetoothStates.POWERED_ON){
- *       // do something
- *     } else {
- *       // do something else
- *     }
- *   }).catch(e => console.error(e));
- *
- * ```
- */
 var Diagnostic = (function () {
     function Diagnostic() {
     }
     /**
      * Checks if app is able to access device location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isLocationAvailable = function () { return; };
-    /**
-     * Checks if Wifi is connected/enabled. On iOS this returns true if the device is connected to a network by WiFi. On Android and Windows 10 Mobile this returns true if the WiFi setting is set to enabled.
-     * On Android this requires permission. `<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />`
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isWifiAvailable = function () { return; };
-    /**
-     * Checks if the device has a camera. On Android this returns true if the device has a camera. On iOS this returns true if both the device has a camera AND the application is authorized to use it. On Windows 10 Mobile this returns true if both the device has a rear-facing camera AND the
-     * application is authorized to use it.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCameraAvailable = function () { return; };
-    /**
-     * Checks if the device has Bluetooth capabilities and if so that Bluetooth is switched on (same on Android, iOS and Windows 10 Mobile)
-     * On Android this requires permission <uses-permission android:name="android.permission.BLUETOOTH" />
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isBluetoothAvailable = function () { return; };
-    /**
-     * Displays the device location settings to allow user to enable location services/change location mode.
-     */
-    Diagnostic.switchToLocationSettings = function () { };
-    /**
-     * Displays mobile settings to allow user to enable mobile data.
-     */
-    Diagnostic.switchToMobileDataSettings = function () { };
-    /**
-     * Displays Bluetooth settings to allow user to enable Bluetooth.
-     */
-    Diagnostic.switchToBluetoothSettings = function () { };
-    /**
-     * Displays WiFi settings to allow user to enable WiFi.
-     */
-    Diagnostic.switchToWifiSettings = function () { };
-    /**
-     * Returns true if the WiFi setting is set to enabled, and is the same as `isWifiAvailable()`
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isWifiEnabled = function () { return; };
-    /**
-     * Enables/disables WiFi on the device.
-     * Requires `ACCESS_WIFI_STATE` and `CHANGE_WIFI_STATE` permissions on Android
-     * @param state {boolean}
-     */
-    Diagnostic.setWifiState = function (state) { return; };
-    /**
-     * Enables/disables Bluetooth on the device.
-     * Requires `BLUETOOTH` and `BLUETOOTH_ADMIN` permissions on Android
-     * @param state {boolean}
-     */
-    Diagnostic.setBluetoothState = function (state) { return; };
-    /**
-     * Returns true if the device setting for location is on. On Android this returns true if Location Mode is switched on. On iOS this returns true if Location Services is switched on.
-     * @returns {Promise<boolean>}
      */
     Diagnostic.isLocationEnabled = function () { return; };
     /**
-     * Checks if the application is authorized to use location.
-     * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @returns {Promise<any>}
+     * Checks if Wifi is connected/enabled. On iOS this returns true if the device is connected to a network by WiFi. On Android and Windows 10 Mobile this returns true if the WiFi setting is set to enabled.
+     * On Android this requires permission. `<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />`
      */
-    Diagnostic.isLocationAuthorized = function () { return; };
+    Diagnostic.isWifiEnabled = function () { return; };
     /**
-     * Returns the location authorization status for the application.
-     * @returns {Promise<any>}
+     * Checks if the device has a camera. On Android this returns true if the device has a camera. On iOS this returns true if both the device has a camera AND the application is authorized to use it. On Windows 10 Mobile this returns true if both the device has a rear-facing camera AND the
+     * application is authorized to use it.
      */
-    Diagnostic.getLocationAuthorizationStatus = function () { return; };
+    Diagnostic.isCameraEnabled = function () { return; };
+    /**
+     * Checks if the device has Bluetooth capabilities and if so that Bluetooth is switched on (same on Android, iOS and Windows 10 Mobile)
+     * On Android this requires permission <uses-permission android:name="android.permission.BLUETOOTH" />
+     */
+    Diagnostic.isBluetoothEnabled = function () { return; };
     /**
      * Returns the location authorization status for the application.
      * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
      *
      * mode - (iOS-only / optional) location authorization mode: "always" or "when_in_use". If not specified, defaults to "when_in_use".
-     * @returns {Promise<any>}
      */
     Diagnostic.requestLocationAuthorization = function (mode) { return; };
     /**
+     * Checks if the application is authorized to use location.
+     * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
+     */
+    Diagnostic.isLocationAuthorized = function () { return; };
+    /**
      * Checks if camera hardware is present on device.
-     * @returns {Promise<any>}
      */
     Diagnostic.isCameraPresent = function () { return; };
     /**
      * Checks if the application is authorized to use the camera.
      * Note for Android: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return TRUE as permissions are already granted at installation time.
-     * @returns {Promise<any>}
      */
     Diagnostic.isCameraAuthorized = function () { return; };
-    /**
-     * Returns the camera authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getCameraAuthorizationStatus = function () { return; };
-    /**
-     * Requests camera authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCameraAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use the microphone.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isMicrophoneAuthorized = function () { return; };
-    /**
-     * Returns the microphone authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getMicrophoneAuthorizationStatus = function () { return; };
-    /**
-     * Requests microphone authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestMicrophoneAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use contacts (address book).
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isContactsAuthorized = function () { return; };
-    /**
-     * Returns the contacts authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getContactsAuthroizationStatus = function () { return; };
-    /**
-     * Requests contacts authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestContactsAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized to use the calendar.
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return TRUE as permissions are already granted at installation time.
-     *
-     * Notes for iOS:
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isCalendarAuthorized = function () { return; };
-    /**
-     * Returns the calendar authorization status for the application.
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return `GRANTED` status as permissions are already granted at installation time.
-     *
-     * Notes for iOS:
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     *
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getCalendarAuthorizationStatus = function () { return; };
-    /**
-     * Requests calendar authorization for the application.
-     *
-     * Notes for iOS:
-     *   - Should only be called if authorization status is NOT_DETERMINED. Calling it when in any other state will have no effect and just return the current authorization status.
-     *   - This relates to Calendar Events (not Calendar Reminders)
-     *
-     * Notes for Android:
-     *   - This is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will have no effect as the permissions are already granted at installation time.
-     *   - This requests permission for `READ_CALENDAR` run-time permission
-     *   - Required permissions must be added to `AndroidManifest.xml` as appropriate - see Android permissions: `READ_CALENDAR`, `WRITE_CALENDAR`
-     *
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCalendarAuthorization = function () { return; };
-    /**
-     * Opens settings page for this app.
-     * On Android, this opens the "App Info" page in the Settings app.
-     * On iOS, this opens the app settings page in the Settings app. This works only on iOS 8+ - iOS 7 and below will invoke the errorCallback.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.switchToSettings = function () { return; };
-    /**
-     * Returns the state of Bluetooth on the device.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getBluetoothState = function () { return; };
-    /**
-     * Registers a function to be called when a change in Bluetooth state occurs.
-     * @param handler
-     */
-    Diagnostic.registerBluetoothStateChangeHandler = function (handler) { };
-    /**
-     * Registers a function to be called when a change in Location state occurs.
-     * @param handler
-     */
-    Diagnostic.registerLocationStateChangeHandler = function (handler) { };
-    /**
-     * Checks if high-accuracy locations are available to the app from GPS hardware.
-     * Returns true if Location mode is enabled and is set to "Device only" or "High accuracy" AND if the app is authorised to use location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isGpsLocationAvailable = function () { return; };
     /**
      * Checks if location mode is set to return high-accuracy locations from GPS hardware.
      *   Returns true if Location mode is enabled and is set to either:
@@ -88039,364 +87267,60 @@ var Diagnostic = (function () {
      */
     Diagnostic.isGpsLocationEnabled = function () { return; };
     /**
-     * Checks if low-accuracy locations are available to the app from network triangulation/WiFi access points.
-     * Returns true if Location mode is enabled and is set to "Battery saving" or "High accuracy" AND if the app is authorised to use location.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.isNetworkLocationAvailable = function () { return; };
-    /**
      * Checks if location mode is set to return low-accuracy locations from network triangulation/WiFi access points.
      * Returns true if Location mode is enabled and is set to either:
      *   - Battery saving = network triangulation and Wifi network IDs (low accuracy)
      *   - High accuracy = GPS hardware, network triangulation and Wifi network IDs (high and low accuracy)
-     * @returns {Promise<any>}
      */
     Diagnostic.isNetworkLocationEnabled = function () { return; };
     /**
-     * Returns the current location mode setting for the device.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getLocationMode = function () { return; };
-    /**
-     * Returns the current authorisation status for a given permission.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permission
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getPermissionAuthorizationStatus = function (permission) { return; };
-    /**
-     * Returns the current authorisation status for multiple permissions.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permissions
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getPermissionsAuthorizationStatus = function (permissions) { return; };
-    /**
-     * Requests app to be granted authorisation for a runtime permission.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will have no effect as the permissions are already granted at installation time.
-     * @param permission
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRuntimePermission = function (permission) { return; };
-    /**
-     * Requests app to be granted authorisation for multiple runtime permissions.
-     * Note: this is intended for Android 6 / API 23 and above. Calling on Android 5 / API 22 and below will always return GRANTED status as permissions are already granted at installation time.
-     * @param permissions
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRuntimePermissions = function (permissions) { return; };
-    /**
-     * Checks if the device setting for Bluetooth is switched on.
-     * This requires `BLUETOOTH` permission on Android
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isBluetoothEnabled = function () { return; };
-    /**
-     * Checks if the device has Bluetooth capabilities.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothSupport = function () { return; };
-    /**
-     * Checks if the device has Bluetooth Low Energy (LE) capabilities.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothLESupport = function () { return; };
-    /**
-     * Checks if the device supports Bluetooth Low Energy (LE) Peripheral mode.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.hasBluetoothLEPeripheralSupport = function () { return; };
-    /**
-     * Checks if the application is authorized to use the Camera Roll in Photos app.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isCameraRollAuthorized = function () { return; };
-    /**
-     * Returns the authorization status for the application to use the Camera Roll in Photos app.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.getCameraRollAuthorizationStatus = function () { return; };
-    /**
-     * Requests camera roll authorization for the application.
-     * Should only be called if authorization status is NOT_REQUESTED.
-     * Calling it when in any other state will have no effect.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestCameraRollAuthorization = function () { return; };
-    /**
      * Checks if remote (push) notifications are enabled.
-     * @returns {Promise<boolean>}
+     * On iOS 8+, returns true if app is registered for remote notifications AND "Allow Notifications" switch is ON AND alert style is not set to "None" (i.e. "Banners" or "Alerts").
+     * On iOS <=7, returns true if app is registered for remote notifications AND alert style is not set to "None" (i.e. "Banners" or "Alerts") - same as isRegisteredForRemoteNotifications().
      */
     Diagnostic.isRemoteNotificationsEnabled = function () { return; };
     /**
      * Indicates if the app is registered for remote (push) notifications on the device.
-     * @returns {Promise<boolean>}
+     * On iOS 8+, returns true if the app is registered for remote notifications and received its device token, or false if registration has not occurred, has failed, or has been denied by the user. Note that user preferences for notifications in the Settings app will not affect this.
+     * On iOS <=7, returns true if app is registered for remote notifications AND alert style is not set to "None" (i.e. "Banners" or "Alerts") - same as isRemoteNotificationsEnabled().
      */
     Diagnostic.isRegisteredForRemoteNotifications = function () { return; };
-    /**
-     * Indicates the current setting of notification types for the app in the Settings app.
-     * Note: on iOS 8+, if "Allow Notifications" switch is OFF, all types will be returned as disabled.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getRemoteNotificationTypes = function () { return; };
-    /**
-     * Checks if the application is authorized to use reminders.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isRemindersAuthorized = function () { return; };
-    /**
-     * Returns the reminders authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getRemindersAuthorizationStatus = function () { return; };
-    /**
-     * Requests reminders authorization for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.requestRemindersAuthorization = function () { return; };
-    /**
-     * Checks if the application is authorized for background refresh.
-     * @returns {Promise<boolean>}
-     */
-    Diagnostic.isBackgroundRefreshAuthorized = function () { return; };
-    /**
-     * Returns the background refresh authorization status for the application.
-     * @returns {Promise<any>}
-     */
-    Diagnostic.getBackgroundRefreshStatus = function () { return; };
-    Diagnostic.permission = {
-        READ_CALENDAR: 'READ_CALENDAR',
-        WRITE_CALENDAR: 'WRITE_CALENDAR',
-        CAMERA: 'CAMERA',
-        READ_CONTACTS: 'READ_CONTACTS',
-        WRITE_CONTACTS: 'WRITE_CONTACTS',
-        GET_ACCOUNTS: 'GET_ACCOUNTS',
-        ACCESS_FINE_LOCATION: 'ACCESS_FINE_LOCATION',
-        ACCESS_COARSE_LOCATION: 'ACCESS_COARSE_LOCATION',
-        RECORD_AUDIO: 'RECORD_AUDIO',
-        READ_PHONE_STATE: 'READ_PHONE_STATE',
-        CALL_PHONE: 'CALL_PHONE',
-        ADD_VOICEMAIL: 'ADD_VOICEMAIL',
-        USE_SIP: 'USE_SIP',
-        PROCESS_OUTGOING_CALLS: 'PROCESS_OUTGOING_CALLS',
-        READ_CALL_LOG: 'READ_CALL_LOG',
-        WRITE_CALL_LOG: 'WRITE_CALL_LOG',
-        SEND_SMS: 'SEND_SMS',
-        RECEIVE_SMS: 'RECEIVE_SMS',
-        READ_SMS: 'READ_SMS',
-        RECEIVE_WAP_PUSH: 'RECEIVE_WAP_PUSH',
-        RECEIVE_MMS: 'RECEIVE_MMS',
-        WRITE_EXTERNAL_STORAGE: 'WRITE_EXTERNAL_STORAGE',
-        READ_EXTERNAL_STORAGE: 'READ_EXTERNAL_STORAGE',
-        BODY_SENSORS: 'BODY_SENSORS'
-    };
-    Diagnostic.permissionStatus = {
-        GRANTED: 'GRANTED',
-        GRANTED_WHEN_IN_USE: 'GRANTED_WHEN_IN_USE',
-        RESTRICTED: 'RESTRICTED',
-        DENIED: 'DENIED',
-        DENIED_ALWAYS: 'DENIED_ALWAYS',
-        NOT_REQUESTED: 'NOT_REQUESTED'
-    };
-    Diagnostic.locationAuthorizationMode = {
-        ALWAYS: 'ALWAYS',
-        WHEN_IN_USE: 'WHEN_IN_USE'
-    };
-    Diagnostic.permissionGroups = {
-        CALENDAR: ['READ_CALENDAR', 'WRITE_CALENDAR'],
-        CAMERA: ['CAMERA'],
-        CONTACTS: ['READ_CONTACTS', 'WRITE_CONTACTS', 'GET_ACCOUNTS'],
-        LOCATION: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
-        MICROPHONE: ['RECORD_AUDIO'],
-        PHONE: ['READ_PHONE_STATE', 'CALL_PHONE', 'ADD_VOICEMAIL', 'USE_SIP', 'PROCESS_OUTGOING_CALLS', 'READ_CALL_LOG', 'WRITE_CALL_LOG'],
-        SENSORS: ['BODY_SENSORS'],
-        SMS: ['SEND_SMS', 'RECEIVE_SMS', 'READ_SMS', 'RECEIVE_WAP_PUSH', 'RECEIVE_MMS'],
-        STORAGE: ['READ_EXTERNAL_STORAGE', 'WRITE_EXTERNAL_STORAGE']
-    };
-    Diagnostic.locationMode = {
-        HIGH_ACCURACY: 'high_accuracy',
-        DEVICE_ONLY: 'device_only',
-        BATTERY_SAVING: 'battery_saving',
-        LOCATION_OFF: 'location_off'
-    };
-    Diagnostic.bluetoothState = {
-        UNKNOWN: 'unknown',
-        RESETTING: 'resetting',
-        UNSUPPORTED: 'unsupported',
-        UNAUTHORIZED: 'unauthorized',
-        POWERED_OFF: 'powered_off',
-        POWERED_ON: 'powered_on',
-        POWERING_OFF: 'powering_off',
-        POWERING_ON: 'powering_on'
-    };
     __decorate([
         plugin_1.Cordova()
-    ], Diagnostic, "isLocationAvailable", null);
+    ], Diagnostic, "isLocationEnabled", null);
     __decorate([
         plugin_1.Cordova()
-    ], Diagnostic, "isWifiAvailable", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Diagnostic, "isCameraAvailable", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Diagnostic, "isBluetoothAvailable", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToLocationSettings", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToMobileDataSettings", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToBluetoothSettings", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "switchToWifiSettings", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'Windows 10'] })
     ], Diagnostic, "isWifiEnabled", null);
     __decorate([
-        plugin_1.Cordova({ callbackOrder: 'reverse', platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "setWifiState", null);
+        plugin_1.Cordova()
+    ], Diagnostic, "isCameraEnabled", null);
     __decorate([
-        plugin_1.Cordova({ callbackOrder: 'reverse', platforms: ['Android', 'Windows 10'] })
-    ], Diagnostic, "setBluetoothState", null);
+        plugin_1.Cordova()
+    ], Diagnostic, "isBluetoothEnabled", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isLocationEnabled", null);
+        plugin_1.Cordova()
+    ], Diagnostic, "requestLocationAuthorization", null);
     __decorate([
         plugin_1.Cordova()
     ], Diagnostic, "isLocationAuthorized", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getLocationAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestLocationAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isCameraPresent", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isCameraAuthorized", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getCameraAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestCameraAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isMicrophoneAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getMicrophoneAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestMicrophoneAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isContactsAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getContactsAuthroizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestContactsAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "isCalendarAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getCalendarAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "requestCalendarAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "switchToSettings", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'] })
-    ], Diagnostic, "getBluetoothState", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'], sync: true })
-    ], Diagnostic, "registerBluetoothStateChangeHandler", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android', 'iOS'], sync: true })
-    ], Diagnostic, "registerLocationStateChangeHandler", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isGpsLocationAvailable", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isGpsLocationEnabled", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isNetworkLocationAvailable", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isNetworkLocationEnabled", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "getLocationMode", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "getPermissionAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "getPermissionsAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "requestRuntimePermission", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'], callbackOrder: 'reverse' })
-    ], Diagnostic, "requestRuntimePermissions", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "isBluetoothEnabled", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothSupport", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothLESupport", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['Android'] })
-    ], Diagnostic, "hasBluetoothLEPeripheralSupport", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isCameraRollAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getCameraRollAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "requestCameraRollAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isRemoteNotificationsEnabled", null);
     __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
+        plugin_1.Cordova()
     ], Diagnostic, "isRegisteredForRemoteNotifications", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getRemoteNotificationTypes", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isRemindersAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getRemindersAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "requestRemindersAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "isBackgroundRefreshAuthorized", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], Diagnostic, "getBackgroundRefreshStatus", null);
     Diagnostic = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova.plugins.diagnostic',
@@ -88408,7 +87332,7 @@ var Diagnostic = (function () {
 }());
 exports.Diagnostic = Diagnostic;
 
-},{"./plugin":581}],539:[function(require,module,exports){
+},{"./plugin":546}],525:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -88425,8 +87349,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-dialogs`. For more info, please see the [Dialogs plugin docs](https://github.com/apache/cordova-plugin-dialogs).
  *
  * @usage
- * ```typescript
- * import { Dialogs } from 'ionic-native';
+ * ```js
+ * import {Dialogs} from 'ionic-native';
  *
  *
  *
@@ -88438,9 +87362,9 @@ var Dialogs = (function () {
     }
     /**
      * Shows a custom alert or dialog box.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Alert)
-     * @param {string} buttonName Button name. (Optional, defaults to OK)
+     * @param message Dialog message. (String)
+     * @param title Dialog title. (String) (Optional, defaults to Alert)
+     * @param buttonName Button name. (String) (Optional, defaults to OK)
      * @returns {Promise<any>} Returns a blank promise once the user has dismissed the alert.
      */
     Dialogs.alert = function (message, title, buttonName) {
@@ -88450,9 +87374,9 @@ var Dialogs = (function () {
     };
     /**
      * Displays a customizable confirmation dialog box.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Confirm)
-     * @param {Array<string>} buttonLabels Array of strings specifying button labels. (Optional, defaults to [OK,Cancel])
+     * @param message Dialog message. (String)
+     * @param title Dialog title. (String) (Optional, defaults to Confirm)
+     * @param buttonLabels Array of strings specifying button labels. (Array) (Optional, defaults to [OK,Cancel])
      * @returns {Promise<number>} Returns a promise that resolves the button index that was clicked. Note that the index use one-based indexing.
      */
     Dialogs.confirm = function (message, title, buttonLabels) {
@@ -88462,10 +87386,10 @@ var Dialogs = (function () {
     };
     /**
      * Displays a native dialog box that is more customizable than the browser's prompt function.
-     * @param {string} message Dialog message.
-     * @param {string} title Dialog title. (Optional, defaults to Prompt)
-     * @param {Array<string>} buttonLabels  Array of strings specifying button labels. (Optional, defaults to ["OK","Cancel"])
-     * @param {string} defaultText Default textbox input value.  (Optional, Default: empty string)
+     * @param message Dialog message. (String)
+     * @param title Dialog title (String) (Optional, defaults to Prompt)
+     * @param buttonLabels  Array of strings specifying button labels (Array) (Optional, defaults to ["OK","Cancel"])
+     * @param defaultText Default textbox input value (String) (Optional, Default: empty string)
      * @returns {Promise<any>} Returns a promise that resolves an object with the button index clicked and the text entered
      */
     Dialogs.prompt = function (message, title, buttonLabels, defaultText) {
@@ -88476,7 +87400,7 @@ var Dialogs = (function () {
     };
     /**
      * The device plays a beep sound.
-     * @param {numbers} times The number of times to repeat the beep.
+     * @param times The number of times to repeat the beep. (Number)
      */
     Dialogs.beep = function (times) { };
     __decorate([
@@ -88513,7 +87437,7 @@ var Dialogs = (function () {
 }());
 exports.Dialogs = Dialogs;
 
-},{"./plugin":581}],540:[function(require,module,exports){
+},{"./plugin":546}],526:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -88529,14 +87453,13 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-email-composer. For more info, please see the [Email Composer plugin docs](https://github.com/katzer/cordova-plugin-email-composer).
  *
  * DISCLAIMER: This plugin is experiencing issues with the latest versions of Cordova. Use at your own risk. Functionality is not guaranteed. Please stay tuned for a more stable version.
- * A good alternative to this plugin is the social sharing plugin.
  *
  * @usage
- * ```typescript
- * import { EmailComposer } from 'ionic-native';
+ * ```ts
+ * import {EmailComposer} from 'ionic-native';
  *
  *
- * EmailComposer.isAvailable().then((available: boolean) =>{
+ * EmailComposer.isAvailable().then((available) =>{
  *  if(available) {
  *    //Now we know we can send
  *  }
@@ -88573,26 +87496,16 @@ var EmailComposer = (function () {
      */
     EmailComposer.isAvailable = function (app) {
         return new Promise(function (resolve, reject) {
-            if (app) {
-                cordova.plugins.email.isAvailable(app, function (isAvailable) {
-                    if (isAvailable) {
-                        resolve();
-                    }
-                    else {
-                        reject();
-                    }
-                });
-            }
-            else {
-                cordova.plugins.email.isAvailable(function (isAvailable) {
-                    if (isAvailable) {
-                        resolve();
-                    }
-                    else {
-                        reject();
-                    }
-                });
-            }
+            if (app)
+                cordova.plugins.email.isAvailable(app, function (isAvailable) { if (isAvailable)
+                    resolve();
+                else
+                    reject(); });
+            else
+                cordova.plugins.email.isAvailable(function (isAvailable) { if (isAvailable)
+                    resolve();
+                else
+                    reject(); });
         });
     };
     /**
@@ -88631,499 +87544,7 @@ var EmailComposer = (function () {
 }());
 exports.EmailComposer = EmailComposer;
 
-},{"./plugin":581}],541:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name EstimoteBeacons
- *
- * @description
- * This plugin enables communication between a phone and Estimote Beacons peripherals.
- *
- */
-var EstimoteBeacons = (function () {
-    function EstimoteBeacons() {
-    }
-    /**
-     * Ask the user for permission to use location services
-     * while the app is in the foreground.
-     * You need to call this function or requestAlwaysAuthorization
-     * on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.requestWhenInUseAuthorization().then(
-     *   () => { console.log('on success'); },
-     *   () => { console.log('on error'); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.requestWhenInUseAuthorization = function () { return; };
-    /**
-     * Ask the user for permission to use location services
-     * whenever the app is running.
-     * You need to call this function or requestWhenInUseAuthorization
-     * on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.requestAlwaysAuthorization().then(
-     *   () => { console.log('on success'); },
-     *   () => { console.log('on error'); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.requestAlwaysAuthorization = function () { return; };
-    /**
-     * Get the current location authorization status.
-     * Implemented on iOS 8+.
-     * Does nothing on other platforms.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.authorizationStatus().then(
-     *   (result) => { console.log('Location authorization status: ' + result); },
-     *   (errorMessage) => { console.log('Error: ' + errorMessage); }
-     * );
-     * ```
-     *
-     * @see {@link https://community.estimote.com/hc/en-us/articles/203393036-Estimote-SDK-and-iOS-8-Location-Services|Estimote SDK and iOS 8 Location Services}
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.authorizationStatus = function () { return; };
-    /**
-     * Start advertising as a beacon.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startAdvertisingAsBeacon('B9407F30-F5F8-466E-AFF9-25556B57FE6D', 1, 1, 'MyRegion')
-     *    .then(() => { console.log('Beacon started'); });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopAdvertisingAsBeacon().then((result) => { console.log('Beacon stopped'); });
-     * }, 5000);
-     * ```
-     * @param uuid {string} UUID string the beacon should advertise (mandatory).
-     * @param major {number} Major value to advertise (mandatory).
-     * @param minor {number} Minor value to advertise (mandatory).
-     * @param regionId {string} Identifier of the region used to advertise (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.startAdvertisingAsBeacon = function (uuid, major, minor, regionId) { return; };
-    /**
-     * Stop advertising as a beacon.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startAdvertisingAsBeacon('B9407F30-F5F8-466E-AFF9-25556B57FE6D', 1, 1, 'MyRegion')
-     *    .then(() => { console.log('Beacon started'); });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopAdvertisingAsBeacon().then((result) => { console.log('Beacon stopped'); });
-     * }, 5000);
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.stopAdvertisingAsBeacon = function () { return; };
-    /**
-     * Enable analytics.
-     *
-     * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.enableAnalytics(true).then(() => { console.log('Analytics enabled'); });
-     * ```
-     * @param enable {number} Boolean value to turn analytics on or off (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.enableAnalytics = function (enable) { return; };
-    /**
-    * Test if analytics is enabled.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.isAnalyticsEnabled().then((enabled) => { console.log('Analytics enabled: ' + enabled); });
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.isAnalyticsEnabled = function () { return; };
-    /**
-    * Test if App ID and App Token is set.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.isAuthorized().then((isAuthorized) => { console.log('App ID and App Token is set: ' + isAuthorized); });
-     * ```
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.isAuthorized = function () { return; };
-    /**
-    * Set App ID and App Token.
-    *
-    * @see {@link http://estimote.github.io/iOS-SDK/Classes/ESTConfig.html|Further details}
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.setupAppIDAndAppToken('MyAppID', 'MyAppToken').then(() => { console.log('AppID and AppToken configured!'); });
-     * ```
-     * @param appID {string} The App ID (mandatory).
-     * @param appToken {string} The App Token (mandatory).
-     * @return Returns a Promise.
-     */
-    EstimoteBeacons.setupAppIDAndAppToken = function (appID, appToken) { return; };
-    /**
-     * Start scanning for all nearby beacons using CoreBluetooth (no region object is used).
-     * Available on iOS.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startEstimoteBeaconDiscovery().subscribe(beacons => {
-     *   console.log(JSON.stringify(beacons));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopEstimoteBeaconDiscovery().then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @return Returns an Observable that notifies of each beacon discovered.
-     */
-    EstimoteBeacons.startEstimoteBeaconDiscovery = function () { return; };
-    /**
-     * Stop CoreBluetooth scan. Available on iOS.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.startEstimoteBeaconDiscovery().subscribe(beacons => {
-     *   console.log(JSON.stringify(beacons));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopEstimoteBeaconDiscovery().then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopEstimoteBeaconDiscovery = function () { return; };
-    /**
-     * Start ranging beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startRangingBeaconsInRegion(region).subscribe(info => {
-     *   console.log(JSON.stringify(info));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopRangingBeaconsInRegion(region).then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return Returns an Observable that notifies of each beacon discovered.
-     */
-    EstimoteBeacons.startRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startRangingBeaconsInRegion(region).subscribe(info => {
-     *   console.log(JSON.stringify(info));
-     * });
-     * setTimeout(() => {
-     *   EstimoteBeacons.stopRangingBeaconsInRegion(region).then(() => { console.log('scan stopped'); });
-     * }, 5000);
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Start ranging secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * {@link EstimoteBeacons.startRangingBeaconsInRegion}.
-     * To use secure beacons set the App ID and App Token using
-     * {@link EstimoteBeacons.setupAppIDAndAppToken}.
-     */
-    EstimoteBeacons.startRangingSecureBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * {@link EstimoteBeacons.stopRangingBeaconsInRegion}.
-     */
-    EstimoteBeacons.stopRangingSecureBeaconsInRegion = function (region) { return; };
-    /**
-     * Start monitoring beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.startMonitoringForRegion(region).subscribe(state => {
-     *   console.log('Region state: ' + JSON.stringify(state));
-     * });
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @param [notifyEntryStateOnDisplay=false] {boolean} Set to true to detect if you
-     * are inside a region when the user turns display on, see
-     * {@link https://developer.apple.com/library/prerelease/ios/documentation/CoreLocation/Reference/CLBeaconRegion_class/index.html#//apple_ref/occ/instp/CLBeaconRegion/notifyEntryStateOnDisplay|iOS documentation}
-     * for further details (optional, defaults to false, iOS only).
-     * @return Returns an Observable that notifies of each region state discovered.
-     */
-    EstimoteBeacons.startMonitoringForRegion = function (region, notifyEntryStateOnDisplay) { return; };
-    /**
-     * Stop monitoring beacons. Available on iOS and Android.
-     *
-     * @usage
-     * ```
-     * let region: BeaconRegion = {} // Empty region matches all beacons.
-     * EstimoteBeacons.stopMonitoringForRegion(region).then(() => { console.log('monitoring is stopped'); });
-     * ```
-     * @param region {BeaconRegion} Dictionary with region properties (mandatory).
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.stopMonitoringForRegion = function (region) { return; };
-    /**
-     * Start monitoring secure beacons. Available on iOS.
-     * This function has the same parameters/behaviour as
-     * EstimoteBeacons.startMonitoringForRegion.
-     * To use secure beacons set the App ID and App Token using
-     * {@link EstimoteBeacons.setupAppIDAndAppToken}.
-     * @see {@link EstimoteBeacons.startMonitoringForRegion}
-     */
-    EstimoteBeacons.startSecureMonitoringForRegion = function (region, notifyEntryStateOnDisplay) { return; };
-    /**
-    * Stop monitoring secure beacons. Available on iOS.
-    * This function has the same parameters/behaviour as
-    * {@link EstimoteBeacons.stopMonitoringForRegion}.
-    */
-    EstimoteBeacons.stopSecureMonitoringForRegion = function (region) { return; };
-    /**
-     * Connect to Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.connectToBeacon(FF:0F:F0:00:F0:00);
-     * ```
-     * ```
-     * EstimoteBeacons.connectToBeacon({
-     *     proximityUUID: '000000FF-F00F-0FF0-F000-000FF0F00000',
-     *     major: 1,
-     *     minor: 1
-     *   });
-     * ```
-     * @param beacon {Beacon} Beacon to connect to.
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.connectToBeacon = function (beacon) { return; };
-    /**
-     * Disconnect from connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * EstimoteBeacons.disconnectConnectedBeacon();
-     * ```
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.disconnectConnectedBeacon = function () { return; };
-    /**
-     * Write proximity UUID to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes constant ESTIMOTE_PROXIMITY_UUID
-     * EstimoteBeacons.writeConnectedProximityUUID(ESTIMOTE_PROXIMITY_UUID);
-     *
-     * @param uuid {string} String to write as new UUID
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedProximityUUID = function (uuid) { return; };
-    /**
-     * Write major to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes 1
-     * EstimoteBeacons.writeConnectedMajor(1);
-     *
-     * @param major {number} number to write as new major
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedMajor = function (major) { return; };
-    /**
-     * Write minor to connected Estimote Beacon. Available on Android.
-     *
-     * @usage
-     * ```
-     * // Example that writes 1
-     * EstimoteBeacons.writeConnectedMinor(1);
-     *
-     * @param minor {number} number to write as new minor
-     * @return returns a Promise.
-     */
-    EstimoteBeacons.writeConnectedMinor = function (minor) { return; };
-    /** Proximity value */
-    EstimoteBeacons.ProximityUnknown = 0;
-    /** Proximity value */
-    EstimoteBeacons.ProximityImmediate = 1;
-    /** Proximity value */
-    EstimoteBeacons.ProximityNear = 2;
-    /** Proximity value */
-    EstimoteBeacons.ProximityFar = 3;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorUnknown = 0;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorMintCocktail = 1;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorIcyMarshmallow = 2;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorBlueberryPie = 3;
-    /**
-     * Beacon colour.
-     */
-    EstimoteBeacons.BeaconColorSweetBeetroot = 4;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorCandyFloss = 5;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorLemonTart = 6;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorVanillaJello = 7;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorLiquoriceSwirl = 8;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorWhite = 9;
-    /** Beacon colour */
-    EstimoteBeacons.BeaconColorTransparent = 10;
-    /** Region state */
-    EstimoteBeacons.RegionStateUnknown = 'unknown';
-    /** Region state */
-    EstimoteBeacons.RegionStateOutside = 'outside';
-    /** Region state */
-    EstimoteBeacons.RegionStateInside = 'inside';
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "requestWhenInUseAuthorization", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "requestAlwaysAuthorization", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "authorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({
-            clearFunction: 'stopAdvertisingAsBeacon'
-        })
-    ], EstimoteBeacons, "startAdvertisingAsBeacon", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopAdvertisingAsBeacon", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "enableAnalytics", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "isAnalyticsEnabled", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "isAuthorized", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "setupAppIDAndAppToken", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopEstimoteBeaconDiscovery'
-        })
-    ], EstimoteBeacons, "startEstimoteBeaconDiscovery", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopEstimoteBeaconDiscovery", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopRangingBeaconsInRegion',
-            clearWithArgs: true
-        })
-    ], EstimoteBeacons, "startRangingBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopRangingBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopRangingSecureBeaconsInRegion',
-            clearWithArgs: true
-        })
-    ], EstimoteBeacons, "startRangingSecureBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopRangingSecureBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopMonitoringForRegion',
-            clearWithArgs: true,
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], EstimoteBeacons, "startMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopSecureMonitoringForRegion',
-            clearWithArgs: true,
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], EstimoteBeacons, "startSecureMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "stopSecureMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "connectToBeacon", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "disconnectConnectedBeacon", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "writeConnectedProximityUUID", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "writeConnectedMajor", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], EstimoteBeacons, "writeConnectedMinor", null);
-    EstimoteBeacons = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-estimote',
-            pluginRef: 'estimote.beacons',
-            repo: 'https://github.com/evothings/phonegap-estimotebeacons',
-            platforms: ['iOS', 'Android']
-        })
-    ], EstimoteBeacons);
-    return EstimoteBeacons;
-}());
-exports.EstimoteBeacons = EstimoteBeacons;
-
-},{"./plugin":581}],542:[function(require,module,exports){
+},{"./plugin":546}],527:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -89201,8 +87622,8 @@ var plugin_1 = require('./plugin');
  * For tracking events, see `logEvent` and `logPurchase`.
  *
  * @usage
- * ```typescript
- * import { Facebook } from 'ionic-native';
+ * ```js
+ * import {Facebook} from 'ionic-native';
  *
  *
  *
@@ -89214,8 +87635,8 @@ var Facebook = (function () {
     }
     /**
      * Browser wrapper
-     * @param {number} appId Your Facebook AppID from their dashboard
-     * @param {string} version The version of API you may want to use. Optional
+     * @param appId
+     * @param version
      */
     Facebook.browserInit = function (appId, version) {
         return;
@@ -89223,7 +87644,7 @@ var Facebook = (function () {
     /**
      * Login to Facebook to authenticate this app.
      *
-     * ```typescript
+     * ```ts
      * {
      *   status: "connected",
      *   authResponse: {
@@ -89238,7 +87659,7 @@ var Facebook = (function () {
      * ```
      *
      * @param {string[]}  permissions List of [permissions](https://developers.facebook.com/docs/facebook-login/permissions) this app has upon logging in.
-     * @return {Promise<FacebookLoginResponse>} Returns a Promise that resolves with a status object if login succeeds, and rejects if login fails.
+     * @return Returns a Promise that resolves with a status object if login succeeds, and rejects if login fails.
      */
     Facebook.login = function (permissions) { return; };
     /**
@@ -89381,134 +87802,14 @@ var Facebook = (function () {
             plugin: 'cordova-plugin-facebook4',
             pluginRef: 'facebookConnectPlugin',
             repo: 'https://github.com/jeduan/cordova-plugin-facebook4',
-            install: 'ionic plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" --variable APP_NAME="myApplication"'
+            install: 'cordova plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" --variable APP_NAME="myApplication"'
         })
     ], Facebook);
     return Facebook;
 }());
 exports.Facebook = Facebook;
 
-},{"./plugin":581}],543:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name FileChooser
- * @description
- *
- * Opens the file picker on Android for the user to select a file, returns a file URI.
- *
- * @usage
- * ```
- * import {FileChooser} from 'ionic-native';
- *
- * FileChooser.open()
- *   .then(uri => console.log(uri);
- *   .catch(e => console.log(e);
- *
- * ```
- */
-var FileChooser = (function () {
-    function FileChooser() {
-    }
-    /**
-     * Open a file
-     */
-    FileChooser.open = function () { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], FileChooser, "open", null);
-    FileChooser = __decorate([
-        plugin_1.Plugin({
-            plugin: 'http://github.com/don/cordova-filechooser.git',
-            pluginRef: 'fileChooser',
-            repo: 'https://github.com/don/cordova-filechooser',
-            platforms: ['Android']
-        })
-    ], FileChooser);
-    return FileChooser;
-}());
-exports.FileChooser = FileChooser;
-
-},{"./plugin":581}],544:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name FileOpener
- * @description
- * This plugin will open a file on your device file system with its default application.
- *
- * @usage
- * ```
- * import {FileOpener} from 'ionic-native';
- *
- *
- *
- * ```
- */
-var FileOpener = (function () {
-    function FileOpener() {
-    }
-    /**
-     * Open an file
-     * @param filePath {string} File Path
-     * @param fileMIMEType {string} File MIME Type
-     */
-    FileOpener.open = function (filePath, fileMIMEType) { return; };
-    /**
-     * Uninstalls a package
-     * @param packageId {string}  Package ID
-     */
-    FileOpener.uninstall = function (packageId) { return; };
-    /**
-     * Check if an app is already installed
-     * @param packageId {string} Package ID
-     */
-    FileOpener.appIsInstalled = function (packageId) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "open", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "uninstall", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackStyle: 'object',
-            successName: 'success',
-            errorName: 'error'
-        })
-    ], FileOpener, "appIsInstalled", null);
-    FileOpener = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-file-opener2',
-            pluginRef: 'cordova.plugins.fileOpener2',
-            repo: 'https://github.com/pwlin/cordova-plugin-file-opener2'
-        })
-    ], FileOpener);
-    return FileOpener;
-}());
-exports.FileOpener = FileOpener;
-
-},{"./plugin":581}],545:[function(require,module,exports){
+},{"./plugin":546}],528:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -89522,17 +87823,6 @@ var plugin_1 = require('./plugin');
  * @description
  * This plugin implements a File API allowing read/write access to files residing on the device.
  *
- * The File class implements static convenience functions to access files and directories.
- *
- * Example:
- * ```
- * import { File } from 'ionic-native';
- *
- * declare var cordova: any;
- * const fs:string = cordova.file.dataDirectory;
- * File.checkDir(this.fs, 'mydir').then(_ => console.log('yay')).catch(err => console.log('boooh'));
- * ```
- *
  *  This plugin is based on several specs, including : The HTML5 File API http://www.w3.org/TR/FileAPI/
  *  The (now-defunct) Directories and System extensions Latest: http://www.w3.org/TR/2012/WD-file-system-api-20120417/
  *  Although most of the plugin code was written when an earlier spec was current: http://www.w3.org/TR/2011/WD-file-system-api-20110419/
@@ -89541,27 +87831,43 @@ var plugin_1 = require('./plugin');
 var File = (function () {
     function File() {
     }
-    File.getFreeDiskSpace = function () {
-        return;
-    };
+    // @Cordova()
+    // static getFreeDiskSpace(): Promise<any> { return }
     /**
      * Check if a directory exists in a certain path, directory.
      *
      * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} dir Name of directory to check
-     * @return {Promise<boolean|FileError>} Returns a Promise that resolves to true if the directory exists or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.checkDir = function (path, dir) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(dir))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        var fullpath = path + dir;
-        return File.resolveDirectoryUrl(fullpath)
-            .then(function () {
-            return true;
-        });
+        if (!(/\/$/.test(dir))) {
+            path += '/';
+        }
+        try {
+            var directory = path + dir;
+            window.resolveLocalFileSystemURL(directory, function (fileSystem) {
+                if (fileSystem.isDirectory === true) {
+                    resolveFn(fileSystem);
+                }
+                else {
+                    rejectFn({ code: 13, message: 'input is not a directory' });
+                }
+            }, function (error) {
+                error.message = File.cordovaFileError[error.code];
+                rejectFn(error);
+            });
+        }
+        catch (err) {
+            err.message = File.cordovaFileError[err.code];
+            rejectFn(err);
+        }
+        return promise;
     };
     /**
      * Creates a new directory in the specific path.
@@ -89571,45 +87877,74 @@ var File = (function () {
      * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} dirName Name of directory to create
      * @param {boolean} replace If true, replaces file with same name. If false returns error
-     * @return {Promise<DirectoryEntry|FileError>} Returns a Promise that resolves with a DirectoryEntry or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.createDir = function (path, dirName, replace) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
+        replace = !replace;
         var options = {
-            create: true
+            create: true,
+            exclusive: replace
         };
-        if (!replace) {
-            options.exclusive = true;
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, options, function (result) {
+                    resolveFn(result);
+                }, function (error) {
+                    error.message = File.cordovaFileError[error.code];
+                    rejectFn(error);
+                });
+            }, function (err) {
+                err.message = File.cordovaFileError[err.code];
+                rejectFn(err);
+            });
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, options);
-        });
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Remove a directory at a given path.
      *
      * @param {string} path The path to the directory
      * @param {string} dirName The directory name
-     * @return {Promise<RemoveResult|FileError>} Returns a Promise that resolves to a RemoveResult or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.removeDir = function (path, dirName) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (de) {
-            return File.remove(de);
-        });
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, { create: false }, function (dirEntry) {
+                    dirEntry.remove(function () {
+                        resolveFn({ success: true, fileRemoved: dirEntry });
+                    }, function (error) {
+                        error.message = File.cordovaFileError[error.code];
+                        rejectFn(error);
+                    });
+                }, function (err) {
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
+                });
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
+            });
+        }
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Move a directory to a given path.
@@ -89618,26 +87953,38 @@ var File = (function () {
      * @param {string} dirName The source directory name
      * @param {string} newPath The destionation path to the directory
      * @param {string} newDirName The destination directory name
-     * @return {Promise<DirectoryEntry|Entry|FileError>} Returns a Promise that resolves to the new DirectoryEntry object or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.moveDir = function (path, dirName, newPath, newDirName) {
-        var _this = this;
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         newDirName = newDirName || dirName;
         if ((/^\//.test(newDirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (srcde) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.move(srcde, deste, newDirName);
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, { create: false }, function (dirEntry) {
+                    window.resolveLocalFileSystemURL(newPath, function (newDirEntry) {
+                        dirEntry.moveTo(newDirEntry, newDirName, function (result) {
+                            resolveFn(result);
+                        }, function (error) {
+                            rejectFn(error);
+                        });
+                    }, function (erro) {
+                        rejectFn(erro);
+                    });
+                }, function (err) {
+                    rejectFn(err);
+                });
+            }, function (er) {
+                rejectFn(er);
             });
-        });
+        }
+        catch (e) {
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Copy a directory in various methods. If destination directory exists, will fail to copy.
@@ -89646,93 +87993,157 @@ var File = (function () {
      * @param {string} dirName Name of directory to copy
      * @param {string} newPath Base FileSystem of new location
      * @param {string} newDirName New name of directory to copy to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to the new Entry object or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.copyDir = function (path, dirName, newPath, newDirName) {
-        var _this = this;
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
+        newDirName = newDirName || dirName;
         if ((/^\//.test(newDirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (srcde) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.copy(srcde, deste, newDirName);
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, { create: false, exclusive: false }, function (dirEntry) {
+                    window.resolveLocalFileSystemURL(newPath, function (newDirEntry) {
+                        dirEntry.copyTo(newDirEntry, newDirName, function (result) {
+                            resolveFn(result);
+                        }, function (error) {
+                            error.message = File.cordovaFileError[error.code];
+                            rejectFn(error);
+                        });
+                    }, function (erro) {
+                        erro.message = File.cordovaFileError[erro.code];
+                        rejectFn(erro);
+                    });
+                }, function (err) {
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
+                });
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
             });
-        });
+        }
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * List files and directory from a given path.
      *
      * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} dirName Name of directory
-     * @return {Promise<Entry[]>} Returns a Promise that resolves to an array of Entry objects or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.listDir = function (path, dirName) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false, exclusive: false });
-        })
-            .then(function (de) {
-            var reader = de.createReader();
-            return File.readEntries(reader);
-        });
+        var options = {
+            create: false,
+            exclusive: false
+        };
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, options, function (parent) {
+                    var reader = parent.createReader();
+                    reader.readEntries(function (entries) {
+                        resolveFn(entries);
+                    }, function () {
+                        rejectFn('DIR_READ_ERROR : ' + path + dirName);
+                    });
+                }, function (error) {
+                    error.message = File.cordovaFileError[error.code];
+                    rejectFn(error);
+                });
+            }, function (err) {
+                err.message = File.cordovaFileError[err.code];
+                rejectFn(err);
+            });
+        }
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Removes all files and the directory from a desired location.
      *
      * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} dirName Name of directory
-     * @return {Promise<RemoveResult>} Returns a Promise that resolves with a RemoveResult or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.removeRecursively = function (path, dirName) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(dirName))) {
-            var err = new FileError(5);
-            err.message = 'directory cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('directory cannot start with \/');
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getDirectory(fse, dirName, { create: false });
-        })
-            .then(function (de) {
-            return File.rimraf(de);
-        });
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getDirectory(dirName, { create: false }, function (dirEntry) {
+                    dirEntry.removeRecursively(function () {
+                        resolveFn({ success: true, fileRemoved: dirEntry });
+                    }, function (error) {
+                        error.message = File.cordovaFileError[error.code];
+                        rejectFn(error);
+                    });
+                }, function (err) {
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
+                });
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
+            });
+        }
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Check if a file exists in a certain path, directory.
      *
      * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} file Name of file to check
-     * @return {Promise<boolean|FileError>} Returns a Promise that resolves with a boolean or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.checkFile = function (path, file) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file cannot start with \/');
         }
-        return File.resolveLocalFilesystemUrl(path + file)
-            .then(function (fse) {
-            if (fse.isFile) {
-                return true;
-            }
-            else {
-                var err = new FileError(13);
-                err.message = 'input is not a file';
-                return Promise.reject(err);
-            }
-        });
+        if (!(/\/$/.test(file))) {
+            path += '/';
+        }
+        try {
+            var directory = path + file;
+            window.resolveLocalFileSystemURL(directory, function (fileSystem) {
+                if (fileSystem.isFile === true) {
+                    resolveFn(fileSystem);
+                }
+                else {
+                    rejectFn({ code: 13, message: 'input is not a file' });
+                }
+            }, function (error) {
+                error.message = File.cordovaFileError[error.code];
+                rejectFn(error);
+            });
+        }
+        catch (err) {
+            err.message = File.cordovaFileError[err.code];
+            rejectFn(err);
+        }
+        return promise;
     };
     /**
      * Creates a new file in the specific path.
@@ -89742,265 +88153,129 @@ var File = (function () {
      * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} fileName Name of file to create
      * @param {boolean} replace If true, replaces file with same name. If false returns error
-     * @return {Promise<FileEntry|FileError>} Returns a Promise that resolves to a FileEntry or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.createFile = function (path, fileName, replace) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file-name cannot start with \/');
         }
+        replace = !replace;
         var options = {
-            create: true
+            create: true,
+            exclusive: replace
         };
-        if (!replace) {
-            options.exclusive = true;
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getFile(fileName, options, function (result) {
+                    resolveFn(result);
+                }, function (error) {
+                    error.message = File.cordovaFileError[error.code];
+                    rejectFn(error);
+                });
+            }, function (err) {
+                err.message = File.cordovaFileError[err.code];
+                rejectFn(err);
+            });
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, options);
-        });
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Removes a file from a desired location.
      *
      * @param {string} path  Base FileSystem. Please refer to the iOS and Android filesystems above
      * @param {string} fileName Name of file to remove
-     * @return {Promise<RemoveResult|FileError>} Returns a Promise that resolves to a RemoveResult or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.removeFile = function (path, fileName) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file-name cannot start with \/');
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, { create: false });
-        })
-            .then(function (fe) {
-            return File.remove(fe);
-        });
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getFile(fileName, { create: false }, function (fileEntry) {
+                    fileEntry.remove(function () {
+                        resolveFn({ success: true, fileRemoved: fileEntry });
+                    }, function (error) {
+                        error.message = File.cordovaFileError[error.code];
+                        rejectFn(error);
+                    });
+                }, function (err) {
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
+                });
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
+            });
+        }
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
+        }
+        return promise;
     };
-    /** Write a new file to the desired location.
+    // static writeFile(path: string, fileName: string, text: string, replace: boolean): Promise<any> { return }
+    // static writeExistingFile(path: string, fileName: string, text: string): Promise<any> { return }
+    /**
+     * Read a file as string.
      *
      * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName path relative to base path
-     * @param {string | Blob} text content or blob to write
-     * @param {boolean | WriteOptions} replaceOrOptions replace file if set to true. See WriteOptions for more information.
-     * @returns {Promise<void>} Returns a Promise that resolves or rejects with an error.
+     * @param {string} fileName Name of file to move
+     * @return Returns a Promise that resolves or rejects with an error.
      */
-    File.writeFile = function (path, fileName, text, replaceOrOptions) {
+    File.readAsText = function (path, fileName) {
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file-name cannot start with \/');
         }
-        var opts = {};
-        if (replaceOrOptions) {
-            if (typeof (replaceOrOptions) === 'boolean') {
-                opts.replace = replaceOrOptions;
-            }
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, opts);
-        })
-            .then(function (fe) {
-            return File.createWriter(fe);
-        })
-            .then(function (writer) {
-            if (opts.append) {
-                writer.seek(writer.length);
-            }
-            if (opts.hasOwnProperty('truncate')) {
-                writer.truncate(opts.truncate);
-            }
-            return File.write(writer, text);
-        });
-    };
-    /** Write to an existing file.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} fileName path relative to base path
-     * @param {string | Blob} text content or blob to write
-     * @returns {Promise<void>} Returns a Promise that resolves or rejects with an error.
-     */
-    File.writeExistingFile = function (path, fileName, text) {
-        if ((/^\//.test(fileName))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, fileName, { create: false });
-        })
-            .then(function (fe) {
-            return File.createWriter(fe);
-        })
-            .then(function (writer) {
-            return File.write(writer, text);
-        });
-    };
-    /**
-     * Read the contents of a file as text.
-     *
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as string or rejects with an error.
-     */
-    File.readAsText = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsText(file);
-                }, function (error) {
-                    reject(error);
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getFile(fileName, { create: false }, function (fileEntry) {
+                    fileEntry.file(function (file) {
+                        var reader = new FileReader();
+                        reader.onloadend = function (e) {
+                            if (this.result !== undefined && this.result !== null) {
+                                resolveFn(this.result);
+                            }
+                            else if (this.error !== undefined && this.error !== null) {
+                                rejectFn(this.error);
+                            }
+                            else {
+                                rejectFn({ code: null, message: 'READER_ONLOADEND_ERR' });
+                            }
+                        };
+                        reader.readAsText(file);
+                    }, function (error) {
+                        error.message = File.cordovaFileError[error.code];
+                        rejectFn(error);
+                    });
+                }, function (err) {
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
                 });
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
             });
-        });
-    };
-    /**
-     * Read file and return data as a base64 encoded data url.
-     * A data url is of the form:
-     *      data:[<mediatype>][;base64],<data>
-
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as data URL or rejects with an error.
-     */
-    File.readAsDataURL = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsDataURL(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
-    /**
-     * Read file and return data as a binary data.
-
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<string|FileError>} Returns a Promise that resolves with the contents of the file as string rejects with an error.
-     */
-    File.readAsBinaryString = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
         }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsBinaryString(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
+        return promise;
     };
-    /**
-     * Read file and return data as an ArrayBuffer.
-
-     * @param {string} path Base FileSystem. Please refer to the iOS and Android filesystems above
-     * @param {string} file Name of file, relative to path.
-     * @return {Promise<ArrayBuffer|FileError>} Returns a Promise that resolves with the contents of the file as ArrayBuffer or rejects with an error.
-     */
-    File.readAsArrayBuffer = function (path, file) {
-        if ((/^\//.test(file))) {
-            var err = new FileError(5);
-            err.message = 'file-name cannot start with \/';
-            return Promise.reject(err);
-        }
-        return File.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return File.getFile(fse, file, { create: false });
-        })
-            .then(function (fe) {
-            var reader = new FileReader();
-            return new Promise(function (resolve, reject) {
-                reader.onloadend = function () {
-                    if (reader.result !== undefined || reader.result !== null) {
-                        resolve(reader.result);
-                    }
-                    else if (reader.error !== undefined || reader.error !== null) {
-                        reject(reader.error);
-                    }
-                    else {
-                        reject({ code: null, message: 'READER_ONLOADEND_ERR' });
-                    }
-                };
-                fe.file(function (file) {
-                    reader.readAsArrayBuffer(file);
-                }, function (error) {
-                    reject(error);
-                });
-            });
-        });
-    };
+    // static readAsDataURL(path: string, file: string): Promise<any> { return }
+    // static readAsBinaryString(path: string, file: string): Promise<any> { return }
+    // static readAsArrayBuffer(path: string, file: string): Promise<any> { return }
     /**
      * Move a file to a given path.
      *
@@ -90008,26 +88283,38 @@ var File = (function () {
      * @param {string} fileName Name of file to move
      * @param {string} newPath Base FileSystem of new location
      * @param {string} newFileName New name of file to move to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to the new Entry or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.moveFile = function (path, fileName, newPath, newFileName) {
-        var _this = this;
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         newFileName = newFileName || fileName;
         if ((/^\//.test(newFileName))) {
-            var err = new FileError(5);
-            err.message = 'file name cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file-name cannot start with \/');
         }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getFile(fse, fileName, { create: false });
-        })
-            .then(function (srcfe) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.move(srcfe, deste, newFileName);
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getFile(fileName, { create: false }, function (fileEntry) {
+                    window.resolveLocalFileSystemURL(newPath, function (newFileEntry) {
+                        fileEntry.moveTo(newFileEntry, newFileName, function (result) {
+                            resolveFn(result);
+                        }, function (error) {
+                            rejectFn(error);
+                        });
+                    }, function (err) {
+                        rejectFn(err);
+                    });
+                }, function (err) {
+                    rejectFn(err);
+                });
+            }, function (er) {
+                rejectFn(er);
             });
-        });
+        }
+        catch (e) {
+            rejectFn(e);
+        }
+        return promise;
     };
     /**
      * Copy a file in various methods. If file exists, will fail to copy.
@@ -90036,230 +88323,43 @@ var File = (function () {
      * @param {string} fileName Name of file to copy
      * @param {string} newPath Base FileSystem of new location
      * @param {string} newFileName New name of file to copy to (leave blank to remain the same)
-     * @return {Promise<Entry|FileError>} Returns a Promise that resolves to an Entry or rejects with an error.
+     * @return Returns a Promise that resolves or rejects with an error.
      */
     File.copyFile = function (path, fileName, newPath, newFileName) {
-        var _this = this;
+        var resolveFn, rejectFn;
+        var promise = new Promise(function (resolve, reject) { resolveFn = resolve; rejectFn = reject; });
         newFileName = newFileName || fileName;
         if ((/^\//.test(newFileName))) {
-            var err = new FileError(5);
-            err.message = 'file name cannot start with \/';
-            return Promise.reject(err);
+            rejectFn('file-name cannot start with \/');
         }
-        return this.resolveDirectoryUrl(path)
-            .then(function (fse) {
-            return _this.getFile(fse, fileName, { create: false });
-        })
-            .then(function (srcfe) {
-            return _this.resolveDirectoryUrl(newPath)
-                .then(function (deste) {
-                return File.copy(srcfe, deste, newFileName);
-            });
-        });
-    };
-    // these private methods help avoid cascading error handling
-    // in the public ones, primarily simply wrapping callback
-    // operations to return Promises that can then be chained.
-    /**
-     * @private
-     */
-    File.fillErrorMessage = function (err) {
-        err.message = File.cordovaFileError[err.code];
-    };
-    /**
-     * @private
-     */
-    File.resolveLocalFilesystemUrl = function (furl) {
-        return new Promise(function (resolve, reject) {
-            try {
-                window.resolveLocalFileSystemURL(furl, function (entry) {
-                    resolve(entry);
+        try {
+            window.resolveLocalFileSystemURL(path, function (fileSystem) {
+                fileSystem.getFile(fileName, { create: false, exclusive: false }, function (fileEntry) {
+                    window.resolveLocalFileSystemURL(newPath, function (newFileEntry) {
+                        fileEntry.copyTo(newFileEntry, newFileName, function (result) {
+                            resolveFn(result);
+                        }, function (error) {
+                            error.message = File.cordovaFileError[error.code];
+                            rejectFn(error);
+                        });
+                    }, function (erro) {
+                        erro.message = File.cordovaFileError[erro.code];
+                        rejectFn(erro);
+                    });
                 }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
+                    err.message = File.cordovaFileError[err.code];
+                    rejectFn(err);
                 });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.resolveDirectoryUrl = function (durl) {
-        return File.resolveLocalFilesystemUrl(durl)
-            .then(function (de) {
-            if (de.isDirectory) {
-                return de;
-            }
-            else {
-                var err = new FileError(13);
-                err.message = 'input is not a directory';
-                return Promise.reject(err);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.getDirectory = function (fse, dn, flags) {
-        return new Promise(function (resolve, reject) {
-            try {
-                fse.getDirectory(dn, flags, function (de) {
-                    resolve(de);
-                }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
-                });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.getFile = function (fse, fn, flags) {
-        return new Promise(function (resolve, reject) {
-            try {
-                fse.getFile(fn, flags, function (fe) {
-                    resolve(fe);
-                }, function (err) {
-                    File.fillErrorMessage(err);
-                    reject(err);
-                });
-            }
-            catch (xc) {
-                File.fillErrorMessage(xc);
-                reject(xc);
-            }
-        });
-    };
-    /**
-     * @private
-     */
-    File.remove = function (fe) {
-        return new Promise(function (resolve, reject) {
-            fe.remove(function () {
-                resolve({ success: true, fileRemoved: fe });
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
+            }, function (er) {
+                er.message = File.cordovaFileError[er.code];
+                rejectFn(er);
             });
-        });
-    };
-    /**
-     * @private
-     */
-    File.move = function (srce, destdir, newName) {
-        return new Promise(function (resolve, reject) {
-            srce.moveTo(destdir, newName, function (deste) {
-                resolve(deste);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.copy = function (srce, destdir, newName) {
-        return new Promise(function (resolve, reject) {
-            srce.copyTo(destdir, newName, function (deste) {
-                resolve(deste);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.readEntries = function (dr) {
-        return new Promise(function (resolve, reject) {
-            dr.readEntries(function (entries) {
-                resolve(entries);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.rimraf = function (de) {
-        return new Promise(function (resolve, reject) {
-            de.removeRecursively(function () {
-                resolve({ success: true, fileRemoved: de });
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.createWriter = function (fe) {
-        return new Promise(function (resolve, reject) {
-            fe.createWriter(function (writer) {
-                resolve(writer);
-            }, function (err) {
-                File.fillErrorMessage(err);
-                reject(err);
-            });
-        });
-    };
-    /**
-     * @private
-     */
-    File.write = function (writer, gu) {
-        if (gu instanceof Blob) {
-            return this.writeFileInChunks(writer, gu);
         }
-        return new Promise(function (resolve, reject) {
-            writer.onwriteend = function (evt) {
-                if (writer.error) {
-                    reject(writer.error);
-                }
-                else {
-                    resolve();
-                }
-            };
-            writer.write(gu);
-        });
-    };
-    /**
-     * @private
-     */
-    File.writeFileInChunks = function (writer, file) {
-        var BLOCK_SIZE = 1024 * 1024;
-        var writtenSize = 0;
-        function writeNextChunk() {
-            var size = Math.min(BLOCK_SIZE, file.size - writtenSize);
-            var chunk = file.slice(writtenSize, writtenSize + size);
-            writtenSize += size;
-            writer.write(chunk);
+        catch (e) {
+            e.message = File.cordovaFileError[e.code];
+            rejectFn(e);
         }
-        return new Promise(function (resolve, reject) {
-            writer.onerror = reject;
-            writer.onwrite = function () {
-                if (writtenSize < file.size) {
-                    writeNextChunk();
-                }
-                else {
-                    resolve();
-                }
-            };
-            writeNextChunk();
-        });
+        return promise;
     };
     File.cordovaFileError = {
         1: 'NOT_FOUND_ERR',
@@ -90273,13 +88373,8 @@ var File = (function () {
         9: 'INVALID_MODIFICATION_ERR',
         10: 'QUOTA_EXCEEDED_ERR',
         11: 'TYPE_MISMATCH_ERR',
-        12: 'PATH_EXISTS_ERR',
-        13: 'WRONG_ENTRY_TYPE',
-        14: 'DIR_READ_ERR',
+        12: 'PATH_EXISTS_ERR'
     };
-    __decorate([
-        plugin_1.Cordova()
-    ], File, "getFreeDiskSpace", null);
     File = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova-plugin-file',
@@ -90291,7 +88386,7 @@ var File = (function () {
 }());
 exports.File = File;
 
-},{"./plugin":581}],546:[function(require,module,exports){
+},{"./plugin":546}],529:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90302,49 +88397,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var plugin_1 = require('./plugin');
 /**
  * @name Transfer
- *
- * @description
- * This plugin allows you to upload and download files.
- *
- * @usage
- * ```typescript
- * import { Transfer } from 'ionic-native';
- *
- *
- * // Create instance:
+ * @description This plugin allows you to upload and download files.
+ * Example:
+ * Create instance:
  * const fileTransfer = new Transfer();
  *
- * // Upload a file:
+ * Upload a file:
  * fileTransfer.upload(..).then(..).catch(..);
  *
- * // Download a file:
+ * Download a file:
  * fileTransfer.download(..).then(..).catch(..);
  *
- * // Abort active transfer:
+ * Abort active transfer:
  * fileTransfer.abort();
- *
- * E.g
- *
- * upload(){
- *   const fileTransfer = new Transfer();
- *   var options: any;
- *
- *   options = {
- *      fileKey: 'file',
- *      fileName: 'name.jpg',
- *      headers: {}
- *      .....
- *   }
- *   fileTransfer.upload("<file path>", "<api endpoint>", options)
- *    .then((data) => {
- *      // success
- *    }, (err) => {
- *      // error
- *    })
- * }
- *
- * ```
- *
  */
 var Transfer = (function () {
     function Transfer() {
@@ -90356,7 +88421,7 @@ var Transfer = (function () {
      * @param {string} fileUrl  Filesystem URL representing the file on the device or a data URI. For backwards compatibility, this can also be the full path of the file on the device.
      * @param {string} url  URL of the server to receive the file, as encoded by encodeURI().
      * @param {FileUploadOptions} options  Optional parameters.
-     * @param {boolean} trustAllHosts  Optional parameter, defaults to false. If set to true, it accepts all security certificates. This is useful since Android rejects self-signed security certificates. Not recommended for production use. Supported on Android and iOS.
+     * @param {boolean} trustAllHosts: Optional parameter, defaults to false. If set to true, it accepts all security certificates. This is useful since Android rejects self-signed security certificates. Not recommended for production use. Supported on Android and iOS.
      * @return Returns a Promise that resolves to a FileUploadResult and rejects with FileTransferError.
      */
     Transfer.prototype.upload = function (fileUrl, url, options, trustAllHosts) {
@@ -90386,23 +88451,11 @@ var Transfer = (function () {
      * object which has an error code of FileTransferError.ABORT_ERR.
      */
     Transfer.prototype.abort = function () { };
-    /**
-     * Error code rejected from upload with FileTransferError
-     * Defined in FileTransferError.
-     *      FILE_NOT_FOUND_ERR: 1   Return when file was not found
-     *      INVALID_URL_ERR: 2,     Return when url was invalid
-     *      CONNECTION_ERR: 3,      Return on connection error
-     *      ABORT_ERR: 4,           Return on aborting
-     *      NOT_MODIFIED_ERR: 5     Return on "304 Not Modified" HTTP response
-     * @enum {number}
-     */
-    Transfer.FileTransferErrorCode = {
-        FILE_NOT_FOUND_ERR: 1,
-        INVALID_URL_ERR: 2,
-        CONNECTION_ERR: 3,
-        ABORT_ERR: 4,
-        NOT_MODIFIED_ERR: 5
-    };
+    Transfer.FILE_NOT_FOUND_ERR = 1;
+    Transfer.INVALID_URL_ERR = 2;
+    Transfer.CONNECTION_ERR = 3;
+    Transfer.ABORT_ERR = 4;
+    Transfer.NOT_MODIFIED_ERR = 4;
     __decorate([
         plugin_1.CordovaInstance({
             successIndex: 2,
@@ -90431,7 +88484,7 @@ var Transfer = (function () {
 }());
 exports.Transfer = Transfer;
 
-},{"./plugin":581}],547:[function(require,module,exports){
+},{"./plugin":546}],530:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90447,8 +88500,8 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-flashlight`. For more info, please see the [Flashlight plugin docs](https://github.com/EddyVerbruggen/Flashlight-PhoneGap-Plugin).
  *
  * @usage
- * ```typescript
- * import { Flashlight } from 'ionic-native';
+ * ```js
+ * import {Flashlight} from 'ionic-native';
  *
  *
  *
@@ -90479,7 +88532,7 @@ var Flashlight = (function () {
     Flashlight.toggle = function () { return; };
     /**
      * Checks if the flashlight is turned on.
-     * @returns {boolean}
+     * Returns a boolean
      */
     Flashlight.isSwitchedOn = function () { return; };
     __decorate([
@@ -90510,110 +88563,7 @@ var Flashlight = (function () {
 }());
 exports.Flashlight = Flashlight;
 
-},{"./plugin":581}],548:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-var Observable_1 = require('rxjs/Observable');
-var Geofence = (function () {
-    function Geofence() {
-    }
-    /**
-     * Initializes the plugin. User will be prompted to allow the app to use location and notifications.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.initialize = function () { return; };
-    ;
-    /**
-     * Adds a new geofence or array of geofences. For geofence object, see above.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.addOrUpdate = function (geofences) { return; };
-    ;
-    /**
-     * Removes a geofence or array of geofences. `geofenceID` corresponds to one or more IDs specified when the
-     * geofence was created.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.remove = function (geofenceId) { return; };
-    ;
-    /**
-     * Removes all geofences.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.removeAll = function () { return; };
-    ;
-    /**
-     * Returns an array of geofences currently being monitored.
-     *
-     * @return {Promise<Array<string>>}
-     */
-    Geofence.getWatched = function () { return; };
-    ;
-    /**
-     * Called when a geofence is crossed in the direction specified by `TransitType`.
-     *
-     * @return {Promise<any>}
-     */
-    Geofence.onTransitionReceived = function () {
-        return new Observable_1.Observable(function (observer) {
-            window && window.geofence && (window.geofence.onTransitionReceived = observer.next.bind(observer));
-            return function () { return window.geofence.onTransitionReceived = function () { }; };
-        });
-    };
-    /**
-     * Called when the user clicks a geofence notification. iOS and Android only.
-     *
-     * @return {Promise<Object>}
-     */
-    Geofence.onNotificationClicked = function () {
-        return new Observable_1.Observable(function (observer) {
-            window && window.geofence && (window.geofence.onNotificationClicked = observer.next.bind(observer));
-            return function () { return window.geofence.onNotificationClicked = function () { }; };
-        });
-    };
-    Geofence.TransitionType = {
-        ENTER: 1,
-        EXIT: 2,
-        BOTH: 3
-    };
-    __decorate([
-        plugin_1.Cordova()
-    ], Geofence, "initialize", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Geofence, "addOrUpdate", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Geofence, "remove", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Geofence, "removeAll", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Geofence, "getWatched", null);
-    Geofence = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-geofence',
-            pluginRef: 'geofence',
-            repo: 'https://github.com/cowbell/cordova-plugin-geofence/',
-            platforms: ['Android', 'iOS', 'Windows Phone 8', 'Windows Phone']
-        })
-    ], Geofence);
-    return Geofence;
-}());
-exports.Geofence = Geofence;
-
-},{"./plugin":581,"rxjs/Observable":609}],549:[function(require,module,exports){
+},{"./plugin":546}],531:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90632,19 +88582,20 @@ var Observable_1 = require('rxjs/Observable');
  *
  * @usage
  *
- * ```typescript
- * import { Geolocation } from 'ionic-native';
+ * ```ts
+ * import {Geolocation} from 'ionic-native';
+ *
  *
  *
  * Geolocation.getCurrentPosition().then((resp) => {
- *  // resp.coords.latitude
- *  // resp.coords.longitude
+ *  //resp.coords.latitude
+ *  //resp.coords.longitude
  * })
  *
  * let watch = Geolocation.watchPosition();
  * watch.subscribe((data) => {
- *  // data.coords.latitude
- *  // data.coords.longitude
+ *  //data.coords.latitude
+ *  //data.coords.longitude
  * })
  * ```
  */
@@ -90662,10 +88613,8 @@ var Geolocation = (function () {
      * Watch the current device's position.  Clear the watch by unsubscribing from
      * Observable changes.
      *
-     * ```typescript
-     * var subscription = Geolocation.watchPosition()
-     *                               .filter((p) => p.code === undefined) //Filter Out Errors
-     *                               .subscribe(position => {
+     * ```ts
+     * var subscription = Geolocation.watchPosition().subscribe(position => {
      *   console.log(position.coords.longitude + ' ' + position.coords.latitude);
      * });
      *
@@ -90678,7 +88627,8 @@ var Geolocation = (function () {
      */
     Geolocation.watchPosition = function (options) {
         return new Observable_1.Observable(function (observer) {
-            var watchId = navigator.geolocation.watchPosition(observer.next.bind(observer), observer.next.bind(observer), options);
+            var cb = function (data) { return observer.next(data); };
+            var watchId = navigator.geolocation.watchPosition(cb, options);
             return function () { return navigator.geolocation.clearWatch(watchId); };
         });
     };
@@ -90698,7 +88648,7 @@ var Geolocation = (function () {
 }());
 exports.Geolocation = Geolocation;
 
-},{"./plugin":581,"rxjs/Observable":609}],550:[function(require,module,exports){
+},{"./plugin":546,"rxjs/Observable":562}],532:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90711,8 +88661,9 @@ var plugin_1 = require('./plugin');
  * @name Globalization
  * @description
  * @usage
- * ```typescript
- * import { Globalization } from 'ionic-native';
+ * ```js
+ * import {Globalization} from 'ionic-native';
+ *
  *
  *
  * ```
@@ -90732,63 +88683,55 @@ var Globalization = (function () {
     Globalization.getLocaleName = function () { return; };
     /**
      * Converts date to string
-     * @param {Date} date Date you wish to convert
-     * @param options Options for the converted date. Length, selector.
-     * @return {Promise<{value: string}>} Returns a promise when the date has been converted.
+     * @param date
+     * @param options
+     * @return {Promise<{value: string}>}
      */
     Globalization.dateToString = function (date, options) { return; };
     /**
-     * Parses a date formatted as a string, according to the client's user preferences and calendar using the time zone of the client, and returns the corresponding date object.
-     * @param {string} dateString Date as a string to be converted
-     * @param options Options for the converted date. Length, selector.
-     * @return {Promise<{value: string}>} Returns a promise when the date has been converted.
+     *
+     * @param dateString
+     * @param options
      */
     Globalization.stringToDate = function (dateString, options) { return; };
     /**
-     * Returns a pattern string to format and parse dates according to the client's user preferences.
-     * @param options Object with the format length and selector
-     * @return {Promise<{value: string}>} Returns a promise.
+     *
+     * @param options
      */
     Globalization.getDatePattern = function (options) { return; };
     /**
-     * Returns an array of the names of the months or days of the week, depending on the client's user preferences and calendar.
-     * @param options Object with type (narrow or wide) and item (month or days).
-     * @return {Promise<{value: string}>} Returns a promise.
+     *
+     * @param options
      */
     Globalization.getDateNames = function (options) { return; };
     /**
-     * Indicates whether daylight savings time is in effect for a given date using the client's time zone and calendar.
-     * @param {data} date Date to process
-     * @returns {Promise<dst>} reutrns a promise with the value
+     * Check if day light saving is active
+     * @param date
      */
     Globalization.isDayLightSavingsTime = function (date) { return; };
     /**
-     * Returns the first day of the week according to the client's user preferences and calendar.
-     * @returns {Promise<value>} reutrns a promise with the value
+     * Get first day of week
      */
     Globalization.getFirstDayOfWeek = function () { return; };
     /**
-     * Returns a number formatted as a string according to the client's user preferences.
+     *
      * @param options
      */
     Globalization.numberToString = function (options) { return; };
     /**
      *
-     * @param {string} stringToConvert String you want to conver to a number
-     * @param options  The type of number you want to return. Can be decimal, percent, or currency.
-     * @returns {Promise} Returns a promise with the value.
+     * @param stringToConvert
+     * @param options
      */
     Globalization.stringToNumber = function (stringToConvert, options) { return; };
     /**
-     * Returns a pattern string to format and parse numbers according to the client's user preferences.
-     * @param options Can be decimal, percent, or currency.
-     * @returns {Promise} returns a promise with the value.
+     *
+     * @param options
      */
     Globalization.getNumberPattern = function (options) { return; };
     /**
-     * Returns a pattern string to format and parse currency values according to the client's user preferences and ISO 4217 currency code.
-     * @param {string} currencyCode Currency Code.A
-     * @returns {Promise} returns a promise with the value
+     *
+     * @param currencyCode
      */
     Globalization.getCurrencyPattern = function (currencyCode) { return; };
     __decorate([
@@ -90856,7 +88799,7 @@ var Globalization = (function () {
 }());
 exports.Globalization = Globalization;
 
-},{"./plugin":581}],551:[function(require,module,exports){
+},{"./plugin":546}],533:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90869,9 +88812,7 @@ var plugin_1 = require('./plugin');
  * @name Google Plus
  * @description
  * @usage
- * ```typescript
- * import { GooglePlus } from 'ionic-native';
- *
+ * ```
  *
  * ```
  */
@@ -90921,7 +88862,7 @@ var GooglePlus = (function () {
 }());
 exports.GooglePlus = GooglePlus;
 
-},{"./plugin":581}],552:[function(require,module,exports){
+},{"./plugin":546}],534:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -90952,10 +88893,9 @@ var GoogleAnalytics = (function () {
      * Track a screen
      * https://developers.google.com/analytics/devguides/collection/analyticsjs/screens
      *
-     * @param {string}  title         Screen title
-     * @param {string}  campaignUrl   Campaign url for measuring referrals
+     * @param {string}  title   Screen title
      */
-    GoogleAnalytics.trackView = function (title, campaignUrl) { return; };
+    GoogleAnalytics.trackView = function (title) { return; };
     /**
      * Track an event
      * https://developers.google.com/analytics/devguides/collection/analyticsjs/events
@@ -91014,22 +88954,7 @@ var GoogleAnalytics = (function () {
      * https://developers.google.com/analytics/devguides/collection/analyticsjs/user-id
      * @param {string}  id
      */
-    GoogleAnalytics.setUserId = function (id) { };
-    /**
-     * Sets the app version
-     * @param appVersion
-     */
-    GoogleAnalytics.setAppVersion = function (appVersion) { };
-    /**
-     * Set a anonymize Ip address
-     * @param anonymize
-     */
-    GoogleAnalytics.setAnonymizeIp = function (anonymize) { };
-    /**
-     * Enabling Advertising Features in Google Analytics allows you to take advantage of Remarketing, Demographics & Interests reports, and more
-     * @param allow
-     */
-    GoogleAnalytics.setAllowIDFACollection = function (allow) { };
+    GoogleAnalytics.setUserId = function (id) { return; };
     /**
      * Enable verbose logging
      */
@@ -91064,19 +88989,10 @@ var GoogleAnalytics = (function () {
         plugin_1.Cordova()
     ], GoogleAnalytics, "addCustomDimension", null);
     __decorate([
-        plugin_1.Cordova({ sync: true })
+        plugin_1.Cordova()
     ], GoogleAnalytics, "setUserId", null);
     __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], GoogleAnalytics, "setAppVersion", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], GoogleAnalytics, "setAnonymizeIp", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], GoogleAnalytics, "setAllowIDFACollection", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
+        plugin_1.Cordova()
     ], GoogleAnalytics, "debugMode", null);
     __decorate([
         plugin_1.Cordova()
@@ -91093,7 +89009,7 @@ var GoogleAnalytics = (function () {
 }());
 exports.GoogleAnalytics = GoogleAnalytics;
 
-},{"./plugin":581}],553:[function(require,module,exports){
+},{"./plugin":546}],535:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -91139,79 +89055,35 @@ exports.GoogleMapsAnimation = {
  * @description This plugin uses the native Google Maps SDK
  * @usage
  * ```
- * import { GoogleMap, GoogleMapsEvent } from 'ionic-native';
+ * import {GoogleMap, GoogleMapsEvent} from 'ionic-native';
  *
- * // create a new map using element ID
+ * ...
+ *
+ * // somewhere in your component
  * let map = new GoogleMap('elementID');
  *
- * // or create a new map by passing HTMLElement
- * let element: HTMLElement = document.getElementById('elementID');
- *
- * // In Angular 2 or Ionic 2, if we have this element in html: <div #map></div>
- * // then we can use @ViewChild to find the element and pass it to GoogleMaps
- * @ViewChild('map') mapElement;
- * let map = new GoogleMap(mapElement);
- *
- * // listen to MAP_READY event
- * map.one(GoogleMapsEvent.MAP_READY).subscribe(() => console.log('Map is ready!'));
- *
- *
- * // create LatLng object
- * let ionic: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
- *
- * // create CameraPosition
- * let position: CameraPosition = {
- *   target: ionic,
- *   zoom: 18,
- *   tilt: 30
- * };
- *
- * // move the map's camera to position
- * map.moveCamera(position);
- *
- * // create new marker
- * let markerOptions: GoogleMapsMarkerOptions = {
- *   position: ionic,
- *   title: 'Ionic'
- * };
- *
- * map.addMarker(markerOptions)
- *   .then((marker: GoogleMapsMarker) => {
- *     marker.showInfoWindow();
- *   });
+ * map.on(GoogleMapsEvent.MAP_READY).subscribe(() => console.log("Map is ready!"));
  * ```
  */
 var GoogleMap = (function () {
-    function GoogleMap(element, options) {
-        if (typeof element === 'string')
-            element = document.getElementById(element);
-        this._objectInstance = plugin.google.maps.Map.getMap(element, options);
+    function GoogleMap(elementId, options) {
+        this._objectInstance = plugin.google.maps.Map.getMap(document.getElementById(elementId), options);
     }
     /**
-     * Checks if a map object has been created and is available.
-     *
-     * @return {Promise<boolean>}
+     * Checks if a map object has been created.
+     * @return {Promise<boolean>} returns a promise that resolves with a boolean that indicates if the plugin is available.
      */
     GoogleMap.isAvailable = function () {
         return;
     };
-    /**
-     * Listen to a map event.
-     *
-     * @return {Observable<any>}
-     */
     GoogleMap.prototype.on = function (event) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.on(event, observer.next.bind(observer));
+            var cb = function (data) { return observer.next(data); };
+            _this._objectInstance.on(event, cb);
             return function () { return _this._objectInstance.off(event); };
         });
     };
-    /**
-     * Listen to a map event only once.
-     *
-     * @return {Promise<any>}
-     */
     GoogleMap.prototype.one = function (event) {
         var _this = this;
         return new Promise(function (resolve) { return _this._objectInstance.one(event, resolve); });
@@ -91221,25 +89093,19 @@ var GoogleMap = (function () {
     GoogleMap.prototype.setClickable = function (isClickable) {
     };
     /**
-     * Get the position of the camera.
-     *
-     * @return {Promise<CameraPosition>}
+     * Get the position of the camera
      */
     GoogleMap.prototype.getCameraPosition = function () {
         return;
     };
     /**
-     * Get the location of the user.
-     *
-     * @return {Promise<MyLocation>}
+     * Get the location of the user
      */
-    GoogleMap.prototype.getMyLocation = function (options) {
+    GoogleMap.prototype.getMyLocation = function () {
         return;
     };
     /**
-     * Get the visible region.
-     *
-     * @return {Promise<VisibleRegion>}
+     * Get the visible region
      */
     GoogleMap.prototype.getVisibleRegion = function () {
         return;
@@ -91259,8 +89125,10 @@ var GoogleMap = (function () {
     };
     GoogleMap.prototype.setTilt = function (tiltLevel) {
     };
-    GoogleMap.prototype.animateCamera = function (animateCameraOptions) { return; };
-    GoogleMap.prototype.moveCamera = function (cameraPosition) { return; };
+    GoogleMap.prototype.animateCamera = function (animateCameraOptions) {
+    };
+    GoogleMap.prototype.moveCamera = function (cameraPosition) {
+    };
     GoogleMap.prototype.setMyLocationEnabled = function (enabled) {
     };
     GoogleMap.prototype.setIndoorEnabled = function (enabled) {
@@ -91275,12 +89143,10 @@ var GoogleMap = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._objectInstance.addMarker(options, function (marker) {
-                if (marker) {
+                if (marker)
                     resolve(new GoogleMapsMarker(marker));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
@@ -91288,12 +89154,10 @@ var GoogleMap = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._objectInstance.addCircle(options, function (circle) {
-                if (circle) {
+                if (circle)
                     resolve(new GoogleMapsCircle(circle));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
@@ -91301,12 +89165,10 @@ var GoogleMap = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._objectInstance.addPolygon(options, function (polygon) {
-                if (polygon) {
+                if (polygon)
                     resolve(new GoogleMapsPolygon(polygon));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
@@ -91314,12 +89176,10 @@ var GoogleMap = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._objectInstance.addPolyline(options, function (polyline) {
-                if (polyline) {
+                if (polyline)
                     resolve(new GoogleMapsPolyline(polyline));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
@@ -91327,38 +89187,32 @@ var GoogleMap = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._objectInstance.addTileOverlay(options, function (tileOverlay) {
-                if (tileOverlay) {
+                if (tileOverlay)
                     resolve(new GoogleMapsTileOverlay(tileOverlay));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
     GoogleMap.prototype.addGroundOverlay = function (options) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this._objectInstance.addGroundOverlay(options, function (groundOverlay) {
-                if (groundOverlay) {
+            _this._objectInstance.addTileOverlay(options, function (groundOverlay) {
+                if (groundOverlay)
                     resolve(new GoogleMapsGroundOverlay(groundOverlay));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
     GoogleMap.prototype.addKmlOverlay = function (options) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this._objectInstance.addKmlOverlay(options, function (kmlOverlay) {
-                if (kmlOverlay) {
+            _this._objectInstance.addTileOverlay(options, function (kmlOverlay) {
+                if (kmlOverlay)
                     resolve(new GoogleMapsKmlOverlay(kmlOverlay));
-                }
-                else {
+                else
                     reject();
-                }
             });
         });
     };
@@ -91426,10 +89280,10 @@ var GoogleMap = (function () {
         plugin_1.CordovaInstance({ sync: true })
     ], GoogleMap.prototype, "setTilt", null);
     __decorate([
-        plugin_1.CordovaInstance()
+        plugin_1.CordovaInstance({ sync: true })
     ], GoogleMap.prototype, "animateCamera", null);
     __decorate([
-        plugin_1.CordovaInstance()
+        plugin_1.CordovaInstance({ sync: true })
     ], GoogleMap.prototype, "moveCamera", null);
     __decorate([
         plugin_1.CordovaInstance({ sync: true })
@@ -91489,8 +89343,7 @@ var GoogleMap = (function () {
         plugin_1.Plugin({
             pluginRef: 'plugin.google.maps.Map',
             plugin: 'cordova-plugin-googlemaps',
-            repo: 'https://github.com/mapsplugin/cordova-plugin-googlemaps',
-            install: 'ionic plugin add cordova-plugin-googlemaps --variable API_KEY_FOR_ANDROID="YOUR_ANDROID_API_KEY_IS_HERE" --variable API_KEY_FOR_IOS="YOUR_IOS_API_KEY_IS_HERE"'
+            repo: 'https://github.com/mapsplugin/cordova-plugin-googlemaps'
         })
     ], GoogleMap);
     return GoogleMap;
@@ -91506,8 +89359,11 @@ var GoogleMapsMarker = (function () {
     GoogleMapsMarker.prototype.addEventListener = function (event) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
+            var cb = function (data) {
+                observer.next(data);
+            };
+            _this._objectInstance.addEventListener(event, cb);
+            return function () { return _this._objectInstance.removeEventListener(event, cb); };
         });
     };
     GoogleMapsMarker.prototype.isVisible = function () {
@@ -91660,8 +89516,9 @@ var GoogleMapsCircle = (function () {
     GoogleMapsCircle.prototype.addEventListener = function (event) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
+            var cb = function (data) { return observer.next(data); };
+            _this._objectInstance.addEventListener(event, cb);
+            return function () { return _this._objectInstance.removeEventListener(event, cb); };
         });
     };
     GoogleMapsCircle.prototype.getCenter = function () {
@@ -91753,8 +89610,9 @@ var GoogleMapsPolyline = (function () {
     GoogleMapsPolyline.prototype.addEventListener = function (event) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
+            var cb = function (data) { return observer.next(data); };
+            _this._objectInstance.addEventListener(event, cb);
+            return function () { return _this._objectInstance.removeEventListener(event, cb); };
         });
     };
     GoogleMapsPolyline.prototype.getPoints = function () {
@@ -91841,8 +89699,9 @@ var GoogleMapsPolygon = (function () {
     GoogleMapsPolygon.prototype.addEventListener = function (event) {
         var _this = this;
         return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
+            var cb = function (data) { return observer.next(data); };
+            _this._objectInstance.addEventListener(event, cb);
+            return function () { return _this._objectInstance.removeEventListener(event, cb); };
         });
     };
     GoogleMapsPolygon.prototype.getPoints = function () {
@@ -92073,11 +89932,10 @@ exports.GoogleMapsKmlOverlay = GoogleMapsKmlOverlay;
  * @private
  */
 var GoogleMapsLatLngBounds = (function () {
-    function GoogleMapsLatLngBounds(southwestOrArrayOfLatLng, northeast) {
-        this.southwestOrArrayOfLatLng = southwestOrArrayOfLatLng;
+    function GoogleMapsLatLngBounds(southwest, northeast) {
+        this.southwest = southwest;
         this.northeast = northeast;
-        var args = !!northeast ? [southwestOrArrayOfLatLng, northeast] : southwestOrArrayOfLatLng;
-        this._objectInstance = new plugin.google.maps.LatLngBounds(args);
+        this._objectInstance = new plugin.google.maps.LatLngBounds([southwest, northeast]);
     }
     GoogleMapsLatLngBounds.prototype.toString = function () {
         return;
@@ -92136,32 +89994,8 @@ var GoogleMapsLatLng = (function () {
     return GoogleMapsLatLng;
 }());
 exports.GoogleMapsLatLng = GoogleMapsLatLng;
-/**
- * @private
- */
-var Geocoder = (function () {
-    function Geocoder() {
-    }
-    /**
-     * Converts position to address and vice versa
-     * @param {GeocoderRequest} request Request object with either an address or a position
-     * @returns {Promise<GeocoderResult[]>}
-     */
-    Geocoder.geocode = function (request) {
-        return new Promise(function (resolve, reject) {
-            if (!plugin || !plugin.google || !plugin.google.maps || !plugin.google.maps.Geocoder) {
-                reject({ error: 'plugin_not_installed' });
-            }
-            else {
-                plugin.google.maps.Geocoder.geocode(request, resolve);
-            }
-        });
-    };
-    return Geocoder;
-}());
-exports.Geocoder = Geocoder;
 
-},{"./plugin":581,"rxjs/Observable":609}],554:[function(require,module,exports){
+},{"./plugin":546,"rxjs/Observable":562}],536:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -92174,13 +90008,14 @@ var plugin_1 = require('./plugin');
  * @name Hotspot
  * @description
  * @usage
- * ```typescript
- * import { Hotspot, Network } from 'ionic-native';
+ * ```js
+ * import {Hotspot, Network} from 'ionic-native';
  *
- *
- * Hotspot.scanWifi().then((networks: Array<Network>) => {
- *     console.log(networks);
- * });
+ * ...
+ *     Hotspot.scanWifi().then((networks: Array<Network>) => {
+ *         console.log(networks);
+ *     });
+ * ...
  *
  * ```
  */
@@ -92418,7 +90253,7 @@ var Hotspot = (function () {
 }());
 exports.Hotspot = Hotspot;
 
-},{"./plugin":581}],555:[function(require,module,exports){
+},{"./plugin":546}],537:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -92432,20 +90267,6 @@ var plugin_1 = require('./plugin');
  * @description
  * Embedded httpd for Cordova apps. Light weight HTTP server.
  * @usage
- * ```typescript
- * import {Httpd, HttpdOptions} from 'ionic-native';
- *
- * let options: HttpdOptions = {
- *      www_root: 'httpd_root', // relative path to app's www directory
- *      port: 80,
- *      localhost_only: false
- *  };
- *
- * Httpd.startServer(options).subscribe((data) => {
- *  console.log('Server is live');
- * });
- *
- * ```
  */
 var Httpd = (function () {
     function Httpd() {
@@ -92464,7 +90285,7 @@ var Httpd = (function () {
     /**
      * Get the local path of the running webserver
      * @returns {Promise<string>} Returns a promise that resolves with the local path of the web server.
-      */
+     */
     Httpd.getLocalPath = function () { return; };
     __decorate([
         plugin_1.Cordova({
@@ -92490,501 +90311,7 @@ var Httpd = (function () {
 }());
 exports.Httpd = Httpd;
 
-},{"./plugin":581}],556:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-var Observable_1 = require('rxjs/Observable');
-/**
- * @name IBeacon
- * @description
- * This plugin provides functions for working with iBeacons.
- *
- *  The plugin's API closely mimics the one exposed through the [CLLocationManager](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html) introduced in iOS 7.
- *
- * @usage
- *
- * ```typescript
- * import { IBeacon } from 'ionic-native';
- *
- *
- * // Request permission to use location on iOS
- * IBeacon.requestAlwaysAuthorization();
- * // create a new delegate and register it with the native layer
- * let delegate = IBeacon.Delegate();
- *
- * // Subscribe to some of the delegate's event handlers
- * delegate.didRangeBeaconsInRegion()
- *   .subscribe(
- *     data => console.log('didRangeBeaconsInRegion: ', data),
- *     error => console.error();
- *   );
- * delegate.didStartMonitoringForRegion()
- *   .subscribe(
- *     data => console.log('didStartMonitoringForRegion: ', data),
- *     error => console.error();
- *   );
- * delegate.didEnterRegion()
- *   .subscribe(
- *     data => {
- *       console.log('didEnterRegion: ', data);
- *     }
- *   );
- *
- * let beaconRegion = IBeacon.BeaconRegion('deskBeacon','F7826DA6-ASDF-ASDF-8024-BC5B71E0893E');
- *
- * IBeacon.startMonitoringForRegion(beaconRegion)
- *   .then(
- *     () => console.log('Native layer recieved the request to monitoring'),
- *     error => console.error('Native layer failed to begin monitoring: ', error)
- *   );
- * ```
- */
-var IBeacon = (function () {
-    function IBeacon() {
-    }
-    /**
-     * Instances of this class are delegates between the {@link LocationManager} and
-     * the code that consumes the messages generated on in the native layer.
-     *
-     * @returns {Delegate} An instance of the type {@type Delegate}.
-     */
-    IBeacon.Delegate = function () {
-        var delegate = new cordova.plugins.locationManager.Delegate();
-        delegate.didChangeAuthorizationStatus = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didChangeAuthorizationStatus = cb;
-            });
-        };
-        delegate.didDetermineStateForRegion = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didDetermineStateForRegion = cb;
-            });
-        };
-        delegate.didEnterRegion = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didEnterRegion = cb;
-            });
-        };
-        delegate.didExitRegion = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didExitRegion = cb;
-            });
-        };
-        delegate.didRangeBeaconsInRegion = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didRangeBeaconsInRegion = cb;
-            });
-        };
-        delegate.didStartMonitoringForRegion = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.didStartMonitoringForRegion = cb;
-            });
-        };
-        delegate.monitoringDidFailForRegionWithError = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.monitoringDidFailForRegionWithError = cb;
-            });
-        };
-        delegate.peripheralManagerDidStartAdvertising = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.peripheralManagerDidStartAdvertising = cb;
-            });
-        };
-        delegate.peripheralManagerDidUpdateState = function (pluginResult) {
-            return new Observable_1.Observable(function (observer) {
-                var cb = function (data) { return observer.next(data); };
-                return delegate.peripheralManagerDidUpdateState = cb;
-            });
-        };
-        cordova.plugins.locationManager.setDelegate(delegate);
-        return delegate;
-    };
-    /**
-     * Creates a new BeaconRegion
-     *
-     * @param {String} identifier @see {CLRegion}
-     * @param {String} uuid The proximity ID of the beacon being targeted.
-     * This value must not be blank nor invalid as a UUID.
-     * @param {Number} major The major value that you use to identify one or more beacons.
-     * @param {Number} minor The minor value that you use to identify a specific beacon.
-     * @param {BOOL} notifyEntryStateOnDisplay
-     *
-     * @return Returns the BeaconRegion that was created
-     */
-    IBeacon.BeaconRegion = function (identifer, uuid, major, minor, notifyEntryStateOnDisplay) {
-        return new cordova.plugins.locationManager.BeaconRegion(identifer, uuid, major, minor, notifyEntryStateOnDisplay);
-    };
-    /**
-     * @return Returns the Delegate
-     */
-    IBeacon.getDelegate = function () { return; };
-    /**
-     * @param {Delegate} delegate An instance of a delegate to register with the native layer.
-     *
-     * @return Returns the Delegate
-     */
-    IBeacon.setDelegate = function (delegate) { return; };
-    /**
-     * Signals the native layer that the client side is ready to consume messages.
-     * Readiness here means that it has a {Delegate} set by the consumer javascript
-     * code.
-     *
-     * The {LocationManager.setDelegate()} will implicitly call this method as well,
-     * therefore the only case when you have to call this manually is if you don't
-     * wish to specify a {Delegate} of yours.
-     *
-     * The purpose of this signaling mechanism is to make the events work when the
-     * app is being woken up by the Operating System to give it a chance to handle
-     * region monitoring events for example.
-     *
-     * If you don't set a {Delegate} and don't call this method manually, an error
-     * message get emitted in the native runtime and the DOM as well after a certain
-     * period of time.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the request and started to send events.
-     */
-    IBeacon.onDomDelegateReady = function () { return; };
-    /**
-     * Determines if bluetooth is switched on, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether bluetooth is active.
-     */
-    IBeacon.isBluetoothEnabled = function () { return; };
-    /**
-     * Enables Bluetooth using the native Layer. (ANDROID ONLY)
-     *
-     * @returns Returns a promise which is resolved when Bluetooth
-     * could be enabled. If not, the promise will be rejected with an error.
-     */
-    IBeacon.enableBluetooth = function () { return; };
-    /**
-     * Disables Bluetooth using the native Layer. (ANDROID ONLY)
-     *
-     * @returns Returns a promise which is resolved when Bluetooth
-     * could be enabled. If not, the promise will be rejected with an error.
-     */
-    IBeacon.disableBluetooth = function () { return; };
-    /**
-     * Start monitoring the specified region.
-     *
-     * If a region of the same type with the same identifier is already being
-     * monitored for this application,
-     * it will be removed from monitoring. For circular regions, the region
-     * monitoring service will prioritize
-     * regions by their size, favoring smaller regions over larger regions.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the monitoring request.
-     */
-    IBeacon.startMonitoringForRegion = function (region) { return; };
-    /**
-     * Stop monitoring the specified region.  It is valid to call
-     * stopMonitoringForRegion: for a region that was registered for monitoring
-     * with a different location manager object, during this or previous
-     * launches of your application.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.stopMonitoringForRegion = function (region) { return; };
-    /**
-     * Request state the for specified region. When result is ready
-     * didDetermineStateForRegion is triggered. This can be any region,
-     * also those which is not currently monitored.
-     *
-     * This is done asynchronously and may not be immediately reflected in monitoredRegions.
-     *
-     * @param {Region} region An instance of {Region} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.requestStateForRegion = function (region) { return; };
-    /**
-     * Start ranging the specified beacon region.
-     *
-     * If a region of the same type with the same identifier is already being
-     * monitored for this application, it will be removed from monitoring.
-     *
-     * This is done asynchronously and may not be immediately reflected in rangedRegions.
-     *
-     * @param {Region} region An instance of {BeaconRegion} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the monitoring request.
-     */
-    IBeacon.startRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Stop ranging the specified region.  It is valid to call
-     * stopMonitoringForRegion: for a region that was registered for ranging
-     * with a different location manager object, during this or previous
-     * launches of your application.
-     *
-     * This is done asynchronously and may not be immediately reflected in rangedRegions.
-     *
-     * @param {Region} region An instance of {BeaconRegion} which will be monitored
-     * by the operating system.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop monitoring.
-     */
-    IBeacon.stopRangingBeaconsInRegion = function (region) { return; };
-    /**
-     * Queries the native layer to determine the current authorization in effect.
-     *
-     * @returns Returns a promise which is resolved with the
-     * requested authorization status.
-     */
-    IBeacon.getAuthorizationStatus = function () { return; };
-    /**
-     * For iOS 8 and above only. The permission model has changed by Apple in iOS 8, making it necessary for apps to
-     * explicitly request permissions via methods like these:
-     * <a href="https://developer.apple.com/library/prerelease/iOS/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/requestWhenInUseAuthorization">requestWhenInUseAuthorization</a>
-     * <a href="https://developer.apple.com/library/prerelease/iOS/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/requestAlwaysAuthorization">requestAlwaysAuthorization</a>
-     *
-     * If you are using this plugin on Android devices only, you will never have to use this, nor {@code requestAlwaysAuthorization}
-     * @returns Returns a promise that is resolved when the request dialog is shown.
-     */
-    IBeacon.requestWhenInUseAuthorization = function () { return; };
-    /**
-     * See the docuemntation of {@code requestWhenInUseAuthorization} for further details.
-     *
-     * @returns Returns a promise which is resolved when the native layer
-     * shows the request dialog.
-     */
-    IBeacon.requestAlwaysAuthorization = function () { return; };
-    /**
-     *
-     * @returns Returns a promise which is resolved with an {Array}
-     * of {Region} instances that are being monitored by the native layer.
-     */
-    IBeacon.getMonitoredRegions = function () { return; };
-    /**
-     *
-     * @returns Returns a promise which is resolved with an {Array}
-     * of {Region} instances that are being ranged by the native layer.
-     */
-    IBeacon.getRangedRegions = function () { return; };
-    /**
-     * Determines if ranging is available or not, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether ranging is available or not.
-     */
-    IBeacon.isRangingAvailable = function () { return; };
-    /**
-     * Determines if region type is supported or not, according to the native layer.
-     *
-     * @param {Region} region An instance of {Region} which will be checked
-     * by the operating system.
-     *
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether the region type is supported or not.
-     */
-    IBeacon.isMonitoringAvailableForClass = function (region) { return; };
-    /**
-     * Start advertising the specified region.
-     *
-     * If a region a different identifier is already being advertised for
-     * this application, it will be replaced with the new identifier.
-     *
-     * This call will accept a valid beacon even when no BlueTooth is available,
-     * and will start when BlueTooth is powered on. See {Delegate.}
-     *
-     * @param {Region} region An instance of {Region} which will be advertised
-     * by the operating system.
-     * @param {Integer} measuredPower: Optional parameter, if left empty, the device will
-     * use it's own default value.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the advertising request.
-     */
-    IBeacon.startAdvertising = function (region, measuredPower) { return; };
-    /**
-     * Stop advertising as a beacon.
-     *
-     * This is done asynchronously and may not be immediately reflected in isAdvertising.
-     *
-     * @return Returns a promise which is resolved as soon as the
-     * native layer acknowledged the dispatch of the request to stop advertising.
-     */
-    IBeacon.stopAdvertising = function (region) { return; };
-    /**
-     * Determines if advertising is available or not, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether advertising is available or not.
-     */
-    IBeacon.isAdvertisingAvailable = function () { return; };
-    /**
-     * Determines if advertising is currently active, according to the native layer.
-     * @returns Returns a promise which is resolved with a {Boolean}
-     * indicating whether advertising is active.
-     */
-    IBeacon.isAdvertising = function () { return; };
-    /**
-     * Disables debug logging in the native layer. Use this method if you want
-     * to prevent this plugin from writing to the device logs.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the logging level accordingly.
-     */
-    IBeacon.disableDebugLogs = function () { return; };
-    /**
-     * Enables the posting of debug notifications in the native layer. Use this method if you want
-     * to allow the plugin the posting local notifications.
-     * This can be very helpful when debugging how to apps behave when launched into the background.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the flag to enabled.
-     */
-    IBeacon.enableDebugNotifications = function () { return; };
-    /**
-     * Disables the posting of debug notifications in the native layer. Use this method if you want
-     * to prevent the plugin from posting local notifications.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the flag to disabled.
-     */
-    IBeacon.disableDebugNotifications = function () { return; };
-    /**
-     * Enables debug logging in the native layer. Use this method if you want
-     * a debug the inner workings of this plugin.
-     *
-     * @returns Returns a promise which is resolved as soon as the
-     * native layer has set the logging level accordingly.
-     */
-    IBeacon.enableDebugLogs = function () { return; };
-    /**
-     * Appends the provided [message] to the device logs.
-     * Note: If debug logging is turned off, this won't do anything.
-     *
-     * @param {String} message The message to append to the device logs.
-     *
-     * @returns Returns a promise which is resolved with the log
-     * message received by the native layer for appending. The returned message
-     * is expected to be equivalent to the one provided in the original call.
-     */
-    IBeacon.appendToDeviceLog = function (message) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], IBeacon, "getDelegate", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], IBeacon, "setDelegate", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "onDomDelegateReady", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "isBluetoothEnabled", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "enableBluetooth", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "disableBluetooth", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "startMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "stopMonitoringForRegion", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "requestStateForRegion", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "startRangingBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "stopRangingBeaconsInRegion", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "getAuthorizationStatus", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "requestWhenInUseAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "requestAlwaysAuthorization", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "getMonitoredRegions", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "getRangedRegions", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "isRangingAvailable", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "isMonitoringAvailableForClass", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "startAdvertising", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "stopAdvertising", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "isAdvertisingAvailable", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "isAdvertising", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "disableDebugLogs", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "enableDebugNotifications", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "disableDebugNotifications", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "enableDebugLogs", null);
-    __decorate([
-        plugin_1.Cordova({ otherPromise: true })
-    ], IBeacon, "appendToDeviceLog", null);
-    IBeacon = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-ibeacon',
-            pluginRef: 'cordova.plugins.locationManager',
-            repo: 'https://github.com/petermetz/cordova-plugin-ibeacon',
-            platforms: ['Android', 'iOS']
-        })
-    ], IBeacon);
-    return IBeacon;
-}());
-exports.IBeacon = IBeacon;
-
-},{"./plugin":581,"rxjs/Observable":609}],557:[function(require,module,exports){
+},{"./plugin":546}],538:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93002,8 +90329,8 @@ var plugin_1 = require('./plugin');
  * For more info, please see the https://github.com/wymsee/cordova-imagePicker
  *
  * @usage
- * ```typescript
- * import { ImagePicker } from 'ionic-native';
+ * ```js
+ * import {ImagePicker} from 'ionic-native';
  *
  *
  *
@@ -93011,7 +90338,8 @@ var plugin_1 = require('./plugin');
  *   for (var i = 0; i < results.length; i++) {
  *       console.log('Image URI: ' + results[i]);
  *   }
- * }, (err) => { });
+ * }, (err) => {
+ * });
  * ```
  */
 var ImagePicker = (function () {
@@ -93040,7 +90368,7 @@ var ImagePicker = (function () {
 }());
 exports.ImagePicker = ImagePicker;
 
-},{"./plugin":581}],558:[function(require,module,exports){
+},{"./plugin":546}],539:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93049,82 +90377,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var plugin_1 = require('./plugin');
-/**
- * @name ImageResizer
- * @description
- * Cordova Plugin For Image Resize
- *
- * Requires plugin `info.protonet.imageresizer` - use the Ionic CLI and type in the following command:
- * `ionic plugin add https://github.com/protonet/cordova-plugin-image-resizer.git`
- *
- * For more info, please see the https://github.com/protonet/cordova-plugin-image-resizer
- *
- * @usage
- * ```typescript
- * import { ImageResizer, ImageResizerOptions } from 'ionic-native';
- *
- * let options = {
- *  uri: uri,
- *  folderName: 'Protonet',
- *  quality: 90,
- *  width: 1280,
- *  height: 1280
- * } as ImageResizerOptions;
- *
- * ImageResizer
- * .resize(options)
- * .then(
- *  (filePath: string) => { console.log('FilePath', filePath); },
- *  () => { console.log('Error occured'); }
- * )
- * ```
- */
-var ImageResizer = (function () {
-    function ImageResizer() {
-    }
-    ImageResizer.resize = function (options) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], ImageResizer, "resize", null);
-    ImageResizer = __decorate([
-        plugin_1.Plugin({
-            plugin: 'https://github.com/protonet/cordova-plugin-image-resizer.git',
-            pluginRef: 'ImageResizer',
-            repo: 'https://github.com/protonet/cordova-plugin-image-resizer'
-        })
-    ], ImageResizer);
-    return ImageResizer;
-}());
-exports.ImageResizer = ImageResizer;
-
-},{"./plugin":581}],559:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-var Observable_1 = require('rxjs/Observable');
-/**
- * @name InAppBrowser
- * @description Launches in app Browser
- * @usage
- * ```typescript
- * import {InAppBrowser} from 'ionic-native';
- *
- *
- * ...
- *
- *
- * let browser = new InAppBrowser('https://ionic.io', '_system');
- * browser.executeScript(...);
- * browser.insertCSS(...);
- * browser.close();
- * ```
- */
 var InAppBrowser = (function () {
+    function InAppBrowser() {
+    }
     /**
      * Opens a URL in a new InAppBrowser instance, the current browser instance, or the system browser.
      * @param  url     The URL to load.
@@ -93133,212 +90388,23 @@ var InAppBrowser = (function () {
      *                 The options string must not contain any blank space, and each feature's
      *                 name/value pairs must be separated by a comma. Feature names are case insensitive.
      */
-    function InAppBrowser(url, target, options) {
-        try {
-            this._objectInstance = cordova.InAppBrowser.open(url, target, options);
-        }
-        catch (e) {
-            window.open(url);
-            console.warn('Native: InAppBrowser is not installed or you are running on a browser. Falling back to window.open, all instance methods will NOT work.');
-        }
-    }
-    InAppBrowser.open = function (url, target, options) {
-        console.warn('Native: Your current usage of the InAppBrowser plugin is depreciated as of ionic-native@1.3.8. Please check the Ionic Native docs for the latest usage details.');
-    };
-    /**
-     * Displays an InAppBrowser window that was opened hidden. Calling this has no effect
-     * if the InAppBrowser was already visible.
-     */
-    InAppBrowser.prototype.show = function () { };
-    /**
-     * Closes the InAppBrowser window.
-     */
-    InAppBrowser.prototype.close = function () { };
-    /**
-     * Injects JavaScript code into the InAppBrowser window.
-     * @param script    Details of the script to run, specifying either a file or code key.
-     */
-    InAppBrowser.prototype.executeScript = function (script) { return; };
-    /**
-     * Injects CSS into the InAppBrowser window.
-     * @param css       Details of the script to run, specifying either a file or code key.
-     */
-    InAppBrowser.prototype.insertCss = function (css) { return; };
-    /**
-     * A method that allows you to listen to events happening in the browser.
-     * @param event Event name
-     * @returns {Observable<any>} Returns back an observable that will listen to the event on subscribe, and will stop listening to the event on unsubscribe.
-     */
-    InAppBrowser.prototype.on = function (event) {
-        var _this = this;
-        return new Observable_1.Observable(function (observer) {
-            _this._objectInstance.addEventListener(event, observer.next.bind(observer));
-            return function () { return _this._objectInstance.removeEventListener(event, observer.next.bind(observer)); };
-        });
-    };
+    InAppBrowser.open = function (url, target, options) { return; };
     __decorate([
-        plugin_1.CordovaInstance({ sync: true })
-    ], InAppBrowser.prototype, "show", null);
-    __decorate([
-        plugin_1.CordovaInstance({ sync: true })
-    ], InAppBrowser.prototype, "close", null);
-    __decorate([
-        plugin_1.CordovaInstance()
-    ], InAppBrowser.prototype, "executeScript", null);
-    __decorate([
-        plugin_1.CordovaInstance()
-    ], InAppBrowser.prototype, "insertCss", null);
+        plugin_1.Cordova({
+            sync: true
+        })
+    ], InAppBrowser, "open", null);
     InAppBrowser = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova-plugin-inappbrowser',
-            pluginRef: 'cordova.InAppBrowser',
-            repo: 'https://github.com/apache/cordova-plugin-inappbrowser'
+            pluginRef: 'cordova.InAppBrowser'
         })
     ], InAppBrowser);
     return InAppBrowser;
 }());
 exports.InAppBrowser = InAppBrowser;
 
-},{"./plugin":581,"rxjs/Observable":609}],560:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name InAppPurchase
- * @description
- * A lightweight Cordova plugin for in app purchases on iOS/Android.
- *
- * @usage
- * ```ts
- * import {InAppPurchase} from 'ionic-native';
- *
- * InAppPurchase
- *  .getProducts(['com.yourapp.prod1', 'com.yourapp.prod2', ...])
- *  .then((products) => {
- *    console.log(products);
- *     //  [{ productId: 'com.yourapp.prod1', 'title': '...', description: '...', price: '...' }, ...]
- *  })
- *  .catch((err) => {
- *    console.log(err);
- *  });
- *
- *
- * InAppPurchase
- *   .buy('com.yourapp.prod1')
- *   .then((data)=> {
- *     console.log(data);
- *     // {
- *     //   transactionId: ...
- *     //   receipt: ...
- *     //   signature: ...
- *     // }
- *   })
- *   .catch((err)=> {
- *     console.log(err);
- *   });
- *
- * ```
- *
- * @advanced
- *
- * ```ts
- * // fist buy the product...
- * InAppPurchase
- *   .buy('com.yourapp.consumable_prod1')
- *   .then(data => InAppPurchase.consume(data.productType, data.receipt, data.signature))
- *   .then(() => console.log('product was successfully consumed!'))
- *   .catch( err=> console.log(err))
- * ```
- *
- *
- */
-var InAppPurchase = (function () {
-    function InAppPurchase() {
-    }
-    /**
-     * Retrieves a list of full product data from Apple/Google. This method must be called before making purchases.
-     * @param {array<string>} productId an array of product ids.
-     * @returns {Promise} Returns a Promise that resolves with an array of objects.
-     */
-    InAppPurchase.getProducts = function (productId) { return; };
-    /**
-     * Buy a product that matches the productId.
-     * @param {string} productId A string that matches the product you want to buy.
-     * @returns {Promise} Returns a Promise that resolves with the transaction details.
-     */
-    InAppPurchase.buy = function (productId) { return; };
-    /**
-     * Same as buy, but for subscription based products.
-     * @param {string} productId A string that matches the product you want to subscribe to.
-     * @returns {Promise} Returns a Promise that resolves with the transaction details.
-     */
-    InAppPurchase.subscribe = function (productId) { return; };
-    /**
-     * Call this function after purchasing a "consumable" product to mark it as consumed. On Android, you must consume products that you want to let the user purchase multiple times. If you will not consume the product after a purchase, the next time you will attempt to purchase it you will get the error message:
-     * @param {string} productType
-     * @param {string} receipt
-     * @param {string} signature
-     */
-    InAppPurchase.consume = function (productType, receipt, signature) { return; };
-    /**
-     * Restore all purchases from the store
-     * @returns {Promise} Returns a promise with an array of purchases.
-     */
-    InAppPurchase.restorePurchases = function () { return; };
-    /**
-     * Get the receipt.
-     * @returns {Promise<string>} Returns a promise that contains the string for the receipt
-     */
-    InAppPurchase.getReceipt = function () { return; };
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "getProducts", null);
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "buy", null);
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "subscribe", null);
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "consume", null);
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true
-        })
-    ], InAppPurchase, "restorePurchases", null);
-    __decorate([
-        plugin_1.Cordova({
-            otherPromise: true,
-            platforms: ['iOS']
-        })
-    ], InAppPurchase, "getReceipt", null);
-    InAppPurchase = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-inapppurchase',
-            pluginRef: 'inAppPurchase',
-            platforms: ['Android', 'iOS'],
-            repo: 'https://github.com/AlexDisler/cordova-plugin-inapppurchase'
-        })
-    ], InAppPurchase);
-    return InAppPurchase;
-}());
-exports.InAppPurchase = InAppPurchase;
-
-},{"./plugin":581}],561:[function(require,module,exports){
+},{"./plugin":546}],540:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93353,9 +90419,8 @@ var plugin_1 = require('./plugin');
  * Prevent the screen of the mobile device from falling asleep.
  *
  * @usage
- * ```typescript
- * import { Insomnia } from 'ionic-native';
- *
+ * ```js
+ * import {Insomnia} from 'ionic-native';
  *
  * Insomnia.keepAwake()
  *   .then(
@@ -93402,129 +90467,7 @@ var Insomnia = (function () {
 }());
 exports.Insomnia = Insomnia;
 
-},{"./plugin":581}],562:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Instagram
- * @description Share a photo with the instagram app
- *
- * @usage
- * ```
- * import {Instagram} from 'ionic-native';
- *
- * Instagram.share('data:image/png;uhduhf3hfif33', 'Caption')
- *   .then(() => console.log('Shared!'))
- *   .catch((error: any) => console.error(error));
- *
- * ```
- */
-var Instagram = (function () {
-    function Instagram() {
-    }
-    /**
-     * Detect if the Instagram application is installed on the device.
-     *
-     * @return {Promise<boolean|string>} Returns a promise that returns a boolean value if installed, or the app version on android
-     */
-    Instagram.isInstalled = function () { return; };
-    /**
-     * Share an image on Instagram
-     * Note: Instagram app stopped accepting pre-filled captions on both iOS and Android. As a work-around, the caption is copied to the clipboard. You have to inform your users to paste the caption.
-     *
-     * @param canvasIdOrDataUrl The canvas element id or the dataURL of the image to share
-     * @param caption The caption of the image
-     * @return {Promise<any>} Returns a promise that resolves if the image was shared
-     */
-    Instagram.share = function (canvasIdOrDataUrl, caption) { return; };
-    /**
-     * Share a library asset or video
-     * @param assetLocalIdentifier A local fileURI
-     * @return {Promise<any>} Returns a promise that resolves if the image was shared
-     */
-    Instagram.shareAsset = function (assetLocalIdentifier) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            callbackStyle: 'node'
-        })
-    ], Instagram, "isInstalled", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackStyle: 'node'
-        })
-    ], Instagram, "share", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], Instagram, "shareAsset", null);
-    Instagram = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-instagram-plugin',
-            pluginRef: 'Instagram',
-            repo: 'https://github.com/vstirbu/InstagramPlugin'
-        })
-    ], Instagram);
-    return Instagram;
-}());
-exports.Instagram = Instagram;
-
-},{"./plugin":581}],563:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name IsDebug
- * @description
- * Detect if the app is running in debug mode or not.
- * Debug mode is when the app is built and installed locally via xcode / eclipse / the cordova cli etc, compared to release mode when the app was downloaded from the app / play store via an end user.
- *
- * @usage
- * ```
- * import {IsDebug} from 'ionic-native';
- *
- * IsDebug.getIsDebug()
- *   .then((isDebug: boolean) => console.log('Is debug:', isDebug))
- *   .catch((error: any) => console.error(error));
- *
- * ```
- */
-var IsDebug = (function () {
-    function IsDebug() {
-    }
-    /**
-     * Determine if an app was installed via xcode / eclipse / the ionic CLI etc
-     * @return {Promise<boolean>} Returns a promise that resolves with true if the app was installed via xcode / eclipse / the ionic CLI etc. It will resolve to false if the app was downloaded from the app / play store by the end user.
-     */
-    IsDebug.getIsDebug = function () {
-        return;
-    };
-    __decorate([
-        plugin_1.Cordova()
-    ], IsDebug, "getIsDebug", null);
-    IsDebug = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-is-debug',
-            pluginRef: 'cordova.plugins.IsDebug',
-            repo: 'https://github.com/mattlewis92/cordova-plugin-is-debug'
-        })
-    ], IsDebug);
-    return IsDebug;
-}());
-exports.IsDebug = IsDebug;
-
-},{"./plugin":581}],564:[function(require,module,exports){
+},{"./plugin":546}],541:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93537,8 +90480,8 @@ var plugin_1 = require('./plugin');
  * @name Keyboard
  * @description
  * @usage
- * ```typescript
- * import { Keyboard } from 'ionic-native';
+ * ```js
+ * import {Keyboard} from 'ionic-native';
  *
  *
  *
@@ -93551,7 +90494,9 @@ var Keyboard = (function () {
      * Hide the keyboard accessory bar with the next, previous and done buttons.
      * @param hide {boolean}
      */
-    Keyboard.hideKeyboardAccessoryBar = function (hide) { };
+    Keyboard.hideKeyboardAccessoryBar = function (hide) {
+        console.log('hideKeyboardAccessoryBar method has been removed temporarily.');
+    };
     /**
      * Force keyboard to be shown.
      */
@@ -93573,9 +90518,6 @@ var Keyboard = (function () {
      * Creates an observable that notifies you when the keyboard is hidden. Unsubscribe to observable to cancel event watch.
      */
     Keyboard.onKeyboardHide = function () { return; };
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], Keyboard, "hideKeyboardAccessoryBar", null);
     __decorate([
         plugin_1.Cordova({
             sync: true,
@@ -93619,7 +90561,7 @@ var Keyboard = (function () {
 }());
 exports.Keyboard = Keyboard;
 
-},{"./plugin":581}],565:[function(require,module,exports){
+},{"./plugin":546}],542:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93634,20 +90576,15 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: uk.co.workingedge.phonegap.plugin.launchnavigator. For more info, please see the [LaunchNavigator plugin docs](https://github.com/dpa99c/phonegap-launch-navigator).
  *
  * @usage
- * Please refer to the plugin's repo for detailed usage. This docs page only explains the Native wrapper.
+ * ```js
+ * import {LaunchNavigator} from 'ionic-native';
  *
- * ```typescript
- * import { LaunchNavigator, LaunchNavigatorOptions } from 'ionic-native';
  *
- * let options: LaunchNavigatorOptions = {
- *   start: 'London, ON',
- *   app: LaunchNavigator.APPS.UBER
- * };
  *
- * LaunchNavigator.navigate('Toronto, ON', options)
+ * LaunchNavigator.navigate("Toronto, ON", "London, ON")
  *   .then(
- *     success => console.log('Launched navigator'),
- *     error => console.log('Error launching navigator', error)
+ *     success => console.log("Launched navigator"),
+ *     error => console.log("Error launching navigator", error)
  *   );
  * ```
  */
@@ -93656,119 +90593,21 @@ var LaunchNavigator = (function () {
     }
     /**
      * Launches navigator app
-     * @param destination {string|number[]} Location name or coordinates (as string or array)
-     * @param options {LaunchNavigatorOptions}
+     * @param destination Location name or coordinates
+     * @param start Location name or coordinates
+     * @param options
      * @returns {Promise<any>}
      */
-    LaunchNavigator.navigate = function (destination, options) { return; };
-    /**
-     * Determines if the given app is installed and available on the current device.
-     * @param app {string}
-     */
-    LaunchNavigator.isAppAvailable = function (app) { return; };
-    /**
-     * Returns a list indicating which apps are installed and available on the current device.
-     */
-    LaunchNavigator.availableApps = function () { return; };
-    /**
-     * Returns the display name of the specified app.
-     * @param app {string}
-     */
-    LaunchNavigator.getAppDisplayName = function (app) { return; };
-    /**
-     * Returns list of supported apps on a given platform.
-     * @param platform {string}
-     */
-    LaunchNavigator.getAppsForPlatform = function (platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of transport mode.
-     * @param app {string} specified as a string, you can use one of the constants, e.g `LaunchNavigator.APP.GOOGLE_MAPS`
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsTransportMode = function (app, platform) { return; };
-    /**
-     * Returns the list of transport modes supported by an app on a given platform.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.getTransportModes = function (app, platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of launch mode.
-     * Note that currently only Google Maps on Android does.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsLaunchMode = function (app, platform) { return; };
-    /**
-     * Indicates if an app on a given platform supports specification of start location.
-     * @param app {string}
-     * @param platform {string}
-     */
-    LaunchNavigator.supportsStart = function (app, platform) { return; };
-    LaunchNavigator.supportsStartName = function (app, platform) { return; };
-    LaunchNavigator.supportsDestName = function (app, platform) { return; };
-    LaunchNavigator.userSelect = function (destination, options) { };
-    LaunchNavigator.APP = {
-        USER_SELECT: 'user_select',
-        APPLE_MAPS: 'apple_maps',
-        GOOGLE_MAPS: 'google_maps',
-        WAZE: 'waze',
-        CITYMAPPER: 'citymapper',
-        NAVIGON: 'navigon',
-        TRANSIT_APP: 'transit_app',
-        YANDEX: 'yandex',
-        UBER: 'uber',
-        TOMTOM: 'tomtom',
-        BING_MAPS: 'bing_maps',
-        SYGIC: 'sygic',
-        HERE_MAPS: 'here_maps',
-        MOOVIT: 'moovit'
-    };
-    LaunchNavigator.TRANSPORT_MODE = {
-        DRIVING: 'driving',
-        WALKING: 'walking',
-        BICYCLING: 'bicycling',
-        TRANSIT: 'transit'
+    LaunchNavigator.navigate = function (destination, start, options) {
+        if (start === void 0) { start = null; }
+        return;
     };
     __decorate([
         plugin_1.Cordova({
-            successIndex: 1,
-            errorIndex: 2
+            successIndex: 2,
+            errorIndex: 3
         })
     ], LaunchNavigator, "navigate", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], LaunchNavigator, "isAppAvailable", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], LaunchNavigator, "availableApps", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "getAppDisplayName", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "getAppsForPlatform", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "supportsTransportMode", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "getTransportModes", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "supportsLaunchMode", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "supportsStart", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "supportsStartName", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "supportsDestName", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], LaunchNavigator, "userSelect", null);
     LaunchNavigator = __decorate([
         plugin_1.Plugin({
             plugin: 'uk.co.workingedge.phonegap.plugin.launchnavigator',
@@ -93780,7 +90619,7 @@ var LaunchNavigator = (function () {
 }());
 exports.LaunchNavigator = LaunchNavigator;
 
-},{"./plugin":581}],566:[function(require,module,exports){
+},{"./plugin":546}],543:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -93795,15 +90634,16 @@ var plugin_1 = require('./plugin');
  * This plugin allows you to display local notifications on the device
  *
  * @usage
- * ```typescript
- * import { LocalNotifications } from 'ionic-native';
+ * ```ts
+ * import {LocalNotifications} from 'ionic-native';
+ *
  *
  *
  * // Schedule a single notification
  * LocalNotifications.schedule({
  *   id: 1,
- *   text: 'Single Notification',
- *   sound: isAndroid? 'file://sound.mp3': 'file://beep.caf',
+ *   text: "Single Notification",
+ *   sound: isAndroid? 'file://sound.mp3': 'file://beep.caf'
  *   data: { secret: key }
  * });
  *
@@ -93811,22 +90651,22 @@ var plugin_1 = require('./plugin');
  * // Schedule multiple notifications
  * LocalNotifications.schedule([{
  *    id: 1,
- *    text: 'Multi Notification 1',
+ *    text: "Multi Notification 1",
  *    sound: isAndroid ? 'file://sound.mp3': 'file://beep.caf',
  *    data: { secret:key }
  *   },{
  *    id: 2,
- *    title: 'Local Notification Example',
- *    text: 'Multi Notification 2',
- *    icon: 'http://example.com/icon.png'
+ *    title: "Local Notification Example",
+ *    text: "Multi Notification 2",
+ *    icon: "http://example.com/icon.png"
  * }]);
  *
  *
  * // Schedule delayed notification
  * LocalNotifications.schedule({
- *    text: 'Delayed Notification',
+ *    text: "Delayed Notification",
  *    at: new Date(new Date().getTime() + 3600),
- *    led: 'FF0000',
+ *    led: "FF0000",
  *    sound: null
  * });
  * ```
@@ -94003,184 +90843,7 @@ var LocalNotifications = (function () {
 }());
 exports.LocalNotifications = LocalNotifications;
 
-},{"./plugin":581}],567:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Market
- * @description
- * Opens an app's page in the market place (Google Play, App Store)
- *
- * @usage
- * ```
- * import {Market} from 'ionic-native';
- *
- * Market.open('your.package.name');
- *
- * ```
- */
-var Market = (function () {
-    function Market() {
-    }
-    /**
-     * Opens an app in Google Play / App Store
-     * @param appId {string} Package name
-     * @param callbacks {Object} Optional callbacks
-     */
-    Market.open = function (appId, callbacks) { };
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], Market, "open", null);
-    Market = __decorate([
-        plugin_1.Plugin({
-            plugin: '',
-            pluginRef: 'plugins.market',
-            repo: 'https://github.com/xmartlabs/cordova-plugin-market'
-        })
-    ], Market);
-    return Market;
-}());
-exports.Market = Market;
-
-},{"./plugin":581}],568:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Media Capture
- * @description
- * @usage
- * ```typescript
- * import { MediaCapture } from 'ionic-native';
- *
- *
- * let options: CaptureImageOptions = { limit: 3 };
- * MediaCapture.captureImage(options)
- *   .then(
- *     (data: MediaFile[]) => console.log(data),
- *     (err: CaptureError) => console.error(err)
- *   );
- *
- * ```
- */
-var MediaCapture = (function () {
-    function MediaCapture() {
-    }
-    Object.defineProperty(MediaCapture, "supportedImageModes", {
-        /**
-         * The audio recording formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedImageModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MediaCapture, "supportedAudioModes", {
-        /**
-         * The recording image sizes and formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedAudioModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(MediaCapture, "supportedVideoModes", {
-        /**
-         * The recording video resolutions and formats supported by the device.
-         * @returns {ConfigurationData[]}
-         */
-        get: function () {
-            return navigator.device.capture.supportedVideoModes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * Start the audio recorder application and return information about captured audio clip files.
-     * @param options
-     */
-    MediaCapture.captureAudio = function (options) { return; };
-    /**
-     * Start the camera application and return information about captured image files.
-     * @param options
-     */
-    MediaCapture.captureImage = function (options) { return; };
-    /**
-     * Start the video recorder application and return information about captured video clip files.
-     * @param options
-     */
-    MediaCapture.captureVideo = function (options) { return; };
-    /**
-     * is fired if the capture call is successful
-     */
-    MediaCapture.onPendingCaptureResult = function () { return; };
-    /**
-     * is fired if the capture call is unsuccessful
-     */
-    MediaCapture.onPendingCaptureError = function () { return; };
-    __decorate([
-        plugin_1.CordovaProperty
-    ], MediaCapture, "supportedImageModes", null);
-    __decorate([
-        plugin_1.CordovaProperty
-    ], MediaCapture, "supportedAudioModes", null);
-    __decorate([
-        plugin_1.CordovaProperty
-    ], MediaCapture, "supportedVideoModes", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureAudio", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureImage", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], MediaCapture, "captureVideo", null);
-    __decorate([
-        plugin_1.Cordova({
-            eventObservable: true,
-            event: 'pendingcaptureresult'
-        })
-    ], MediaCapture, "onPendingCaptureResult", null);
-    __decorate([
-        plugin_1.Cordova({
-            eventObservable: true,
-            event: 'pendingcaptureerror'
-        })
-    ], MediaCapture, "onPendingCaptureError", null);
-    MediaCapture = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-media-capture',
-            pluginRef: 'navigator.device.capture',
-            repo: 'https://github.com/apache/cordova-plugin-media-capture'
-        })
-    ], MediaCapture);
-    return MediaCapture;
-}());
-exports.MediaCapture = MediaCapture;
-
-},{"./plugin":581}],569:[function(require,module,exports){
+},{"./plugin":546}],544:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -94194,22 +90857,22 @@ var Observable_1 = require('rxjs/Observable');
  * @name MediaPlugin
  * @description
  * @usage
- * ```typescript
- * import { MediaPlugin } from 'ionic-native';
+ * ```ts
+ * import {MediaPlugin} from 'ionic-native';
  *
  *
  *
  * // Create a MediaPlugin instance.  Expects path to file or url as argument
- * var file = new MediaPlugin('path/to/file.mp3');
+ * var file = new MediaPlugin("path/to/file.mp3");
  *
  * // Catch the Success & Error Output
  * // Platform Quirks
  * // iOS calls success on completion of playback only
  * // Android calls success on completion of playback AND on release()
  * file.init.then(() => {
- *   console.log('Playback Finished');
+ *   console.log("Playback Finished");
  * }, (err) => {
- *   console.log('somthing went wrong! error code: ' + err.code + ' message: ' + err.message);
+ *   console.log("somthing went wrong! error code: "+err.code+" message: "+err.message);
  * });
  *
  * // play the file
@@ -94241,7 +90904,7 @@ var Observable_1 = require('rxjs/Observable');
  * file.release();
  *
  * // Recording to a file
- * var newFile = new MediaPlugin('path/to/file.mp3');
+ * var newFile = new MediaPlugin("path/to/file.mp3");
  * newFile.startRecord();
  *
  * newFile.stopRecord();
@@ -94257,26 +90920,23 @@ var MediaPlugin = (function () {
      * @param src {string} A URI containing the audio content.
      */
     function MediaPlugin(src) {
-        var _this = this;
-        this.init = new Promise(function (resolve, reject) {
-            _this.status = new Observable_1.Observable(function (observer) {
-                _this._objectInstance = new Media(src, resolve, reject, observer.next.bind(observer));
-            });
+        var res, rej, next;
+        this.init = new Promise(function (resolve, reject) { res = resolve; rej = reject; });
+        this.status = new Observable_1.Observable(function (observer) {
+            next = function (data) { return observer.next(data); };
         });
+        this._objectInstance = new Media(src, res, rej, next);
     }
     /**
-     * Get the current amplitude of the current recording.
-     * @returns {Promise} Returns a promise with the amplitude of the current recording
+     * Returns the current amplitude of the current recording.
      */
     MediaPlugin.prototype.getCurrentAmplitude = function () { return; };
     /**
-     * Get the current position within an audio file. Also updates the Media object's position parameter.
-     * @returns {Promise} Returns a promise with the position of the current recording
+     * Returns the current position within an audio file. Also updates the Media object's position parameter.
      */
     MediaPlugin.prototype.getCurrentPosition = function () { return; };
     /**
-     * Get the duration of an audio file in seconds. If the duration is unknown, it returns a value of -1.
-     * @returns {Promise} Returns a promise with the duration of the current recording
+     * Returns the duration of an audio file in seconds. If the duration is unknown, it returns a value of -1.
      */
     MediaPlugin.prototype.getDuration = function () { return; };
     /**
@@ -94293,7 +90953,7 @@ var MediaPlugin = (function () {
     MediaPlugin.prototype.release = function () { };
     /**
      * Sets the current position within an audio file.
-     * @param {number} milliseconds The time position you want to set for the current audio file
+     * @param milliseconds
      */
     MediaPlugin.prototype.seekTo = function (milliseconds) { };
     /**
@@ -94314,43 +90974,11 @@ var MediaPlugin = (function () {
      */
     MediaPlugin.prototype.stop = function () { };
     // Constants
-    /**
-     * @private
-     */
     MediaPlugin.MEDIA_NONE = 0;
-    /**
-     * @private
-     */
     MediaPlugin.MEDIA_STARTING = 1;
-    /**
-     * @private
-     */
     MediaPlugin.MEDIA_RUNNING = 2;
-    /**
-     * @private
-     */
     MediaPlugin.MEDIA_PAUSED = 3;
-    /**
-     * @private
-     */
     MediaPlugin.MEDIA_STOPPED = 4;
-    // error codes
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_ABORTED = 1;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_NETWORK = 2;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_DECODE = 3;
-    /**
-     * @private
-     */
-    MediaPlugin.MEDIA_ERR_NONE_SUPPORTED = 4;
     __decorate([
         plugin_1.CordovaInstance()
     ], MediaPlugin.prototype, "getCurrentAmplitude", null);
@@ -94412,553 +91040,34 @@ var MediaPlugin = (function () {
     return MediaPlugin;
 }());
 exports.MediaPlugin = MediaPlugin;
-
-},{"./plugin":581,"rxjs/Observable":609}],570:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Mixpanel
- * @description
- * Cordova Plugin that wraps Mixpanel SDK for Android and iOS
- *
- * @usage
- * ```
- * import {Mixpanel} from 'ionic-native';
- *
- * Mixpanel.init(token)
- *   .then(onSuccess)
- *   .catch(onError);
- *
- * ```
- */
-var Mixpanel = (function () {
-    function Mixpanel() {
+var MediaError = (function () {
+    function MediaError() {
     }
-    /**
-     *
-     * @param aliasId {string}
-     * @param originalId {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.alias = function (aliasId, originalId) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.distinctId = function () { return; };
-    /**
-     *
-     */
-    Mixpanel.flush = function () { return; };
-    /**
-     *
-     * @param distinctId {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.identify = function (distinctId) { return; };
-    /**
-     *
-     * @param token {string}
-     * @returns {Promise<any>}
-     */
-    Mixpanel.init = function (token) { return; };
-    /**
-     *
-     * @param superProperties
-     * @returns {Promise<any>}
-     */
-    Mixpanel.registerSuperProperties = function (superProperties) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.reset = function () { return; };
-    /**
-     *
-     * @param eventName
-     * @param eventProperties
-     */
-    Mixpanel.track = function (eventName, eventProperties) { return; };
-    /**
-     *
-     * @returns {Promise<any>}
-     */
-    Mixpanel.showSurvey = function () { return; };
-    Object.defineProperty(Mixpanel, "people", {
-        /**
-         *
-         * @returns {MixpanelPeople}
-         */
-        get: function () { return mixpanel.people; },
+    Object.defineProperty(MediaError, "MEDIA_ERR_ABORTED", {
+        get: function () { return 1; },
         enumerable: true,
         configurable: true
     });
-    ;
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "alias", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "distinctId", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "flush", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "identify", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "init", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "registerSuperProperties", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "reset", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "track", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], Mixpanel, "showSurvey", null);
-    __decorate([
-        plugin_1.CordovaProperty
-    ], Mixpanel, "people", null);
-    Mixpanel = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-mixpanel',
-            pluginRef: 'mixpanel',
-            repo: 'https://github.com/samzilverberg/cordova-mixpanel-plugin'
-        })
-    ], Mixpanel);
-    return Mixpanel;
+    Object.defineProperty(MediaError, "MEDIA_ERR_NETWORK", {
+        get: function () { return 2; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MediaError, "MEDIA_ERR_DECODE", {
+        get: function () { return 3; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(MediaError, "MEDIA_ERR_NONE_SUPPORTED", {
+        get: function () { return 4; },
+        enumerable: true,
+        configurable: true
+    });
+    return MediaError;
 }());
-exports.Mixpanel = Mixpanel;
+exports.MediaError = MediaError;
 
-},{"./plugin":581}],571:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name MusicControls
- * @description
- * Music controls for Cordova applications.
- * Display a 'media' notification with play/pause, previous, next buttons, allowing the user to control the play.
- * Handle also headset event (plug, unplug, headset button).
- *
- * @usage
- * ```
- * import {MusicControls} from 'ionic-native';
- *
- * MusicControls.create({
- *   track       : 'Time is Running Out',        // optional, default : ''
- *   artist      : 'Muse',                       // optional, default : ''
- *   cover       : 'albums/absolution.jpg',      // optional, default : nothing
- *   // cover can be a local path (use fullpath 'file:///storage/emulated/...', or only 'my_image.jpg' if my_image.jpg is in the www folder of your app)
- *   //           or a remote url ('http://...', 'https://...', 'ftp://...')
- *   isPlaying   : true,                         // optional, default : true
- *   dismissable : true,                         // optional, default : false
- *
- *   // hide previous/next/close buttons:
- *   hasPrev   : false,      // show previous button, optional, default: true
- *   hasNext   : false,      // show next button, optional, default: true
- *   hasClose  : true,       // show close button, optional, default: false
- *
- *   // Android only, optional
- *   // text displayed in the status bar when the notification (and the ticker) are updated
- *   ticker    : 'Now playing "Time is Running Out"'
- *  });
- *
- *  MusicControls.subscribe().subscribe(action => {
- *
- *    switch(action) {
- *        case 'music-controls-next':
- *            // Do something
- *            break;
- *        case 'music-controls-previous':
- *            // Do something
- *            break;
- *        case 'music-controls-pause':
- *            // Do something
- *            break;
- *        case 'music-controls-play':
- *            // Do something
- *            break;
- *        case 'music-controls-destroy':
- *            // Do something
- *            break;
- *
- *        // Headset events (Android only)
- *        case 'music-controls-media-button' :
- *            // Do something
- *            break;
- *        case 'music-controls-headset-unplugged':
- *            // Do something
- *            break;
- *        case 'music-controls-headset-plugged':
- *            // Do something
- *            break;
- *        default:
- *            break;
- *    }
- *
- *  });
- *
- *  MusicControls.listen(); // activates the observable above
- *
- *  MusicControls.updateIsPlaying(true);
- *
- *
- * ```
- */
-var MusicControls = (function () {
-    function MusicControls() {
-    }
-    /**
-     * Create the media controls
-     * @param options {MusicControlsOptions}
-     * @returns {Promise<any>}
-     */
-    MusicControls.create = function (options) { return; };
-    /**
-     * Destroy the media controller
-     * @returns {Promise<any>}
-     */
-    MusicControls.destroy = function () { return; };
-    /**
-     * Subscribe to the events of the media controller
-     * @returns {Observable<any>}
-     */
-    MusicControls.subscribe = function () { return; };
-    /**
-     * Start listening for events, this enables the Observable from the subscribe method
-     */
-    MusicControls.listen = function () { };
-    /**
-     * Toggle play/pause:
-     * @param isPlaying {boolean}
-     */
-    MusicControls.updateIsPlaying = function (isPlaying) { };
-    __decorate([
-        plugin_1.Cordova()
-    ], MusicControls, "create", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], MusicControls, "destroy", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true
-        })
-    ], MusicControls, "subscribe", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], MusicControls, "listen", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], MusicControls, "updateIsPlaying", null);
-    MusicControls = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-music-controls',
-            pluginRef: 'MusicControls',
-            repo: 'https://github.com/homerours/cordova-music-controls-plugin'
-        })
-    ], MusicControls);
-    return MusicControls;
-}());
-exports.MusicControls = MusicControls;
-
-},{"./plugin":581}],572:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name NativeAudio
- * @description Native Audio Playback
- * @usage
- * ```typescript
- * import {NativeAudio} from 'ionic-native';
- *
- * NativeAudio.preloadSimple('uniqueId1', 'path/to/file.mp3').then(onSuccess, onError);
- * NativeAudio.preloadComplex('uniqueId2', 'path/to/file2.mp3', 1, 1, 0).then(onSuccess, onError);
- *
- * NativeAudio.play('uniqueId1').then(onSuccess, onError);
- * NativeAudio.loop('uniqueId2').then(onSuccess, onError);
- *
- * NativeAudio.setVolumeForComplexAsset('uniqueId2', 0.6).then(onSuccess,onError);
- *
- * NativeAudio.stop('uniqueId1').then(onSuccess,onError);
- *
- * NativeAudio.unload('uniqueId1').then(onSuccess,onError);
- *
- * ```
- */
-var NativeAudio = (function () {
-    function NativeAudio() {
-    }
-    /**
-     * Loads an audio file into memory. Optimized for short clips / single shots (up to five seconds). Cannot be stopped / looped.
-     * @param id {string} unique ID for the audio file
-     * @param assetPath {string}  the relative path or absolute URL (inluding http://) to the audio asset.
-     * @returns {Promise<any>}
-     */
-    NativeAudio.preloadSimple = function (id, assetPath) { return; };
-    /**
-     * Loads an audio file into memory. Optimized for background music / ambient sound. Uses highlevel native APIs with a larger footprint. (iOS: AVAudioPlayer). Can be stopped / looped and used with multiple voices. Can be faded in and out using the delay parameter.
-     * @param id {string} unique ID for the audio file
-     * @param assetPath {string}  the relative path or absolute URL (inluding http://) to the audio asset.
-     * @param volume {number} the volume of the preloaded sound (0.1 to 1.0)
-     * @param voices {number} the number of multichannel voices available
-     * @param delay {number}
-     * @returns {Promise<any>}
-     */
-    NativeAudio.preloadComplex = function (id, assetPath, volume, voices, delay) { return; };
-    /**
-     * Plays an audio asset
-     * @param id {string} unique ID for the audio file
-     * @param completeCallback {Function} callback to be invoked when audio is done playing
-     */
-    NativeAudio.play = function (id, completeCallback) { return; };
-    /**
-     * Stops playing an audio
-     * @param id {string} unique ID for the audio file
-     */
-    NativeAudio.stop = function (id) { return; };
-    /**
-     * Loops an audio asset infinitely, this only works for complex assets
-     * @param id {string} unique ID for the audio file
-     * @return {Promise<any>}
-     */
-    NativeAudio.loop = function (id) { return; };
-    /**
-     * Unloads an audio file from memory
-     * @param id {string} unique ID for the audio file
-     */
-    NativeAudio.unload = function (id) { return; };
-    /**
-     * Changes the volume for preloaded complex assets.
-     * @param id {string} unique ID for the audio file
-     * @param volume {number} the volume of the audio asset (0.1 to 1.0)
-     */
-    NativeAudio.setVolumeForComplexAsset = function (id, volume) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "preloadSimple", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "preloadComplex", null);
-    __decorate([
-        plugin_1.Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], NativeAudio, "play", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "stop", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "loop", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "unload", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeAudio, "setVolumeForComplexAsset", null);
-    NativeAudio = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-nativeaudio',
-            pluginRef: 'plugins.NativeAudio',
-            repo: 'https://github.com/floatinghotpot/cordova-plugin-nativeaudio'
-        })
-    ], NativeAudio);
-    return NativeAudio;
-}());
-exports.NativeAudio = NativeAudio;
-
-},{"./plugin":581}],573:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name NativePageTransitions
- * @description
- * The Native Page Transitions plugin uses native hardware acceleration to animate your transitions between views. You have complete control over the type of transition, the duration, and direction.
- *
- * @usage
- * ```
- * import {NativePageTransitions, TransitionOptions} from 'ionic-native';
- *
- * let options: TransitionOptions = {
- *    direction: 'up',
- *    duration: 500,
- *    slowdownfactor: 3,
- *    slidePixels: 20,
- *    iosdelay: 100,
- *    androiddelay: 150,
- *    winphonedelay: 250,
- *    fixedPixelsTop: 0,
- *    fixedPixelsBottom: 60
- *  };
- *
- * NativePageTransitions.slide(options)
- *   .then(onSuccess)
- *   .catch(onError);
- *
- * ```
- */
-var NativePageTransitions = (function () {
-    function NativePageTransitions() {
-    }
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.slide = function (options) { return; };
-    /**
-     * Perform a flip animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.flip = function (options) { return; };
-    /**
-     * Perform a fade animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.fade = function (options) { return; };
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.drawer = function (options) { return; };
-    /**
-     * Perform a slide animation
-     * @param options {TransitionOptions} Options for the transition
-     */
-    NativePageTransitions.curl = function (options) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], NativePageTransitions, "slide", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativePageTransitions, "flip", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS', 'Android'] })
-    ], NativePageTransitions, "fade", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS', 'Android'] })
-    ], NativePageTransitions, "drawer", null);
-    __decorate([
-        plugin_1.Cordova({ platforms: ['iOS'] })
-    ], NativePageTransitions, "curl", null);
-    NativePageTransitions = __decorate([
-        plugin_1.Plugin({
-            plugin: 'com.telerik.plugins.nativepagetransitions',
-            pluginRef: 'plugins.nativepagetransitions',
-            repo: 'https://github.com/Telerik-Verified-Plugins/NativePageTransitions',
-            platforms: ['iOS', 'Android', 'Windows Phone']
-        })
-    ], NativePageTransitions);
-    return NativePageTransitions;
-}());
-exports.NativePageTransitions = NativePageTransitions;
-
-},{"./plugin":581}],574:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name NativeStorage
- * @description Native storage of variables in Android and iOS
- *
- * @usage
- * ```typescript
- * import { NativeStorage } from 'ionic-native';
- *
- * NativeStorage.setItem('myitem', {property: 'value', anotherProperty: 'anotherValue'})
- *   .then(
- *     () => console.log('Stored item!'),
- *     error => console.error('Error storing item', error)
- *   );
- *
- * NativeStorage.getItem('myitem')
- *   .then(
- *     data => console.log(data),
- *     error => console.error(error)
- *   );
- * ```
- */
-var NativeStorage = (function () {
-    function NativeStorage() {
-    }
-    /**
-     * Stores a value
-     * @param reference {string}
-     * @param value
-     */
-    NativeStorage.setItem = function (reference, value) { return; };
-    /**
-     * Gets a stored item
-     * @param reference {string}
-     */
-    NativeStorage.getItem = function (reference) { return; };
-    /**
-     * Removes a single stored item
-     * @param reference {string}
-     */
-    NativeStorage.remove = function (reference) { return; };
-    /**
-     * Removes all stored values.
-     */
-    NativeStorage.clear = function () { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeStorage, "setItem", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeStorage, "getItem", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeStorage, "remove", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NativeStorage, "clear", null);
-    NativeStorage = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-nativestorage',
-            pluginRef: 'NativeStorage',
-            repo: 'https://github.com/TheCocoaProject/cordova-plugin-nativestorage'
-        })
-    ], NativeStorage);
-    return NativeStorage;
-}());
-exports.NativeStorage = NativeStorage;
-
-},{"./plugin":581}],575:[function(require,module,exports){
+},{"./plugin":546,"rxjs/Observable":562}],545:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -94973,12 +91082,12 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-network-information. For more info, please see the [Network plugin docs](https://github.com/apache/cordova-plugin-network-information).
  *
  * @usage
- * ```typescript
- * import { Network } from 'ionic-native';
+ * ```js
+ * import {Network, Connection} from 'ionic-native';
  *
  * // watch network for a disconnect
  * let disconnectSubscription = Network.onDisconnect().subscribe(() => {
- *   console.log('network was disconnected :-(');
+ *   console.log('network was disconnected :-( ')
  * });
  *
  * // stop disconnect watch
@@ -94988,14 +91097,15 @@ var plugin_1 = require('./plugin');
  * // watch network for a connection
  * let connectSubscription = Network.onConnect().subscribe(() => {
  *   console.log('network connected!');
-
+*
  *   // We just got a connection but we need to wait briefly
  *
-   // before we determine the connection type.  Might need to wait
+// before we determine the connection type.  Might need to wait
 
  *   // prior to doing any api requests as well.
  *   setTimeout(() => {
- *     if (Network.connection === 'wifi') {
+ *     console.log(Network.connection);
+ *     if (Network.connection === Connection.WIFI) {
  *       console.log('we got a wifi connection, woohoo!');
  *     }
  *   }, 3000);
@@ -95005,8 +91115,6 @@ var plugin_1 = require('./plugin');
  * connectSubscription.unsubscribe();
  *
  * ```
- * @advanced
- * The `connection` property will return one of the following connection types: `unknown`, `ethernet`, `wifi`, `2g`, `3g`, `4g`, `cellular`, `none`
  */
 var Network = (function () {
     function Network() {
@@ -95055,601 +91163,54 @@ var Network = (function () {
     return Network;
 }());
 exports.Network = Network;
-
-},{"./plugin":581}],576:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name NFC
- * @description
- * The NFC plugin allows you to read and write NFC tags. You can also beam to, and receive from, other NFC enabled devices.
- *
- * Use to
- * - read data from NFC tags
- * - write data to NFC tags
- * - send data to other NFC enabled devices
- * - receive data from NFC devices
- *
- * This plugin uses NDEF (NFC Data Exchange Format) for maximum compatibilty between NFC devices, tag types, and operating systems.
- *
- * @usage
- * ```
- * import {NFC, Ndef} from 'ionic-native';
- *
- * let message = Ndef.textRecord('Hello world');
- * NFC.share([message]).then(onSuccess).catch(onError);
- *
- * ```
- */
-var NFC = (function () {
-    function NFC() {
+var Connection = (function () {
+    function Connection() {
     }
-    /**
-     * Registers an event listener for any NDEF tag.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addNdefListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for tags matching any tag type.
-     * @param mimeType
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addTagDiscoveredListener = function (mimeType, onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for NDEF tags matching a specified MIME type.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addMimeTypeListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Registers an event listener for formatable NDEF tags.
-     * @param onSuccess
-     * @param onFailure
-     * @return {Promise<any>}
-     */
-    NFC.addNdefFormatableListener = function (onSuccess, onFailure) { return; };
-    /**
-     * Qrites an NdefMessage to a NFC tag.
-     * @param message {any[]}
-     * @return {Promise<any>}
-     */
-    NFC.write = function (message) { return; };
-    /**
-     * Makes a NFC tag read only. **Warning** this is permanent.
-     * @return {Promise<any>}
-     */
-    NFC.makeReadyOnly = function () { return; };
-    /**
-     * Shares an NDEF Message via peer-to-peer.
-     * @param message An array of NDEF Records.
-     * @return {Promise<any>}
-     */
-    NFC.share = function (message) { return; };
-    /**
-     * Stop sharing NDEF data via peer-to-peer.
-     * @return {Promise<any>}
-     */
-    NFC.unshare = function () { return; };
-    /**
-     * Erase a NDEF tag
-     */
-    NFC.erase = function () { return; };
-    /**
-     * Send a file to another device via NFC handover.
-     * @param uris A URI as a String, or an array of URIs.
-     * @return {Promise<any>}
-     */
-    NFC.handover = function (uris) { return; };
-    /**
-     * Stop sharing NDEF data via NFC handover.
-     * @return {Promise<any>}
-     */
-    NFC.stopHandover = function () { return; };
-    /**
-     * Show the NFC settings on the device.
-     * @return {Promise<any>}
-     */
-    NFC.showSettings = function () { return; };
-    /**
-     * Check if NFC is available and enabled on this device.
-     * @return {Promise<any>}
-     */
-    NFC.enabled = function () { return; };
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3,
-            clearFunction: 'removeNdefListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addNdefListener", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            successIndex: 1,
-            errorIndex: 4,
-            clearFunction: 'removeTagDiscoveredListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addTagDiscoveredListener", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3,
-            clearFunction: 'removeMimeTypeListener',
-            clearWithArgs: true
-        })
-    ], NFC, "addMimeTypeListener", null);
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            successIndex: 0,
-            errorIndex: 3
-        })
-    ], NFC, "addNdefFormatableListener", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "write", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "makeReadyOnly", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "share", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "unshare", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "erase", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "handover", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "stopHandover", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "showSettings", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], NFC, "enabled", null);
-    NFC = __decorate([
-        plugin_1.Plugin({
-            plugin: 'phonegap-nfc',
-            pluginRef: 'nfc',
-            repo: 'https://github.com/chariotsolutions/phonegap-nfc'
-        })
-    ], NFC);
-    return NFC;
+    Object.defineProperty(Connection, "UNKNOWN", {
+        get: function () { return 'unknown'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "ETHERNET", {
+        get: function () { return 'ethernet'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "WIFI", {
+        get: function () { return 'wifi'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "CELL_2G", {
+        get: function () { return '2g'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "CELL_3G", {
+        get: function () { return '3g'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "CELL_4G", {
+        get: function () { return '4g'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "CELL", {
+        get: function () { return 'cellular'; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Connection, "NONE", {
+        get: function () { return 'none'; },
+        enumerable: true,
+        configurable: true
+    });
+    return Connection;
 }());
-exports.NFC = NFC;
+exports.Connection = Connection;
 
-},{"./plugin":581}],577:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name OneSignal
- * @description
- * The OneSignal plugin is an client implementation for using the [OneSignal](https://onesignal.com/) Service.
- * OneSignal is a simple implementation for delivering push notifications.
- *
- * Requires Cordova plugin: `onesignal-cordova-plugin`. For more info, please see the [OneSignal Cordova Docs](https://documentation.onesignal.com/docs/phonegap-sdk-installation).
- *
- * @usage
- * ```typescript
- * import { OneSignal } from 'ionic-native';
- *
- * OneSignal.init('b2f7f966-d8cc-11e4-bed1-df8f05be55ba',
- *                        {googleProjectNumber: '703322744261'})
- *  .subscribe(jsonData => {
- *    console.log('didReceiveRemoteNotificationCallBack: ' + JSON.stringify(jsonData));
- *  });
- *
- * OneSignal.enableInAppAlertNotification(true);
- * ```
- *
- */
-var OneSignal = (function () {
-    function OneSignal() {
-    }
-    /**
-     * Only required method you need to call to setup OneSignal to receive push notifications. Call this from the `deviceready` event.
-     *
-     * @param {appId} Your AppId from your OneSignal app
-     * @param {options} The Google Project Number (which you can get from the Google Developer Potal) and the autoRegister option.
-     * @returns {Observable} when a notification is received. Handle your notification action here.
-     */
-    OneSignal.init = function (appId, options) { return; };
-    /**
-     * Call this when you would like to prompt an iOS user to accept push notifications with the default system prompt.
-     * Only use if you passed false to autoRegister when calling init.
-     */
-    OneSignal.registerForPushNotifications = function () { };
-    /**
-     * Tag a user based on an app event of your choosing so later you can create segments on [onesignal.com](https://onesignal.com/) to target these users.
-     * Recommend using sendTags over sendTag if you need to set more than one tag on a user at a time.
-     *
-     * @param {key} Key of your choosing to create or update.
-     * @param {value} Value to set on the key. NOTE: Passing in a blank String deletes the key, you can also call deleteTag.
-     */
-    OneSignal.sendTag = function (key, value) { };
-    /**
-   * Tag a user based on an app event of your choosing so later you can create segments on [onesignal.com](https://onesignal.com/) to target these users.
-   * Recommend using sendTags over sendTag if you need to set more than one tag on a user at a time.
-   *
-   * @param {json} Pass a json object with key/value pairs like: {key: "value", key2: "value2"}
-   */
-    OneSignal.sendTags = function (json) { };
-    /**
-    * Retrieve a list of tags that have been set on the user from the OneSignal server.
-    *
-    * @returns {Promise} Returns a Promise that resolves when tags are recieved.
-    */
-    OneSignal.getTags = function () { return; };
-    /**
-    * Deletes a tag that was previously set on a user with `sendTag` or `sendTags`. Use `deleteTags` if you need to delete more than one.
-    *
-    * @param {key} Key to remove.
-    */
-    OneSignal.deleteTag = function (key) { };
-    /**
-    * Deletes tags that were previously set on a user with `sendTag` or `sendTags`.
-    *
-    * @param {keys} Keys to remove.
-    */
-    OneSignal.deleteTags = function (keys) { };
-    /**
-    * Lets you retrieve the OneSignal user id and device token.
-    * Your handler is called after the device is successfully registered with OneSignal.
-    *
-    * @returns {Promise} Returns a Promise that reolves if the device was successfully registered.
-    * It returns a JSON with `userId`and `pushToken`.
-    */
-    OneSignal.getIds = function () { return; };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon. You can call this from your UI from a button press for example to give your user's options for your notifications.
-    *
-    * By default OneSignal always vibrates the device when a notification is displayed unless the device is in a total silent mode.
-    * Passing false means that the device will only vibrate lightly when the device is in it's vibrate only mode.
-    *
-    * @param {enable} false to disable vibrate, true to re-enable it.
-    */
-    OneSignal.enableVibrate = function (enable) { };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon. You can call this from your UI from a button press for example to give your user's options for your notifications.
-    *
-    * By default OneSignal plays the system's default notification sound when the device's notification system volume is turned on.
-    * Passing false means that the device will only vibrate unless the device is set to a total silent mode.
-    *
-    * @param {enable} false to disable sound, true to re-enable it.
-    */
-    OneSignal.enableSound = function (enable) { };
-    /**
-    * Warning:
-    * Only applies to Android and Amazon devices.
-    *
-    * By default this is false and notifications will not be shown when the user is in your app, instead the notificationOpenedCallback is fired.
-    * If set to true notifications will always show in the notification area and notificationOpenedCallback will not fire until the user taps on the notification.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.enableNotificationsWhenActive = function (enable) { };
-    /**
-    * By default this is false and notifications will not be shown when the user is in your app, instead the notificationOpenedCallback is fired.
-    * If set to true notifications will be shown as native alert boxes if a notification is received when the user is in your app.
-    * The notificationOpenedCallback is then fired after the alert box is closed.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.enableInAppAlertNotification = function (enable) { };
-    /**
-    * You can call this method with false to opt users out of receiving all notifications through OneSignal.
-    * You can pass true later to opt users back into notifications.
-    *
-    * @param {enable} enable
-    */
-    OneSignal.setSubscription = function (enable) { };
-    /**
-    *
-    * @param {notificationObj} Parameters see POST [documentation](https://documentation.onesignal.com/v2.0/docs/notifications-create-notification)
-    * @returns {Promise} Returns a Promise that resolves if the notification was send successfully.
-    */
-    OneSignal.postNotification = function (notificationObj) { return; };
-    /**
-    * Prompts the user for location permission to allow geotagging based on the "Location radius" filter on the OneSignal dashboard.
-    */
-    OneSignal.promptLocation = function () { };
-    /**
-    * Enable logging to help debug if you run into an issue setting up OneSignal.
-    * The logging levels are as follows: 0 = None, 1= Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
-
-    * The higher the value the more information is shown.
-    *
-    * @param {loglevel} contains two properties: logLevel (for console logging) and visualLevel (for dialog messages)
-    */
-    OneSignal.setLogLevel = function (logLevel) { };
-    __decorate([
-        plugin_1.Cordova({ observable: true })
-    ], OneSignal, "init", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "registerForPushNotifications", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "sendTag", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "sendTags", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], OneSignal, "getTags", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "deleteTag", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "deleteTags", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], OneSignal, "getIds", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "enableVibrate", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "enableSound", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "enableNotificationsWhenActive", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "enableInAppAlertNotification", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "setSubscription", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], OneSignal, "postNotification", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "promptLocation", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], OneSignal, "setLogLevel", null);
-    OneSignal = __decorate([
-        plugin_1.Plugin({
-            plugin: 'onesignal-cordova-plugin',
-            pluginRef: 'plugins.OneSignal',
-            repo: 'https://github.com/OneSignal/OneSignal-Cordova-SDK'
-        })
-    ], OneSignal);
-    return OneSignal;
-}());
-exports.OneSignal = OneSignal;
-
-},{"./plugin":581}],578:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name PayPal
- * @description
- * PayPal plugin for Cordova/Ionic Applications
- *
- * @usage
- * ```
- * import {PayPal} from 'ionic-native';
- *
- * PayPal.init({
- *      "PayPalEnvironmentProduction": "YOUR_PRODUCTION_CLIENT_ID",
-       "PayPalEnvironmentSandbox": "YOUR_SANDBOX_CLIENT_ID"
-       })
- *   .then(onSuccess)
- *   .catch(onError);
- *
- * ```
- */
-var PayPal = (function () {
-    function PayPal() {
-    }
-    /**
-     * You must preconnect to PayPal to prepare the device for processing payments.
-     * This improves the user experience, by making the presentation of the
-     * UI faster. The preconnect is valid for a limited time, so
-     * the recommended time to preconnect is on page load.
-     *
-     * @param {String} environment: available options are "PayPalEnvironmentNoNetwork", "PayPalEnvironmentProduction" and "PayPalEnvironmentSandbox"
-     * @param {PayPalConfiguration} configuration: For Future Payments merchantName, merchantPrivacyPolicyURL and merchantUserAgreementURL must be set be set
-     */
-    PayPal.init = function (environment, configuration) { return; };
-    /**
-     * Retreive the version of PayPal iOS SDK Library.
-     */
-    PayPal.version = function () { return; };
-    /**
-     * Start PayPal UI to collect payment from the user.
-     * See https://developer.paypal.com/webapps/developer/docs/integration/mobile/ios-integration-guide/
-     * for more documentation of the params.
-     *
-     * @param {PayPalPayment} payment: PayPalPayment object
-     */
-    PayPal.renderSinglePaymentUI = function (payment) { return; };
-    /**
-     * Once a user has consented to future payments, when the user subsequently initiates a PayPal payment
-     * from their device to be completed by your server, PayPal uses a Correlation ID to verify that the
-     * payment is originating from a valid, user-consented device+application.
-     * This helps reduce fraud and decrease declines.
-     * This method MUST be called prior to initiating a pre-consented payment (a "future payment") from a mobile device.
-     * Pass the result to your server, to include in the payment request sent to PayPal.
-     * Do not otherwise cache or store this value.
-     */
-    PayPal.clientMetadataID = function () { return; };
-    /**
-     * Please Read Docs on Future Payments at https://github.com/paypal/PayPal-iOS-SDK#future-payments
-     */
-    PayPal.renderFuturePaymentUI = function () { return; };
-    /**
-     * Please Read Docs on Profile Sharing at https://github.com/paypal/PayPal-iOS-SDK#profile-sharing
-     *
-     * @param {Array<string>} scopes: scopes Set of requested scope-values. Accepted scopes are: openid, profile, address, email, phone, futurepayments and paypalattributes
-     * See https://developer.paypal.com/docs/integration/direct/identity/attributes/ for more details
-     **/
-    PayPal.renderProfileSharingUI = function (scopes) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "init", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "version", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "renderSinglePaymentUI", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "clientMetadataID", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "renderFuturePaymentUI", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PayPal, "renderProfileSharingUI", null);
-    PayPal = __decorate([
-        plugin_1.Plugin({
-            plugin: 'com.paypal.cordova.mobilesdk',
-            pluginRef: 'PayPalMobile',
-            repo: 'https://github.com/paypal/PayPal-Cordova-Plugin'
-        })
-    ], PayPal);
-    return PayPal;
-}());
-exports.PayPal = PayPal;
-
-},{"./plugin":581}],579:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Photo Viewer
- * @description This plugin can display your image in full screen with the ability to pan, zoom, and share the image.
- * @usage
- * ```typescript
- * import { PhotoViewer } from 'ionic-native';
- *
- * PhotoViewer.show('https://mysite.com/path/to/image.jpg');
- *
- * PhotoViewer.show('https://mysite.com/path/to/image.jpg', 'My image title', {share: false});
- * ```
- */
-var PhotoViewer = (function () {
-    function PhotoViewer() {
-    }
-    /**
-     * Shows an image in full screen
-     * @param url {string} URL or path to image
-     * @param title {string}
-     * @param options {any}
-     */
-    PhotoViewer.show = function (url, title, options) { };
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], PhotoViewer, "show", null);
-    PhotoViewer = __decorate([
-        plugin_1.Plugin({
-            plugin: 'com-sarriaroman-photoviewer',
-            pluginRef: 'PhotoViewer',
-            repo: 'https://github.com/sarriaroman/photoviewer'
-        })
-    ], PhotoViewer);
-    return PhotoViewer;
-}());
-exports.PhotoViewer = PhotoViewer;
-
-},{"./plugin":581}],580:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Pin Dialog
- * @description
- *
- * @usage
- * ```typescript
- * import { PinDialog } from 'ionic-native';
- *
- *
- * PinDialog.prompt('Enter your PIN', 'Verify PIN', ['OK', 'Cancel'])
- *   .then(
- *     (result: any) => {
- *       if (result.buttonIndex == 1) console.log('User clicked OK, value is: ', result.input1);
- *       else if(result.buttonIndex == 2) console.log('User cancelled');
- *     }
- *   );
- * ```
- */
-var PinDialog = (function () {
-    function PinDialog() {
-    }
-    /**
-     * Show pin dialog
-     * @param {string} message Message to show the user
-     * @param {string} title Title of the dialog
-     * @param {string[]} buttons Buttons to show
-     */
-    PinDialog.prompt = function (message, title, buttons) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            successIndex: 1
-        })
-    ], PinDialog, "prompt", null);
-    PinDialog = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-pin-dialog',
-            pluginRef: 'plugins.pinDialog',
-            repo: 'https://github.com/Paldom/PinDialog'
-        })
-    ], PinDialog);
-    return PinDialog;
-}());
-exports.PinDialog = PinDialog;
-
-},{"./plugin":581}],581:[function(require,module,exports){
+},{"./plugin":546}],546:[function(require,module,exports){
 "use strict";
 var util_1 = require('../util');
 var Observable_1 = require('rxjs/Observable');
@@ -95668,12 +91229,10 @@ exports.getPlugin = function (pluginRef) {
  */
 exports.pluginWarn = function (pluginObj, method) {
     var pluginName = pluginObj.name, plugin = pluginObj.plugin;
-    if (method) {
+    if (method)
         console.warn('Native: tried calling ' + pluginName + '.' + method + ', but the ' + pluginName + ' plugin is not installed.');
-    }
-    else {
+    else
         console.warn('Native: tried accessing the ' + pluginName + ' plugin but it\'s not installed.');
-    }
     console.warn('Install the ' + pluginName + ' plugin: \'ionic plugin add ' + plugin + '\'');
 };
 /**
@@ -95682,12 +91241,10 @@ exports.pluginWarn = function (pluginObj, method) {
  * @param method
  */
 exports.cordovaWarn = function (pluginName, method) {
-    if (method) {
+    if (method)
         console.warn('Native: tried calling ' + pluginName + '.' + method + ', but Cordova is not available. Make sure to include cordova.js or run in a device/simulator');
-    }
-    else {
+    else
         console.warn('Native: tried accessing the ' + pluginName + ' plugin but Cordova is not available. Make sure to include cordova.js or run in a device/simulator');
-    }
 };
 function setIndex(args, opts, resolve, reject) {
     if (opts === void 0) { opts = {}; }
@@ -95697,32 +91254,10 @@ function setIndex(args, opts, resolve, reject) {
         args.unshift(reject);
         args.unshift(resolve);
     }
-    else if (opts.callbackStyle === 'node') {
-        args.push(function (err, result) {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(result);
-            }
-        });
-    }
-    else if (opts.callbackStyle === 'object' && opts.successName && opts.errorName) {
-        var obj = {};
-        obj[opts.successName] = resolve;
-        obj[opts.errorName] = reject;
-        args.push(obj);
-    }
     else if (typeof opts.successIndex !== 'undefined' || typeof opts.errorIndex !== 'undefined') {
         // If we've specified a success/error index
         args.splice(opts.successIndex, 0, resolve);
-        // We don't want that the reject cb gets spliced into the position of an optional argument that has not been defined and thus causing non expected behaviour.
-        if (opts.errorIndex > args.length) {
-            args[opts.errorIndex] = reject; // insert the reject fn at the correct specific index
-        }
-        else {
-            args.splice(opts.errorIndex, 0, reject); // otherwise just splice it into the array
-        }
+        args.splice(opts.errorIndex, 0, reject);
     }
     else {
         // Otherwise, let's tack them on to the end of the argument list
@@ -95755,14 +91290,14 @@ function callCordovaPlugin(pluginObj, methodName, args, opts, resolve, reject) {
     return util_1.get(window, pluginObj.pluginRef)[methodName].apply(pluginInstance, args);
 }
 function getPromise(cb) {
-    if (window.angular) {
-        var $q = window.angular.element(document.body).injector().get('$q');
-        return $q(function (resolve, reject) {
+    if (window.Promise) {
+        return new Promise(function (resolve, reject) {
             cb(resolve, reject);
         });
     }
-    else if (window.Promise) {
-        return new Promise(function (resolve, reject) {
+    else if (window.angular) {
+        var $q_1 = window.angular.injector(['ng']).get('$q');
+        return $q_1(function (resolve, reject) {
             cb(resolve, reject);
         });
     }
@@ -95785,16 +91320,6 @@ function wrapPromise(pluginObj, methodName, args, opts) {
         rej(pluginResult.error);
     }
     return p;
-}
-function wrapOtherPromise(pluginObj, methodName, args, opts) {
-    if (opts === void 0) { opts = {}; }
-    return getPromise(function (resolve, reject) {
-        var pluginResult = callCordovaPlugin(pluginObj, methodName, args, opts);
-        if (pluginResult && pluginResult.error) {
-            reject(pluginResult.error);
-        }
-        pluginResult.then(resolve).catch(reject);
-    });
 }
 function wrapObservable(pluginObj, methodName, args, opts) {
     if (opts === void 0) { opts = {}; }
@@ -95832,7 +91357,6 @@ function wrapInstance(pluginObj, methodName, opts) {
             args[_i - 0] = arguments[_i];
         }
         if (opts.sync) {
-            // Sync doesn't wrap the plugin with a promise or observable, it returns the result as-is
             return callInstance(pluginObj, methodName, args, opts);
         }
         else if (opts.observable) {
@@ -95852,12 +91376,6 @@ function wrapInstance(pluginObj, methodName, opts) {
                 };
             });
         }
-        else if (opts.otherPromise) {
-            return getPromise(function (resolve, reject) {
-                var result = callInstance(pluginObj, methodName, args, opts, resolve, reject);
-                result.then(resolve, reject);
-            });
-        }
         else {
             return getPromise(function (resolve, reject) {
                 callInstance(pluginObj, methodName, args, opts, resolve, reject);
@@ -95872,8 +91390,9 @@ function wrapInstance(pluginObj, methodName, opts) {
  */
 function wrapEventObservable(event) {
     return new Observable_1.Observable(function (observer) {
-        window.addEventListener(event, observer.next.bind(observer), false);
-        return function () { return window.removeEventListener(event, observer.next.bind(observer), false); };
+        var callback = function (status) { return observer.next(status); };
+        window.addEventListener(event, callback, false);
+        return function () { return window.removeEventListener(event, callback, false); };
     });
 }
 /**
@@ -95890,22 +91409,14 @@ exports.wrap = function (pluginObj, methodName, opts) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i - 0] = arguments[_i];
         }
-        if (opts.sync) {
-            // Sync doesn't wrap the plugin with a promise or observable, it returns the result as-is
+        if (opts.sync)
             return callCordovaPlugin(pluginObj, methodName, args, opts);
-        }
-        else if (opts.observable) {
+        else if (opts.observable)
             return wrapObservable(pluginObj, methodName, args, opts);
-        }
-        else if (opts.eventObservable && opts.event) {
+        else if (opts.eventObservable && opts.event)
             return wrapEventObservable(opts.event);
-        }
-        else if (opts.otherPromise) {
-            return wrapOtherPromise(pluginObj, methodName, args, opts);
-        }
-        else {
+        else
             return wrapPromise(pluginObj, methodName, args, opts);
-        }
     };
 };
 /**
@@ -95914,7 +91425,7 @@ exports.wrap = function (pluginObj, methodName, opts) {
  * Class decorator specifying Plugin metadata. Required for all plugins.
  *
  * @usage
- * ```typescript
+ * ```ts
  * @Plugin({
  *  name: 'MyPlugin',
  *  plugin: 'cordova-plugin-myplugin',
@@ -96031,7 +91542,7 @@ function InstanceProperty(target, key, descriptor) {
 }
 exports.InstanceProperty = InstanceProperty;
 
-},{"../util":608,"rxjs/Observable":609}],582:[function(require,module,exports){
+},{"../util":561,"rxjs/Observable":562}],547:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96040,95 +91551,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var plugin_1 = require('./plugin');
-/**
- * @name PowerManagement
- * @description
- * The PowerManagement plugin offers access to the devices power-management functionality.
- * It should be used for applications which keep running for a long time without any user interaction.
- *
- * @usage
- * ```
- * import {PowerManagement} from 'ionic-native';
- *
- * PowerManagement.acquire()
- *   .then(onSuccess)
- *   .catch(onError);
- *
- * ```
- */
-var PowerManagement = (function () {
-    function PowerManagement() {
-    }
-    /**
-     * Acquire a wakelock by calling this.
-     */
-    PowerManagement.acquire = function () { return; };
-    /**
-     * This acquires a partial wakelock, allowing the screen to be dimmed.
-     */
-    PowerManagement.dim = function () { return; };
-    /**
-     * Release the wakelock. It's important to do this when you're finished with the wakelock, to avoid unnecessary battery drain.
-     */
-    PowerManagement.release = function () { return; };
-    /**
-     * By default, the plugin will automatically release a wakelock when your app is paused (e.g. when the screen is turned off, or the user switches to another app).
-     * It will reacquire the wakelock upon app resume. If you would prefer to disable this behaviour, you can use this function.
-     * @param set {boolean}
-     */
-    PowerManagement.setReleaseOnPause = function (set) { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], PowerManagement, "acquire", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PowerManagement, "dim", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PowerManagement, "release", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], PowerManagement, "setReleaseOnPause", null);
-    PowerManagement = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-powermanagement-orig',
-            pluginRef: 'https://github.com/Viras-/cordova-plugin-powermanagement',
-            repo: 'powerManagement'
-        })
-    ], PowerManagement);
-    return PowerManagement;
-}());
-exports.PowerManagement = PowerManagement;
-
-},{"./plugin":581}],583:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Printer
- * @description Prints documents or HTML rendered content
- * @usage
- * ```typescript
- * import {Printer, PrintOptions} from 'ionic-native';
- *
- * Printer.isAvailable().then(onSuccess, onError);
- *
- * let options: PrintOptions = {
- *      name: 'MyDocument',
- *      printerId: 'printer007',
- *      duplex: true,
- *      landscape: true,
- *      grayscale: true
- *    };
- *
- * Printer.print(content, options).then(onSuccess, onError);
- * ```
- */
 var Printer = (function () {
     function Printer() {
     }
@@ -96160,7 +91582,7 @@ var Printer = (function () {
 }());
 exports.Printer = Printer;
 
-},{"./plugin":581}],584:[function(require,module,exports){
+},{"./plugin":546}],548:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96179,8 +91601,11 @@ var plugin_1 = require('./plugin');
  * For TypeScript users, see the [Push plugin docs about using TypeScript for custom notifications](https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/TYPESCRIPT.md).
  *
  * @usage
- * ```typescript
- * import { Push } from 'ionic-native';
+ * ```js
+ * import {Push} from 'ionic-native';
+ *
+ *
+ *
  * ```
  */
 var Push = (function () {
@@ -96192,10 +91617,10 @@ var Push = (function () {
      * ```
      * var push = Push.init({
      *    android: {
-     *        senderID: '12345679'
+     *        senderID: "12345679"
      *    },
      *    ios: {
-     *        alert: 'true',
+     *        alert: "true",
      *        badge: true,
      *        sound: 'false'
      *    },
@@ -96231,7 +91656,7 @@ var Push = (function () {
 }());
 exports.Push = Push;
 
-},{"./plugin":581}],585:[function(require,module,exports){
+},{"./plugin":546}],549:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96245,12 +91670,13 @@ var plugin_1 = require('./plugin');
  * @description
  * @usage
  * ```
- * import { SafariViewController } from 'ionic-native';
+ * import {SafariViewController} from 'ionic-native';
  *
+ * ...
  *
  * SafariViewController.isAvailable()
  *   .then(
- *     (available: boolean) => {
+ *     (available) => {
  *       if(available){
  *
  *         SafariViewController.show({
@@ -96263,9 +91689,9 @@ var plugin_1 = require('./plugin');
  *         })
  *         .then(
  *           (result: any) => {
- *             if(result.event === 'opened') console.log('Opened');
- *             else if(result.event === 'loaded') console.log('Loaded');
- *             else if(result.event === 'closed') console.log('Closed');
+ *             if(result.event === 'opened') console.log("Opened");
+ *             else if(result.event === 'loaded') console.log("Loaded");
+ *             else if(result.event === 'closed') console.log("Closed");
  *           },
  *           (error: any) => console.error(error)
  *         );
@@ -96310,10 +91736,14 @@ var SafariViewController = (function () {
         plugin_1.Cordova()
     ], SafariViewController, "isAvailable", null);
     __decorate([
-        plugin_1.Cordova()
+        plugin_1.Cordova({
+            callbackOrder: 'reverse'
+        })
     ], SafariViewController, "show", null);
     __decorate([
-        plugin_1.Cordova()
+        plugin_1.Cordova({
+            sync: true
+        })
     ], SafariViewController, "hide", null);
     __decorate([
         plugin_1.Cordova()
@@ -96328,7 +91758,7 @@ var SafariViewController = (function () {
         plugin_1.Plugin({
             plugin: 'cordova-plugin-safariviewcontroller',
             pluginRef: 'SafariViewController',
-            platforms: ['iOS', 'Android'],
+            platforms: ['iOS'],
             repo: 'https://github.com/EddyVerbruggen/cordova-plugin-safariviewcontroller'
         })
     ], SafariViewController);
@@ -96336,7 +91766,7 @@ var SafariViewController = (function () {
 }());
 exports.SafariViewController = SafariViewController;
 
-},{"./plugin":581}],586:[function(require,module,exports){
+},{"./plugin":546}],550:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96345,107 +91775,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var plugin_1 = require('./plugin');
-/**
- * @name Screen Orientation
- * @description
- * Cordova plugin to set/lock the screen orientation in a common way for iOS, Android, WP8 and Blackberry 10.
- * This plugin is based on an early version of Screen Orientation API so the api does not currently match the current spec.
- *
- * Requires Cordova plugin: `cordova-plugin-screen-orientation`. For more info, please see the [Screen Orientation plugin docs](https://github.com/apache/cordova-plugin-screen-orientation).
- *
- * @usage
- * ```typescript
- * import { ScreenOrientation } from 'ionic-native';
- *
- *
- * // set to either landscape
- * ScreenOrientation.lockOrientation('landscape');
- *
- * // allow user rotate
- * ScreenOrientation.unlockOrientation();
- * ```
- *
- * @advanced
- *
- * Accepted orientation values:
- *
- * | Value                         | Description                                                                  |
- * |-------------------------------|------------------------------------------------------------------------------|
- * | portrait-primary              | The orientation is in the primary portrait mode.                             |
- * | portrait-secondary            | The orientation is in the secondary portrait mode.                           |
- * | landscape-primary             | The orientation is in the primary landscape mode.                            |
- * | landscape-secondary           | The orientation is in the secondary landscape mode.                          |
- * | portrait                      | The orientation is either portrait-primary or portrait-secondary (sensor).   |
- * | landscape                     | The orientation is either landscape-primary or landscape-secondary (sensor). |
- *
- */
-var ScreenOrientation = (function () {
-    function ScreenOrientation() {
-    }
-    /**
-     * Lock the orientation to the passed value.
-     * See below for accepted values
-     * @param {orientation} The orientation which should be locked. Accepted values see table below.
-     */
-    ScreenOrientation.lockOrientation = function (orientation) { };
-    /**
-     * Unlock and allow all orientations.
-     */
-    ScreenOrientation.unlockOrientation = function () { };
-    Object.defineProperty(ScreenOrientation, "orientation", {
-        /*
-         * Get the current orientation of the device.
-         */
-        get: function () {
-            return window.screen.orientation;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], ScreenOrientation, "lockOrientation", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], ScreenOrientation, "unlockOrientation", null);
-    __decorate([
-        plugin_1.CordovaProperty
-    ], ScreenOrientation, "orientation", null);
-    ScreenOrientation = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-screen-orientation',
-            pluginRef: 'window.screen',
-            repo: 'https://github.com/apache/cordova-plugin-screen-orientation',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], ScreenOrientation);
-    return ScreenOrientation;
-}());
-exports.ScreenOrientation = ScreenOrientation;
-
-},{"./plugin":581}],587:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Screenshot
- * @description Captures a screen shot
- * @usage
- * ```typescript
- * import {Screenshot} from 'ionic-native';
- *
- * // Take a screenshot and save to file
- * Screenshot.save('jpg', 80, 'myscreenshot.jpg').then(onSuccess, onError);
- *
- * // Take a screenshot and get temporary file URI
- * Screenshot.URI(80).then(onSuccess, onError);
- * ```
- */
 var Screenshot = (function () {
     function Screenshot() {
     }
@@ -96499,210 +91828,7 @@ var Screenshot = (function () {
 }());
 exports.Screenshot = Screenshot;
 
-},{"./plugin":581}],588:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Secure Storage
- * @description
- * This plugin gets, sets and removes key,value pairs from a device's secure storage.
- *
- * Requires Cordova plugin: `cordova-plugin-secure-storage`. For more info, please see the [Cordova Secure Storage docs](https://github.com/Crypho/cordova-plugin-secure-storage).
- *
- * @usage
- *
- * ```typescript
- * import { SecureStorage } from 'ionic-native';
- *
- * let secureStorage: SecureStorage = new SecureStorage();
- * secureStorage.create('my_store_name')
- *  .then(
- *    () => console.log('Storage is ready!'),
- *    error => console.log(error)
- * );
- *
- * secureStorage.get('myitem')
- *  .then(
- *    data => console.log(data),
- *    error => console.log(error)
- * );
- *
- * secureStorage.set('myitem', 'myvalue')
- *  .then(
- *    data => console.log(data),
- *    error => console.log(error)
- * );
- *
- * secureStorage.remove('myitem')
- * .then(
- *    data => console.log(data),
- *    error => console.log(error)
- * );
- * ```
- */
-var SecureStorage = (function () {
-    function SecureStorage() {
-    }
-    /**
-     * Creates a namespaced storage.
-     * @param store {string}
-     */
-    SecureStorage.prototype.create = function (store) {
-        var _this = this;
-        return new Promise(function (res, rej) {
-            _this._objectInstance = new cordova.plugins.SecureStorage(res, rej, store);
-        });
-    };
-    /**
-     * Gets a stored item
-     * @param reference {string}
-     */
-    SecureStorage.prototype.get = function (reference) { return; };
-    /**
-     * Stores a value
-     * @param reference {string}
-     * @param value {string}
-     */
-    SecureStorage.prototype.set = function (reference, value) { return; };
-    /**
-     * Removes a single stored item
-     * @param reference {string}
-     */
-    SecureStorage.prototype.remove = function (reference) { return; };
-    __decorate([
-        plugin_1.CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "get", null);
-    __decorate([
-        plugin_1.CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "set", null);
-    __decorate([
-        plugin_1.CordovaInstance({
-            callbackOrder: 'reverse'
-        })
-    ], SecureStorage.prototype, "remove", null);
-    SecureStorage = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-secure-storage',
-            pluginRef: 'plugins.securestorage',
-            repo: 'https://github.com/Crypho/cordova-plugin-secure-storage',
-            platforms: ['Android', 'iOS', 'Windows Phone', 'Browser']
-        })
-    ], SecureStorage);
-    return SecureStorage;
-}());
-exports.SecureStorage = SecureStorage;
-
-},{"./plugin":581}],589:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Shake
- * @description Handles shake gesture
- * @usage
- * ```typescript
- * import {Shake} from 'ionic-native';
- *
- * let watch = Shake.startWatch(60).subscribe(() => {
- *   // do something
- *   });
- *
- * watch.unsubscribe();
- * ```
- */
-var Shake = (function () {
-    function Shake() {
-    }
-    /**
-     * Watch for shake gesture
-     * @param sensitivity {number} Optional sensitivity parameter. Defaults to 40
-     */
-    Shake.startWatch = function (sensitivity) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            observable: true,
-            clearFunction: 'stopWatch',
-            successIndex: 0,
-            errorIndex: 2
-        })
-    ], Shake, "startWatch", null);
-    Shake = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-shake',
-            pluginRef: 'shake',
-            repo: 'https://github.com/leecrossley/cordova-plugin-shake'
-        })
-    ], Shake);
-    return Shake;
-}());
-exports.Shake = Shake;
-
-},{"./plugin":581}],590:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Sim
- * @description
- * Gets info from the Sim card like the carrier name, mcc, mnc and country code and other system dependent info.
- *
- * Requires Cordova plugin: `cordova-plugin-sim`. For more info, please see the [Cordova Sim docs](https://github.com/pbakondy/cordova-plugin-sim).
- *
- * @usage
- * ```typescript
- * import { Sim } from 'ionic-native';
- *
- *
- * Sim.getSimInfo().then(
- *   (info) => console.log('Sim info: ', info),
- *   (err) => console.log('Unable to get sim info: ', err)
- * );
- * ```
- */
-var Sim = (function () {
-    function Sim() {
-    }
-    /**
-     * Returns info from the SIM card.
-     * @returns {Promise}
-     */
-    Sim.getSimInfo = function () { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], Sim, "getSimInfo", null);
-    Sim = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-sim',
-            pluginRef: 'plugins.sim',
-            repo: 'https://github.com/pbakondy/cordova-plugin-sim',
-            platforms: ['Android', 'iOS', 'Windows Phone']
-        })
-    ], Sim);
-    return Sim;
-}());
-exports.Sim = Sim;
-
-},{"./plugin":581}],591:[function(require,module,exports){
+},{"./plugin":546}],551:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96718,12 +91844,14 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: cordova-plugin-sms. For more info, please see the [SMS plugin docs](https://github.com/cordova-sms/cordova-sms-plugin).
  *
  * @usage
- * ```typescript
- * import { SMS } from 'ionic-native';
+ * ```ts
+ * import {SMS} from 'ionic-native';
+ *
  *
  *
  * // Send a text message using default options
- * SMS.send('416123456', 'Hello world!');
+ * SMS.send('416123456','Hello world!');
+ *
  * ```
  */
 var SMS = (function () {
@@ -96752,7 +91880,7 @@ var SMS = (function () {
 }());
 exports.SMS = SMS;
 
-},{"./plugin":581}],592:[function(require,module,exports){
+},{"./plugin":546}],552:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96766,22 +91894,11 @@ var plugin_1 = require('./plugin');
  * @description
  * Share text, files, images, and links via social networks, sms, and email.
  * @usage
- * ```typescript
- * import { SocialSharing } from 'ionic-native';
+ * ```js
+ * import {SocialSharing} from 'ionic-native';
  *
- * // Check if sharing via email is supported
- * SocialSharing.canShareViaEmail().then(() => {
- *   // Sharing via email is possible
- * }).catch(() => {
- *   // Sharing via email is not possible
- * });
- *
- * // Share via email
- * SocialSharing.shareViaEmail('Body', 'Subject', 'recipient@example.org').then(() => {
- *   // Success!
- * }).catch(() => {
- *   // Error!
- * });
+ * ...
+ * // TODO add usage info
  * ```
  */
 var SocialSharing = (function () {
@@ -96791,41 +91908,32 @@ var SocialSharing = (function () {
      * Shares using the share sheet
      * @param message {string} The message you would like to share.
      * @param subject {string} The subject
-     * @param file {string|string[]} URL(s) to file(s) or image(s), local path(s) to file(s) or image(s), or base64 data of an image. Only the first file/image will be used on Windows Phone.
+     * @param file {string|Array<string>} URL(s) to file(s) or image(s), local path(s) to file(s) or image(s), or base64 data of an image. Only the first file/image will be used on Windows Phone.
      * @param url {string} A URL to share
-     * @returns {Promise}
      */
-    SocialSharing.share = function (message, subject, file, url) { return; };
+    SocialSharing.share = function (message, subject, file, url) { };
     /**
      * Shares using the share sheet with additional options and returns a result object or an error message (requires plugin version 5.1.0+)
      * @param options {object} The options object with the message, subject, files, url and chooserTitle properties.
-     * @returns {Promise}
      */
     SocialSharing.shareWithOptions = function (options) { return; };
     /**
      * Checks if you can share via a specific app.
-     * @param appName {string} App name or package name. Examples: instagram or com.apple.social.facebook
-     * @param message {string}
-     * @param subject {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
+     * @param appName App name or package name. Examples: instagram or com.apple.social.facebook
      */
-    SocialSharing.canShareVia = function (appName, message, subject, image, url) { return; };
+    SocialSharing.canShareVia = function (appName) { return; };
     /**
      * Shares directly to Twitter
-     * @param message {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
+     * @param message
+     * @param image
+     * @param url
      */
-    SocialSharing.shareViaTwitter = function (message, image, url) { return; };
+    SocialSharing.shareViaTwitter = function (message, image, url) { };
     /**
      * Shares directly to Facebook
      * @param message {string}
      * @param image {string}
      * @param url {string}
-     * @returns {Promise}
      */
     SocialSharing.shareViaFacebook = function (message, image, url) { return; };
     /**
@@ -96834,14 +91942,12 @@ var SocialSharing = (function () {
      * @param image {string}
      * @param url {string}
      * @param pasteMessageHint {string}
-     * @returns {Promise}
      */
     SocialSharing.shareViaFacebookWithPasteMessageHint = function (message, image, url, pasteMessageHint) { return; };
     /**
      * Shares directly to Instagram
      * @param message {string}
      * @param image {string}
-     * @returns {Promise}
      */
     SocialSharing.shareViaInstagram = function (message, image) { return; };
     /**
@@ -96849,7 +91955,6 @@ var SocialSharing = (function () {
      * @param message {string}
      * @param image {string}
      * @param url {string}
-     * @returns {Promise}
      */
     SocialSharing.shareViaWhatsApp = function (message, image, url) { return; };
     /**
@@ -96858,44 +91963,28 @@ var SocialSharing = (function () {
      * @param message {string} Message to send
      * @param image {string} Image to send (does not work on iOS
      * @param url {string} Link to send
-     * @returns {Promise}
      */
     SocialSharing.shareViaWhatsAppToReceiver = function (receiver, message, image, url) { return; };
     /**
      * Share via SMS
      * @param messge {string} message to send
      * @param phoneNumber {string} Number or multiple numbers seperated by commas
-     * @returns {Promise}
      */
     SocialSharing.shareViaSMS = function (messge, phoneNumber) { return; };
-    /**
-     * Checks if you can share via email
-     * @returns {Promise}
-     */
-    SocialSharing.canShareViaEmail = function () { return; };
     /**
      * Share via Email
      * @param message {string}
      * @param subject {string}
-     * @param to {string[]}
-     * @param cc {string[]} Optional
-     * @param bcc {string[]} Optional
-     * @param files {string|string[]} Optional URL or local path to file(s) to attach
-     * @returns {Promise}
+     * @param to {Array<string>}
+     * @param cc {Array<string>}
+     * @param bcc {Array<string>}
+     * @param files {string|Array<string>} URL or local path to file(s) to attach
      */
     SocialSharing.shareViaEmail = function (message, subject, to, cc, bcc, files) { return; };
-    /**
-     * Share via AppName
-     * @param appName {string} App name or package name. Examples: instagram or com.apple.social.facebook
-     * @param message {string}
-     * @param subject {string}
-     * @param image {string}
-     * @param url {string}
-     * @returns {Promise}
-     */
-    SocialSharing.shareVia = function (appName, message, subject, image, url) { return; };
     __decorate([
-        plugin_1.Cordova()
+        plugin_1.Cordova({
+            sync: true
+        })
     ], SocialSharing, "share", null);
     __decorate([
         plugin_1.Cordova({
@@ -96904,29 +91993,22 @@ var SocialSharing = (function () {
     ], SocialSharing, "shareWithOptions", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 5,
-            errorIndex: 6,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "canShareVia", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 3,
-            errorIndex: 4,
+            sync: true,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "shareViaTwitter", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 3,
-            errorIndex: 4,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "shareViaFacebook", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 4,
-            errorIndex: 5,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "shareViaFacebookWithPasteMessageHint", null);
@@ -96937,15 +92019,11 @@ var SocialSharing = (function () {
     ], SocialSharing, "shareViaInstagram", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 3,
-            errorIndex: 4,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "shareViaWhatsApp", null);
     __decorate([
         plugin_1.Cordova({
-            successIndex: 4,
-            errorIndex: 5,
             platforms: ['iOS', 'Android']
         })
     ], SocialSharing, "shareViaWhatsAppToReceiver", null);
@@ -96958,25 +92036,11 @@ var SocialSharing = (function () {
         plugin_1.Cordova({
             platforms: ['iOS', 'Android']
         })
-    ], SocialSharing, "canShareViaEmail", null);
-    __decorate([
-        plugin_1.Cordova({
-            platforms: ['iOS', 'Android'],
-            successIndex: 6,
-            errorIndex: 7
-        })
     ], SocialSharing, "shareViaEmail", null);
-    __decorate([
-        plugin_1.Cordova({
-            successIndex: 5,
-            errorIndex: 6,
-            platforms: ['iOS', 'Android']
-        })
-    ], SocialSharing, "shareVia", null);
     SocialSharing = __decorate([
         plugin_1.Plugin({
             plugin: 'cordova-plugin-x-socialsharing',
-            pluginRef: 'plugins.socialsharing',
+            pluginRef: 'window.plugins.socialsharing',
             repo: 'https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin',
             platforms: ['iOS', 'Android', 'Windows Phone']
         })
@@ -96985,7 +92049,7 @@ var SocialSharing = (function () {
 }());
 exports.SocialSharing = SocialSharing;
 
-},{"./plugin":581}],593:[function(require,module,exports){
+},{"./plugin":546}],553:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -96998,8 +92062,9 @@ var plugin_1 = require('./plugin');
  * @name Spinner Dialog
  * @description
  * @usage
- * ```typescript
- * import { SpinnerDialog } from 'ionic-native';
+ * ```js
+ * import {SpinnerDialog} from 'ionic-native';
+ *
  *
  *
  * SpinnerDialog.show();
@@ -97014,7 +92079,7 @@ var SpinnerDialog = (function () {
      * Shows the spinner dialog
      * @param title {string} Spinner title (shows on Android only)
      * @param message {string} Spinner message
-     * @param cancelCallback {boolean|function} Set to true to set spinner not cancelable. Or provide a function to call when the user cancels the spinner.
+     * @param cancelCallback {boolean|function} Set to false to set spinner not cancelable. Or provide a function to call when the user cancels the spinner.
      * @param iOSOptions {object} Options for iOS only
      */
     SpinnerDialog.show = function (title, message, cancelCallback, iOSOptions) { };
@@ -97044,7 +92109,7 @@ var SpinnerDialog = (function () {
 }());
 exports.SpinnerDialog = SpinnerDialog;
 
-},{"./plugin":581}],594:[function(require,module,exports){
+},{"./plugin":546}],554:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97057,8 +92122,9 @@ var plugin_1 = require('./plugin');
  * @name Splashscreen
  * @description This plugin displays and hides a splash screen during application launch. The methods below allows showing and hiding the splashscreen after the app has loaded.
  * @usage
- * ```typescript
- * import { Splashscreen } from 'ionic-native';
+ * ```ts
+ * import {Splashscreen} from 'ionic-native';
+ *
  *
  *
  * Splashscreen.show();
@@ -97098,7 +92164,7 @@ var Splashscreen = (function () {
 }());
 exports.Splashscreen = Splashscreen;
 
-},{"./plugin":581}],595:[function(require,module,exports){
+},{"./plugin":546}],555:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97115,21 +92181,21 @@ var plugin_1 = require('./plugin');
  *
  * @usage
  *
- * ```typescript
+ * ```ts
  * import { SQLite } from 'ionic-native';
  *
  * let db = new SQLite();
- * db.openDatabase({
+ * db.openDatabse({
  *   name: 'data.db',
  *   location: 'default' // the location field is required
  * }).then(() => {
  *   db.executeSql('create table danceMoves(name VARCHAR(32))', {}).then(() => {
  *
  *   }, (err) => {
- *     console.error('Unable to execute sql: ', err);
- *   });
+ *     console.error('Unable to execute sql', err);
+ *   })
  * }, (err) => {
- *   console.error('Unable to open database: ', err);
+ *   console.error('Unable to open database', err);
  * });
  * ```
  *
@@ -97152,11 +92218,11 @@ var SQLite = (function () {
      * @param config the config for opening the database.
      * @usage
      *
-     * ```typescript
+     * ```ts
      * import { SQLite } from 'ionic-native';
      *
      * let db = new SQLite();
-     * db.openDatabase({
+     * db.openDatabse({
      *   name: 'data.db',
      *   location: 'default' // the location field is required
      * }).then(() => {
@@ -97194,7 +92260,7 @@ var SQLite = (function () {
      *
      * @usage
      *
-     * ```typescript
+     * ```ts
      * db.executeSql('SELECT FROM puppies WHERE type = ?', ['cavalier']).then((resultSet) => {
      *   // Access the items through resultSet.rows
      *   // resultSet.rows.item(i)
@@ -97202,7 +92268,7 @@ var SQLite = (function () {
      * ```
      */
     SQLite.prototype.executeSql = function (statement, params) { return; };
-    SQLite.prototype.addStatement = function (sql, values) { return; };
+    SQLite.prototype.addSatement = function (sql, values) { return; };
     SQLite.prototype.sqlBatch = function (sqlStatements) { return; };
     SQLite.prototype.abortallPendingTransactions = function () { };
     SQLite.prototype.handleStatementSuccess = function (handler, response) { };
@@ -97242,7 +92308,7 @@ var SQLite = (function () {
     ], SQLite.prototype, "executeSql", null);
     __decorate([
         plugin_1.CordovaInstance()
-    ], SQLite.prototype, "addStatement", null);
+    ], SQLite.prototype, "addSatement", null);
     __decorate([
         plugin_1.CordovaInstance()
     ], SQLite.prototype, "sqlBatch", null);
@@ -97298,7 +92364,7 @@ var SQLite = (function () {
 }());
 exports.SQLite = SQLite;
 
-},{"./plugin":581}],596:[function(require,module,exports){
+},{"./plugin":546}],556:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97315,11 +92381,12 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-statusbar`. For more info, please see the [StatusBar plugin docs](https://github.com/apache/cordova-plugin-statusbar).
  *
  * @usage
- * ```typescript
- * import { StatusBar } from 'ionic-native';
+ * ```ts
+ * import {StatusBar} from 'ionic-native';
  *
+ * ...
  *
- * StatusBar.overlaysWebView(true); // let status bar overlay webview
+ * StatuBar.overlaysWebView(true); // let status var overlay webview
  *
  * StatusBar.backgroundColorByHexString('#ffffff'); // set status bar to white
  * ```
@@ -97453,141 +92520,7 @@ var StatusBar = (function () {
 }());
 exports.StatusBar = StatusBar;
 
-},{"./plugin":581}],597:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name StreamingMedia
- * @description
- * This plugin allows you to stream audio and video in a fullscreen, native player on iOS and Android.
- *
- * @usage
- * ```
- * import {StreamingMedia, StreamingVideoOptions} from 'ionic-native';
- *
- * let options: StreamingVideoOptions = {
- *   successCallback: () => { console.log('Video played') },
- *   errorCallback: (e) => { console.log('Error streaming') },
- *   orientation: 'landscape'
- * };
- *
- * StreamingMedia.('https://path/to/video/stream', options);
- *
- * ```
- */
-var StreamingMedia = (function () {
-    function StreamingMedia() {
-    }
-    /**
-     * Streams a video
-     * @param videoUrl {string} The URL of the video
-     * @param options {StreamingVideoOptions} Options
-     */
-    StreamingMedia.playVideo = function (videoUrl, options) { };
-    /**
-     * Streams an audio
-     * @param audioUrl {string} The URL of the audio stream
-     * @param options {StreamingAudioOptions} Options
-     */
-    StreamingMedia.playAudio = function (audioUrl, options) { };
-    /**
-     * Stops streaming audio
-     */
-    StreamingMedia.stopAudio = function () { };
-    /**
-     * Pauses streaming audio
-     */
-    StreamingMedia.pauseAudio = function () { };
-    /**
-     * Resumes streaming audio
-     */
-    StreamingMedia.resumeAudio = function () { };
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], StreamingMedia, "playVideo", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], StreamingMedia, "playAudio", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], StreamingMedia, "stopAudio", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['iOS'] })
-    ], StreamingMedia, "pauseAudio", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true, platforms: ['iOS'] })
-    ], StreamingMedia, "resumeAudio", null);
-    StreamingMedia = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-streaming-media',
-            pluginRef: 'plugins.streamingMedia',
-            repo: 'https://github.com/nchutchind/cordova-plugin-streaming-media',
-            platforms: ['Android', 'iOS']
-        })
-    ], StreamingMedia);
-    return StreamingMedia;
-}());
-exports.StreamingMedia = StreamingMedia;
-
-},{"./plugin":581}],598:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name TextToSpeech
- * @description
- * Text to Speech plugin
- *
- * @usage
- * ```
- * import {TextToSpeech} from 'ionic-native';
- *
- * TextToSpeech.speak('Hello World')
- *   .then(() => console.log('Success'))
- *   .catch((reason: any) => console.log(reason));
- *
- * ```
- */
-var TextToSpeech = (function () {
-    function TextToSpeech() {
-    }
-    /**
-     * This function speaks
-     * @param options {string | TTSOptions} Text to speak or TTSOptions
-     * @return {Promise<any>} Returns a promise that resolves when the speaking finishes
-     */
-    TextToSpeech.speak = function (options) {
-        return;
-    };
-    __decorate([
-        plugin_1.Cordova({
-            successIndex: 1,
-            errorIndex: 2
-        })
-    ], TextToSpeech, "speak", null);
-    TextToSpeech = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-tts',
-            pluginRef: 'TTS',
-            repo: 'https://github.com/vilic/cordova-plugin-tts'
-        })
-    ], TextToSpeech);
-    return TextToSpeech;
-}());
-exports.TextToSpeech = TextToSpeech;
-
-},{"./plugin":581}],599:[function(require,module,exports){
+},{"./plugin":546}],557:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97604,11 +92537,12 @@ var plugin_1 = require('./plugin');
  * Requires Cordova plugin: `cordova-plugin-x-toast`. For more info, please see the [Toast plugin docs](https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin).
  *
  * @usage
- * ```typescript
- * import { Toast } from 'ionic-native';
+ * ```ts
+ * import {Toast} from 'ionic-native';
  *
  *
- * Toast.show("I'm a toast", '5000', 'center').subscribe(
+ *
+ * Toast.show("I'm a toast", "5000", "center").subscribe(
  *   toast => {
  *     console.log(toast);
  *   }
@@ -97737,7 +92671,7 @@ var Toast = (function () {
 }());
 exports.Toast = Toast;
 
-},{"./plugin":581}],600:[function(require,module,exports){
+},{"./plugin":546}],558:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97753,29 +92687,6 @@ var plugin_1 = require('./plugin');
  *
  * Requires Cordova plugin: `cordova-plugin-touch-id`. For more info, please see the [TouchID plugin docs](https://github.com/EddyVerbruggen/cordova-plugin-touch-id).
  *
- * @usage
- * ### Import Touch ID Plugin into Project
- * ```typescript
- * import { TouchID } from 'ionic-native';
- * ```
- * ### Check for Touch ID Availability
- * ```typescript
- * TouchID.isAvailable()
- *   .then(
- *     res => console.log('TouchID is available!'),
- *     err => console.error('TouchID is not available', err)
- *   );
- * ```
- * ### Invoke Touch ID w/ Custom Message
- *
- * ```typescript
- * TouchID.verifyFingerprint('Scan your fingerprint please')
- *   .then(
- *     res => console.log('Ok', res),
- *     err => console.error('Error', err)
- *   );
- * ```
- *
  * ### Error Codes
  *
  * The plugin will reject for various reasons. Your app will most likely need to respond to the cases differently.
@@ -97788,16 +92699,35 @@ var plugin_1 = require('./plugin');
  *  -  `-4` - The scan was cancelled by the system (Home button for example)
  *  -  `-6` - TouchID is not Available
  *  -  `-8` - TouchID is locked out from too many tries
+ * @usage
+ * ```js
+ * import {TouchID} from 'ionic-native';
+ *
+ * ...
+ *
+ * TouchID.isAvailable()
+ *   .then(
+ *     res => console.log("TouchID is available!"),
+ *     err => console.error("TouchID isn't available", err)
+ *   );
+ *
+ * TouchID.verifyFingerprint('Scan your fingerprint please')
+ *   .then(
+ *     res => console.log("Ok", res),
+ *     err => console.error("Error", err)
+ *   );
+ *
+ * ```
  */
 var TouchID = (function () {
     function TouchID() {
     }
     /**
-     * Checks Whether TouchID is available or not.
+     * Whether TouchID is available or not.
      *
      * @return {Promise} Returns a Promise that resolves if yes, rejects if no.
      */
-    TouchID.isAvailable = function () { return; };
+    TouchID.prototype.isAvailable = function () { return; };
     /**
      * Show TouchID dialog and wait for a fingerprint scan. If user taps 'Enter Password' button, brings up standard system passcode screen.
      *
@@ -97822,7 +92752,7 @@ var TouchID = (function () {
     TouchID.verifyFingerprintWithCustomPasswordFallbackAndEnterPasswordLabel = function (message, enterPasswordLabel) { return; };
     __decorate([
         plugin_1.Cordova()
-    ], TouchID, "isAvailable", null);
+    ], TouchID.prototype, "isAvailable", null);
     __decorate([
         plugin_1.Cordova()
     ], TouchID, "verifyFingerprint", null);
@@ -97844,80 +92774,7 @@ var TouchID = (function () {
 }());
 exports.TouchID = TouchID;
 
-},{"./plugin":581}],601:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Twitter Connect
- * @description
- * Plugin to use Twitter Single Sign On
- * Uses Twitter's Fabric SDK
- * ```typescript
- * import {TwitterConnect} from 'ionic-native';
- *
- * function onSuccess(response) {
- *   console.log(response);
- *
- *   // Will console log something like:
- *   // {
- *   //   userName: 'myuser',
- *   //   userId: '12358102',
- *   //   secret: 'tokenSecret'
- *   //   token: 'accessTokenHere'
- *   // }
- * }
- *
- * TwitterConnect.login().then(onSuccess, onError);
- *
- * TwitterConnect.logout().then(onLogoutSuccess, onLogoutError);
- * ```
- */
-var TwitterConnect = (function () {
-    function TwitterConnect() {
-    }
-    /**
-     * Logs in
-     * @return {Promise<TwitterConnectResponse>} returns a promise that resolves if logged in and rejects if failed to login
-     */
-    TwitterConnect.login = function () { return; };
-    /**
-     * Logs out
-     * @return {Promise<any>} returns a promise that resolves if logged out and rejects if failed to logout
-     */
-    TwitterConnect.logout = function () { return; };
-    /**
-     * Returns user's profile information
-     * @return {Promise<any>} returns a promise that resolves if user profile is successfully retrieved and rejects if request fails
-     */
-    TwitterConnect.showUser = function () { return; };
-    __decorate([
-        plugin_1.Cordova()
-    ], TwitterConnect, "login", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], TwitterConnect, "logout", null);
-    __decorate([
-        plugin_1.Cordova()
-    ], TwitterConnect, "showUser", null);
-    TwitterConnect = __decorate([
-        plugin_1.Plugin({
-            plugin: 'twitter-connect-plugin',
-            pluginRef: 'TwitterConnect',
-            repo: 'https://github.com/ManifestWebDesign/twitter-connect-plugin',
-            install: 'ionic plugin add twitter-connect-plugin --variable FABRIC_KEY=fabric_API_key'
-        })
-    ], TwitterConnect);
-    return TwitterConnect;
-}());
-exports.TwitterConnect = TwitterConnect;
-
-},{"./plugin":581}],602:[function(require,module,exports){
+},{"./plugin":546}],559:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -97930,12 +92787,12 @@ var plugin_1 = require('./plugin');
  * @name Vibration
  * @description Vibrates the device
  * @usage
- * ```typescript
- * import { Vibration } from 'ionic-native';
+ * ```ts
+ * import {Vibration} from 'ionic-native';
+ *
  *
  *
  * // Vibrate the device for a second
- * // Duration is ignored on iOS.
  * Vibration.vibrate(1000);
  *
  * // Vibrate 2 seconds
@@ -97974,166 +92831,7 @@ var Vibration = (function () {
 }());
 exports.Vibration = Vibration;
 
-},{"./plugin":581}],603:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name VideoEditor
- * @description Edit videos using native device APIs
- *
- * @usage
- * ```
- * import {VideoEditor} from 'ionic-native';
- *
- * VideoEditor.transcodeVideo({
- *   fileUri: '/path/to/input.mov',
- *   outputFileName: 'output.mp4',
- *   outputFileType: VideoEditor.OutputFileType.MPEG4
- * })
- * .then((fileUri: string) => console.log('video transcode success', fileUri))
- * .catch((error: any) => console.log('video transcode error', error));
- *
- * ```
- */
-var VideoEditor = (function () {
-    function VideoEditor() {
-    }
-    /**
-     * Transcode a video
-     * @param options {TranscodeOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path of the transcoded video
-     */
-    VideoEditor.transcodeVideo = function (options) { return; };
-    /**
-     * Trim a video
-     * @param options {TrimOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path of the trimmed video
-     */
-    VideoEditor.trim = function (options) { return; };
-    /**
-     * Create a JPEG thumbnail from a video
-     * @param options {CreateThumbnailOptions} Options
-     * @return {Promise<string>} Returns a promise that resolves to the path to the jpeg image on the device
-     */
-    VideoEditor.createThumbnail = function (options) { return; };
-    /**
-     * Get info on a video (width, height, orientation, duration, size, & bitrate)
-     * @param options {GetVideoInfoOptions} Options
-     * @return {Promise<VideoInfo>} Returns a promise that resolves to an object containing info on the video
-     */
-    VideoEditor.getVideoInfo = function (options) { return; };
-    VideoEditor.OptimizeForNetworkUse = {
-        NO: 0,
-        YES: 1
-    };
-    VideoEditor.OutputFileType = {
-        M4V: 0,
-        MPEG4: 1,
-        M4A: 2,
-        QUICK_TIME: 3
-    };
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "transcodeVideo", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse',
-            platforms: ['iOS']
-        })
-    ], VideoEditor, "trim", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "createThumbnail", null);
-    __decorate([
-        plugin_1.Cordova({
-            callbackOrder: 'reverse'
-        })
-    ], VideoEditor, "getVideoInfo", null);
-    VideoEditor = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-video-editor',
-            pluginRef: 'VideoEditor',
-            repo: 'https://github.com/jbavari/cordova-plugin-video-editor',
-            platforms: ['Android', 'iOS', 'Windows Phone 8']
-        })
-    ], VideoEditor);
-    return VideoEditor;
-}());
-exports.VideoEditor = VideoEditor;
-
-},{"./plugin":581}],604:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name VideoPlayer
- * @description
- * A Codova plugin that simply allows you to immediately play a video in fullscreen mode.
- *
- * Requires Cordova plugin: `com.moust.cordova.videoplayer`. For more info, please see the [VideoPlayer plugin docs](https://github.com/moust/cordova-plugin-videoplayer).
- *
- * @usage
- * ```typescript
- * import { VideoPlayer } from 'ionic-native';
- *
- *
- * // Playing a video.
- * VideoPlayer.play("file:///android_asset/www/movie.mp4").then(() => {
- *  console.log('video completed');
- * }).catch(err => {
- *  console.log(err);
- * });
- *
- * ```
- */
-var VideoPlayer = (function () {
-    function VideoPlayer() {
-    }
-    /**
-     * Plays the video from the passed url.
-     * @param fileUrl {string} File url to the video.
-     * @param options {VideoOptions?} Optional video playback settings. See options above.
-     * @returns {Promise<any>} Resolves promise when the video was played successfully.
-     */
-    VideoPlayer.play = function (fileUrl, options) { return; };
-    /**
-     * Stops the video playback immediatly.
-     */
-    VideoPlayer.close = function () { };
-    __decorate([
-        plugin_1.Cordova()
-    ], VideoPlayer, "play", null);
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], VideoPlayer, "close", null);
-    VideoPlayer = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-videoplayer',
-            pluginRef: 'VideoPlayer',
-            repo: 'https://github.com/moust/cordova-plugin-videoplayer',
-            platforms: ['Android']
-        })
-    ], VideoPlayer);
-    return VideoPlayer;
-}());
-exports.VideoPlayer = VideoPlayer;
-
-},{"./plugin":581}],605:[function(require,module,exports){
+},{"./plugin":546}],560:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -98147,13 +92845,6 @@ var plugin_1 = require('./plugin');
  * @description
  * @usage
  * For usage information please refer to the plugin's Github repo.
- *
- * ```typescript
- * import {WebIntent} from 'ionic-native';
- *
- * WebIntent.startActivity(options).then(onSuccess, onError);
- *
- * ```
  */
 var WebIntent = (function () {
     function WebIntent() {
@@ -98216,106 +92907,7 @@ var WebIntent = (function () {
 }());
 exports.WebIntent = WebIntent;
 
-},{"./plugin":581}],606:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name YoutubeVideoPlayer
- * @description
- * Plays YouTube videos in Native YouTube App
- *
- * @usage
- * ```
- * import {YoutubeVideoPlayer} from 'ionic-native';
- *
- * YouTubeVideoPlayer.openVideo('myvideoid');
- *
- * ```
- */
-var YoutubeVideoPlayer = (function () {
-    function YoutubeVideoPlayer() {
-    }
-    /**
-     * Plays a YouTube video
-     * @param videoId {string} Video ID
-     */
-    YoutubeVideoPlayer.openVideo = function (videoId) { };
-    __decorate([
-        plugin_1.Cordova({ sync: true })
-    ], YoutubeVideoPlayer, "openVideo", null);
-    YoutubeVideoPlayer = __decorate([
-        plugin_1.Plugin({
-            plugin: 'https://github.com/Glitchbone/CordovaYoutubeVideoPlayer.git',
-            pluginRef: 'YoutubeVideoPlayer',
-            repo: 'https://github.com/Glitchbone/CordovaYoutubeVideoPlayer',
-            platforms: ['Android', 'iOS']
-        })
-    ], YoutubeVideoPlayer);
-    return YoutubeVideoPlayer;
-}());
-exports.YoutubeVideoPlayer = YoutubeVideoPlayer;
-
-},{"./plugin":581}],607:[function(require,module,exports){
-"use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var plugin_1 = require('./plugin');
-/**
- * @name Zip
- * @description
- * A Cordova plugin to unzip files in Android and iOS.
- *
- * @usage
- * ```
- * import {Zip} from 'ionic-native';
- *
- * Zip.unzip('path/to/source.zip', 'path/to/dest', (progress) => console.log('Unzipping, ' + Math.round((progress.loaded / progress.total) * 100) + '%'))
- *  .then((result) => {
- *    if(result === 0) console.log('SUCCESS');
- *    if(result === -1) console.log('FAILED');
- *  });
- *
- * ```
- */
-var Zip = (function () {
-    function Zip() {
-    }
-    /**
-     * Extracts files from a ZIP archive
-     * @param sourceZip {string} Source ZIP file
-     * @param destUrl {string} Destination folder
-     * @param onProgress {Function} optional callback to be called on progress update
-     * @return  {Promise<number>} returns a promise that resolves with a number. 0 is success, -1 is error
-     */
-    Zip.unzip = function (sourceZip, destUrl, onProgress) { return; };
-    __decorate([
-        plugin_1.Cordova({
-            successIndex: 2,
-            errorIndex: 4
-        })
-    ], Zip, "unzip", null);
-    Zip = __decorate([
-        plugin_1.Plugin({
-            plugin: 'cordova-plugin-zip',
-            pluginRef: 'zip',
-            repo: 'https://github.com/MobileChromeApps/cordova-plugin-zip',
-        })
-    ], Zip);
-    return Zip;
-}());
-exports.Zip = Zip;
-
-},{"./plugin":581}],608:[function(require,module,exports){
+},{"./plugin":546}],561:[function(require,module,exports){
 "use strict";
 function get(obj, path) {
     for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
@@ -98329,7 +92921,7 @@ function get(obj, path) {
 exports.get = get;
 ;
 
-},{}],609:[function(require,module,exports){
+},{}],562:[function(require,module,exports){
 "use strict";
 var root_1 = require('./util/root');
 var observable_1 = require('./symbol/observable');
@@ -98465,7 +93057,7 @@ var Observable = (function () {
 }());
 exports.Observable = Observable;
 
-},{"./symbol/observable":617,"./util/root":625,"./util/toSubscriber":627}],610:[function(require,module,exports){
+},{"./symbol/observable":570,"./util/root":578,"./util/toSubscriber":580}],563:[function(require,module,exports){
 "use strict";
 exports.empty = {
     isUnsubscribed: true,
@@ -98474,7 +93066,7 @@ exports.empty = {
     complete: function () { }
 };
 
-},{}],611:[function(require,module,exports){
+},{}],564:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -98681,7 +93273,7 @@ var SubjectObservable = (function (_super) {
     return SubjectObservable;
 }(Observable_1.Observable));
 
-},{"./Observable":609,"./SubjectSubscription":612,"./Subscriber":613,"./Subscription":614,"./symbol/rxSubscriber":618,"./util/ObjectUnsubscribedError":619,"./util/throwError":626}],612:[function(require,module,exports){
+},{"./Observable":562,"./SubjectSubscription":565,"./Subscriber":566,"./Subscription":567,"./symbol/rxSubscriber":571,"./util/ObjectUnsubscribedError":572,"./util/throwError":579}],565:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -98722,7 +93314,7 @@ var SubjectSubscription = (function (_super) {
 }(Subscription_1.Subscription));
 exports.SubjectSubscription = SubjectSubscription;
 
-},{"./Subscription":614}],613:[function(require,module,exports){
+},{"./Subscription":567}],566:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -98974,7 +93566,7 @@ var SafeSubscriber = (function (_super) {
     return SafeSubscriber;
 }(Subscriber));
 
-},{"./Observer":610,"./Subscription":614,"./symbol/rxSubscriber":618,"./util/isFunction":623}],614:[function(require,module,exports){
+},{"./Observer":563,"./Subscription":567,"./symbol/rxSubscriber":571,"./util/isFunction":576}],567:[function(require,module,exports){
 "use strict";
 var isArray_1 = require('./util/isArray');
 var isObject_1 = require('./util/isObject');
@@ -99125,7 +93717,7 @@ var Subscription = (function () {
 }());
 exports.Subscription = Subscription;
 
-},{"./util/UnsubscriptionError":620,"./util/errorObject":621,"./util/isArray":622,"./util/isFunction":623,"./util/isObject":624,"./util/tryCatch":628}],615:[function(require,module,exports){
+},{"./util/UnsubscriptionError":573,"./util/errorObject":574,"./util/isArray":575,"./util/isFunction":576,"./util/isObject":577,"./util/tryCatch":581}],568:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -99231,7 +93823,7 @@ function dispatchError(arg) {
     }
 }
 
-},{"../Observable":609,"../util/root":625}],616:[function(require,module,exports){
+},{"../Observable":562,"../util/root":578}],569:[function(require,module,exports){
 "use strict";
 var root_1 = require('../util/root');
 /**
@@ -99260,7 +93852,7 @@ function toPromise(PromiseCtor) {
 }
 exports.toPromise = toPromise;
 
-},{"../util/root":625}],617:[function(require,module,exports){
+},{"../util/root":578}],570:[function(require,module,exports){
 "use strict";
 var root_1 = require('../util/root');
 var Symbol = root_1.root.Symbol;
@@ -99282,14 +93874,14 @@ else {
     exports.$$observable = '@@observable';
 }
 
-},{"../util/root":625}],618:[function(require,module,exports){
+},{"../util/root":578}],571:[function(require,module,exports){
 "use strict";
 var root_1 = require('../util/root');
 var Symbol = root_1.root.Symbol;
 exports.$$rxSubscriber = (typeof Symbol === 'function' && typeof Symbol.for === 'function') ?
     Symbol.for('rxSubscriber') : '@@rxSubscriber';
 
-},{"../util/root":625}],619:[function(require,module,exports){
+},{"../util/root":578}],572:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -99315,7 +93907,7 @@ var ObjectUnsubscribedError = (function (_super) {
 }(Error));
 exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
 
-},{}],620:[function(require,module,exports){
+},{}],573:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -99338,30 +93930,30 @@ var UnsubscriptionError = (function (_super) {
 }(Error));
 exports.UnsubscriptionError = UnsubscriptionError;
 
-},{}],621:[function(require,module,exports){
+},{}],574:[function(require,module,exports){
 "use strict";
 // typeof any so that it we don't have to cast when comparing a result to the error object
 exports.errorObject = { e: {} };
 
-},{}],622:[function(require,module,exports){
+},{}],575:[function(require,module,exports){
 "use strict";
 exports.isArray = Array.isArray || (function (x) { return x && typeof x.length === 'number'; });
 
-},{}],623:[function(require,module,exports){
+},{}],576:[function(require,module,exports){
 "use strict";
 function isFunction(x) {
     return typeof x === 'function';
 }
 exports.isFunction = isFunction;
 
-},{}],624:[function(require,module,exports){
+},{}],577:[function(require,module,exports){
 "use strict";
 function isObject(x) {
     return x != null && typeof x === 'object';
 }
 exports.isObject = isObject;
 
-},{}],625:[function(require,module,exports){
+},{}],578:[function(require,module,exports){
 (function (global){
 "use strict";
 var objectTypes = {
@@ -99383,12 +93975,12 @@ if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === fre
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],626:[function(require,module,exports){
+},{}],579:[function(require,module,exports){
 "use strict";
 function throwError(e) { throw e; }
 exports.throwError = throwError;
 
-},{}],627:[function(require,module,exports){
+},{}],580:[function(require,module,exports){
 "use strict";
 var Subscriber_1 = require('../Subscriber');
 var rxSubscriber_1 = require('../symbol/rxSubscriber');
@@ -99405,7 +93997,7 @@ function toSubscriber(nextOrObserver, error, complete) {
 }
 exports.toSubscriber = toSubscriber;
 
-},{"../Subscriber":613,"../symbol/rxSubscriber":618}],628:[function(require,module,exports){
+},{"../Subscriber":566,"../symbol/rxSubscriber":571}],581:[function(require,module,exports){
 "use strict";
 var errorObject_1 = require('./errorObject');
 var tryCatchTarget;
@@ -99425,9 +94017,9 @@ function tryCatch(fn) {
 exports.tryCatch = tryCatch;
 ;
 
-},{"./errorObject":621}],629:[function(require,module,exports){
+},{"./errorObject":574}],582:[function(require,module,exports){
 
-},{}]},{},[1,629])
+},{}]},{},[1,582])
 
 
 //# sourceMappingURL=app.bundle.js.map
